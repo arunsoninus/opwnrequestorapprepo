@@ -3,13 +3,6 @@
   "authenticationMethod": "route",
   "routes": [
     {
-      "source": "^<apply-service-segment-path>/(.*)$",
-      "target": "<apply-service-segment-path>/$1",
-      "destination": "nusbtpcwsned",
-      "authenticationType": "xsuaa",
-      "csrfProtection": false
-    },
-    {
       "source": "^/resources/(.*)$",
       "target": "/resources/$1",
       "authenticationType": "none",
@@ -20,6 +13,21 @@
       "target": "/test-resources/$1",
       "authenticationType": "none",
       "destination": "ui5"
+    },
+     {
+      "source": "^/v2/catalog/(.*)$",
+      "destination": "nusbtputil",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/v2/util/(.*)$",
+      "destination": "nusbtputil",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/odata/v2/cwned/(.*)$",
+      "destination": "nusbtpcwsned",
+      "csrfProtection": false
     },
     {
       "source": "^(.*)$",

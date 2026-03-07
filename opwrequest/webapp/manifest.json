@@ -15,6 +15,39 @@
       "version": "1.20.4",
       "toolsId": "a23abf46-6e43-4db2-9127-92dd5d298ce9"
     },
+    "dataSources": {
+      "utilService": {
+        "uri": "/v2/util",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/util_metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "catalogService": {
+        "uri": "/v2/catalog/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/catalog.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "cwRunReportService": {
+        "uri": "/odata/v2/cwned/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/catalog.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "local_data_alias": {
+        "uri": "enums/localdata.json",
+        "type": "JSON"
+      }
+    },
     "crossNavigation": {
       "inbounds": {
         "opwrequest-Display": {
@@ -65,6 +98,37 @@
         "settings": {
           "bundleName": "nus.edu.sg.opwrequest.i18n.i18n"
         }
+      },
+      "CatalogSrvModel": {
+        "dataSource": "catalogService",
+        "preload": true,
+        "settings": {
+          "useBatch": false,
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "UtilitySrvModel": {
+        "dataSource": "utilService",
+        "preload": true,
+        "settings": {
+          "useBatch": false,
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "CWRunReportSrvModel": {
+        "dataSource": "cwRunReportService",
+        "preload": true,
+        "settings": {
+          "useBatch": false,
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "synchronizationMode": "None",
+          "earlyRequests": true
+        }
       }
     },
     "resources": {
@@ -84,21 +148,60 @@
         "viewType": "XML",
         "path": "nus.edu.sg.opwrequest.view",
         "async": true,
-        "viewPath": "nus.edu.sg.opwrequest.view"
+        "transition": "slide",
+        "viewPath": "nus.edu.sg.opwrequest.view",
+        "controlId": "opwFlexibleColumnLayout"
       },
       "routes": [
         {
-          "name": "RouteApp",
-          "pattern": ":?query:",
+          "pattern": ":layout:",
+          "name": "master",
           "target": [
-            "TargetApp"
+            "master",
+            "detail"
+          ]
+        },
+        {
+          "pattern": "detail/{project}/{layout}",
+          "name": "detail",
+          "target": [
+            "master",
+            "detail"
+          ]
+        },
+        {
+          "pattern": "taskdetail/{project}/{taskId}/{taskName}/{layout}",
+          "name": "taskdetail",
+          "target": [
+            "master",
+            "detail"
+          ]
+        },
+        {
+          "pattern": "displaydetail/{project}/{layout}",
+          "name": "displaydetail",
+          "target": [
+            "master",
+            "detail"
+          ]
+        },
+        {
+          "pattern": "displayofn/{project}/{layout}",
+          "name": "displayofn",
+          "target": [
+            "master",
+            "detail"
           ]
         }
       ],
       "targets": {
-        "TargetApp": {
-          "id": "App",
-          "name": "App"
+        "master": {
+          "name": "OpwRequestHistory",
+          "controlAggregation": "beginColumnPages"
+        },
+        "detail": {
+          "name": "OpwDetailView",
+          "controlAggregation": "midColumnPages"
         }
       }
     },
