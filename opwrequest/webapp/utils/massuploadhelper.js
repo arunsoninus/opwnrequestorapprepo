@@ -1,18 +1,11 @@
 sap.ui.define([
 	"sap/m/MessageBox",
-	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
-	"sap/ui/model/FilterType",
-	"sap/ui/core/Fragment",
-	"sap/ui/model/Sorter",
-	"sap/ui/model/json/JSONModel",
 	"./services",
 	"./utility",
 	"./configuration",
 	"./dataformatter",
 	'sap/ui/export/library',
-], function (MessageBox, Filter, FilterOperator, FilterType, Fragment, Sorter, JSONModel, Services, Utility, Config, Formatter,
-	exportLibrary) {
+], function (MessageBox, Services, Utility, Config, Formatter,exportLibrary) {
 	"use strict";
 	var EdmType = exportLibrary.EdmType;
 

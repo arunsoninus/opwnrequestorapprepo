@@ -1,8 +1,7 @@
 sap.ui.define([
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/Device",
 	"./configuration", "./dataformatter","./headerHelper"
-], function (JSONModel, Device, Config, Formatter,HeaderHelper) {
+], function (JSONModel, Config, Formatter,HeaderHelper) {
 	"use strict";
 
 	return {

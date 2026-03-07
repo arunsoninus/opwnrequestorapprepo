@@ -1,5 +1,5 @@
-sap.ui.define(["sap/ui/core/ValueState"],
-	function (ValueState) {
+sap.ui.define([],
+	function () {
 		return {
 
 			attachmentIconSet: function (sType) {

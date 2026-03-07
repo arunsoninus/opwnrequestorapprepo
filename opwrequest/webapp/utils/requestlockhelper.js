@@ -1,15 +1,10 @@
 sap.ui.define([
 	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
-	"sap/ui/model/FilterType",
-	"sap/ui/core/Fragment",
-	"sap/ui/model/Sorter",
-	"sap/ui/model/json/JSONModel",
 	"./services",
 	"./utility",
 	"./configuration",
 	"./dataformatter"
-], function (Filter, FilterOperator, FilterType, Fragment, Sorter, JSONModel, Services, Utility, Config, Formatter) {
+], function (Filter, Services, Utility, Config, Formatter) {
 	"use strict";
 	var requestlockhelper = ("nus.edu.sg.opwrequest.utils.requestlockhelper", {
 		_settingClaimTypeValue: function (component) {

@@ -1,8 +1,6 @@
 sap.ui.define([
-	"sap/ui/model/json/JSONModel",
-	"sap/ui/Device",
-	"./configuration"
-], function (JSONModel, Device, Config) {
+	"sap/ui/Device"
+], function (Device) {
 	"use strict";
 
 	return {

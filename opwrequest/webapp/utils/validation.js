@@ -1,8 +1,7 @@
 sap.ui.define([
-		"./services",
 		"./configuration", "./dataformatter",
 		"./utility", "sap/ui/core/ValueState"
-	], function (Services, Config, Formatter, Utility, ValueState) {
+	], function (Config, Formatter, Utility, ValueState) {
 		"use strict";
 		var validation = ("nus.edu.sg.opwrequest.utils.validation", {
 
