@@ -5,15 +5,13 @@ sap.ui.define([
 	"../utils/appconstant",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/model/FilterType",
 	"../utils/utility",
 	"../utils/configuration",
 	"../utils/requestlockhelper",
 	"../utils/validation",
-	"sap/ui/core/routing/History", "sap/ui/core/ValueState"
+	"sap/ui/core/ValueState"
 ], function (BaseController, ExtendedValueHelp, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Services,
-	AppConstant, Filter, FilterOperator, FilterType, Utility, Config, RequestLockHelper, Validation,
-	History, ValueState) {
+	AppConstant, Filter, FilterOperator, Utility, Config, RequestLockHelper, Validation, ValueState) {
 	"use strict";
 
 	return BaseController.extend("nus.edu.sg.opwrequest.controller.OpwDetailView", {
@@ -270,13 +268,13 @@ sap.ui.define([
 					if (oData.results.length > 0) {
 						this.AppModel.setProperty("/cwsRequest/Program_Manager", oData.results);
 						var oProgramManagerItem = {
-								"STAFF_FULL_NAME": oData.results[0].STAFF_FULL_NAME,
-								"STAFF_ID": oData.results[0].STAFF_ID,
-								"ULU": "",
-								"FDLU": "",
-								"NUSNET_ID": oData.results[0].NUSNET_ID,
-								"PPNT_ID": this.AppModel.getProperty("/cwsRequest/Program_Manager")[0].PPNT_ID
-							},
+							"STAFF_FULL_NAME": oData.results[0].STAFF_FULL_NAME,
+							"STAFF_ID": oData.results[0].STAFF_ID,
+							"ULU": "",
+							"FDLU": "",
+							"NUSNET_ID": oData.results[0].NUSNET_ID,
+							"PPNT_ID": this.AppModel.getProperty("/cwsRequest/Program_Manager")[0].PPNT_ID
+						},
 							aProgramManagers = [];
 						aProgramManagers.push(oProgramManagerItem);
 						this.AppModel.setProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR", aProgramManagers);
@@ -698,7 +696,7 @@ sap.ui.define([
 				success: function (oData) {
 					this.setCwsRequestData(oData);
 				}.bind(this),
-				error: function (oError) {}
+				error: function (oError) { }
 			});
 
 		},
@@ -734,7 +732,7 @@ sap.ui.define([
 			this.initializeModel(this._project, true);
 
 			if (this.AppModel.getProperty("/cwsRequest/createCWSRequest/wbsList").length === 0 && (requestData.STATUS_CODE === "31" ||
-					requestData.STATUS_CODE === "46")) {
+				requestData.STATUS_CODE === "46")) {
 				this.onAddWbsElement();
 			} else if (this.AppModel.getProperty("/cwsRequest/createCWSRequest/wbsList").length > 0) {
 				var oData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/wbsList");
@@ -871,7 +869,7 @@ sap.ui.define([
 				success: function (oData) {
 					fnCallBack(oData);
 				}.bind(this),
-				error: function (oError) {}
+				error: function (oError) { }
 			});
 		},
 		_getInstData: function (oData, oRequestData) {
@@ -994,7 +992,7 @@ sap.ui.define([
 				this.AppModel.setProperty("/exitFullScreen", false);
 
 				if ((requestData.SUBMITTED_BY === this.AppModel.getProperty("/loggedInUserStfNumber")) || (requestData.STAFF_ID === this.AppModel
-						.getProperty("/loggedInUserStfNumber"))) {
+					.getProperty("/loggedInUserStfNumber"))) {
 					this.AppModel.setProperty("/showRejectButton", false);
 					this.AppModel.setProperty("/showApproveButton", false);
 					this.AppModel.setProperty("/showEditButton", false);
@@ -1011,7 +1009,7 @@ sap.ui.define([
 			if (this.viaRequestorForm) {
 				if (this.AppModel.getProperty("/showValidMessage") === false) {
 					if (requestData.REQUEST_STATUS === "38" && requestData.SUBMITTED_BY === this.AppModel.getProperty(
-							"/loggedInUserStfNumber")) { // Approvedrequest
+						"/loggedInUserStfNumber")) { // Approvedrequest
 						this.AppModel.setProperty("/showEditButtonApproved", true);
 						this.AppModel.setProperty("/showWithdrawButton", true);
 					}
@@ -1021,9 +1019,9 @@ sap.ui.define([
 						this.AppModel.setProperty("/showDeleteButton", true);
 					}
 					if (requestData.STATUS_ALIAS !== "Draft" && requestData.SUBMISSION_TYPE !== 'U' && (requestData.REQUEST_STATUS === "41" ||
-							requestData.REQUEST_STATUS === "44" ||
-							requestData.REQUEST_STATUS === "45" ||
-							requestData.REQUEST_STATUS === "46")) { //Submission type added for Release 2 
+						requestData.REQUEST_STATUS === "44" ||
+						requestData.REQUEST_STATUS === "45" ||
+						requestData.REQUEST_STATUS === "46")) { //Submission type added for Release 2 
 						this.AppModel.setProperty("/showEditButton", true);
 						// this.AppModel.setProperty("/oEditKey", "A");
 						// this.ocwsRequest = $.extend(true, {}, this.AppModel.getProperty("/cwsRequest/createCWSRequest"));
@@ -1037,7 +1035,7 @@ sap.ui.define([
 						this.AppModel.setProperty("/showRetractButton", true);
 					}
 					if ((oRole === "CW_PROGRAM_ADMIN" && requestData.REQUEST_STATUS === "38" && requestData.ULU === this.AppModel.getProperty(
-							"/primaryAssigment/ULU_C") && requestData.FDLU === this.AppModel.getProperty("/primaryAssigment/FDLU_C")) || (isDeptOhrss &&
+						"/primaryAssigment/ULU_C") && requestData.FDLU === this.AppModel.getProperty("/primaryAssigment/FDLU_C")) || (isDeptOhrss &&
 							requestData.REQUEST_STATUS === "38")) {
 						this.AppModel.setProperty("/showEditButtonApproved", true);
 						this.AppModel.setProperty("/showWithdrawButton", true);
@@ -1064,7 +1062,7 @@ sap.ui.define([
 				}
 
 				if ((requestData.REQUEST_STATUS === '' || requestData.REQUEST_STATUS === '31' || requestData.REQUEST_STATUS ===
-						'44' || requestData.REQUEST_STATUS === '45' || requestData.REQUEST_STATUS === '46') && (oRole === "CW_PROGRAM_ADMIN")) {
+					'44' || requestData.REQUEST_STATUS === '45' || requestData.REQUEST_STATUS === '46') && (oRole === "CW_PROGRAM_ADMIN")) {
 					this.AppModel.setProperty("/isFormEditable", true);
 					this.AppModel.setProperty("/showSaveButton", true);
 					this.AppModel.setProperty("/showSubmitButton", true);
@@ -1102,7 +1100,7 @@ sap.ui.define([
 					for (let i = 0; i < oData.length; i++) {
 						var request = oData[i];
 						if (!(request.requestStatusCode === "38" || request.requestStatusCode === "49" || request.requestStatusCode === "35" || request.requestStatusCode ===
-								"36" || request.requestStatusCode === "37" || request.requestStatusCode === "41")) {
+							"36" || request.requestStatusCode === "37" || request.requestStatusCode === "41")) {
 							sValid = true;
 						}
 					}
@@ -1128,7 +1126,7 @@ sap.ui.define([
 			if (concurrentStaffId) {
 				sfilters = new Filter({
 					filters: [new Filter("STF_NUMBER", FilterOperator.EQ, nusNetId),
-						new Filter("SF_STF_NUMBER", FilterOperator.EQ, concurrentStaffId)
+					new Filter("SF_STF_NUMBER", FilterOperator.EQ, concurrentStaffId)
 					],
 					and: true
 				});
@@ -1724,7 +1722,7 @@ sap.ui.define([
 				utilizationList.push({
 					"year": durationElement.YEAR,
 					"days": durationElement.DURATION
-						// "days": parseInt(durationElement.DURATION).toString()
+					// "days": parseInt(durationElement.DURATION).toString()
 				})
 			}.bind(this));
 			var oDeptRole = this.AppModel.getProperty("/isDeptOHRSS");
@@ -1741,7 +1739,7 @@ sap.ui.define([
 			};
 
 			if (this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_TYPE") || this.AppModel.getProperty(
-					"/cwsRequest/createCWSRequest/SUB_TYPE")) {
+				"/cwsRequest/createCWSRequest/SUB_TYPE")) {
 				var sUrl = Config.dbOperations.utilizationDays;
 				var oHeaders = Formatter._amendHeaderToken(this);
 				var utilizationModel = new JSONModel();
@@ -1966,9 +1964,9 @@ sap.ui.define([
 			}
 
 			if ((this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS") === "41" || this.AppModel.getProperty(
-						"/cwsRequest/createCWSRequest/REQUEST_STATUS") === "45" || this.AppModel.getProperty(
-						"/cwsRequest/createCWSRequest/REQUEST_STATUS") === "46" ||
-					this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS") === "44")) {
+				"/cwsRequest/createCWSRequest/REQUEST_STATUS") === "45" || this.AppModel.getProperty(
+					"/cwsRequest/createCWSRequest/REQUEST_STATUS") === "46" ||
+				this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS") === "44")) {
 				this.AppModel.setProperty("/showRejectButton", false);
 				this.AppModel.setProperty("/showApproveButton", false);
 			}
@@ -2138,7 +2136,7 @@ sap.ui.define([
 			var oPaidAmount = this.AppModel.getProperty("/cwsRequest/createCWSRequest/PAID_AMOUNT");
 
 			var isDeptOhrss = this.AppModel.getProperty("/isDeptOHRSS");
-			if ((oPaidAmount > 0) && !isDeptOhrss /*&& (oRequestAmount !== oPaidAmount)*/ ) {
+			if ((oPaidAmount > 0) && !isDeptOhrss /*&& (oRequestAmount !== oPaidAmount)*/) {
 				MessageBox.error(this.getI18n("CwsRequest.inValidAmount"));
 				return;
 			}
@@ -2281,7 +2279,7 @@ sap.ui.define([
 		persistentOperationCalled: function (cwsRequest) {
 			var oHeaders = Formatter._amendHeaderToken(this);
 			cwsRequest = Formatter.parseObjectData(cwsRequest);
-			delete(cwsRequest.Photo);
+			delete (cwsRequest.Photo);
 			var that = this;
 			//Handle for Save and Submission
 			Services.persistCwsRequest(this, oHeaders, cwsRequest, function (response) {
@@ -2439,7 +2437,7 @@ sap.ui.define([
 						this.AppModel.setProperty("/cwsRequest/createCWSRequest/REMARKS", oData.results);
 					}
 				}.bind(this),
-				error: function (oError) {}
+				error: function (oError) { }
 			});
 		},
 		onAcknowledgedSubmit: function () {
@@ -2923,7 +2921,7 @@ sap.ui.define([
 			MessageBox.confirm("Do you want to save before exiting?", {
 				title: "Confirmation",
 				actions: [sap.m.MessageBox.Action.YES,
-					sap.m.MessageBox.Action.NO
+				sap.m.MessageBox.Action.NO
 				],
 				emphasizedAction: sap.m.MessageBox.Action.OK,
 				onClose: function (oAction) {
@@ -3181,7 +3179,7 @@ sap.ui.define([
 				var oCont = Services.fetchUserImageAsync(this, this.AppModel.getProperty("/loggedInUserStfNumber"));
 				this.AppModel.setProperty("/oImageRemark", "data:image/png;base64," + oCont[0].photo);
 				if (this.AppModel.getProperty("/cwsRequest/createCWSRequest/REMARKS") && this.AppModel.getProperty(
-						"/cwsRequest/createCWSRequest/REMARKS").length > 0) {
+					"/cwsRequest/createCWSRequest/REMARKS").length > 0) {
 					$.each(this.AppModel.getProperty("/cwsRequest/createCWSRequest/REMARKS"), function (idx, obj) {
 						if (!obj.staffPhoto) {
 							var oCont = Services.fetchUserImageAsync(this, obj.STAFF_ID);
@@ -3193,13 +3191,13 @@ sap.ui.define([
 
 			}
 			if (this.AppModel.getProperty("/cwsRequest/createCWSRequest/REMARKS") && this.AppModel.getProperty(
-					"/cwsRequest/createCWSRequest/REMARKS").length > 0) {
+				"/cwsRequest/createCWSRequest/REMARKS").length > 0) {
 				var oDate = this.AppModel.getProperty("/cwsRequest/createCWSRequest/MODIFIED_ON");
 				var oStatus = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS")
 				$.each(this.AppModel.getProperty("/cwsRequest/createCWSRequest/REMARKS"), function (idx, obj) {
 
 					if ((new Date(obj.REMARKS_UPDATE_ON) > new Date(oDate)) || (oStatus === "31" || oStatus === "44" || oStatus === "45" ||
-							oStatus === "46")) {
+						oStatus === "46")) {
 						obj.oVisible = true;
 					} else {
 						obj.oVisible = false;
@@ -3251,7 +3249,7 @@ sap.ui.define([
 								obj.WBS = (oWBS[i].EvActwbs) ? oWBS[i].EvActwbs : oWBS[i].EvWbs;
 								obj.WBS_Desc = oWBS[i].EvWbsdesc;
 							}
-						} catch (e) {}
+						} catch (e) { }
 					});
 				}
 			} else {
@@ -3298,7 +3296,7 @@ sap.ui.define([
 				this.AppModel.setProperty(sPath + "/valueStateWbs", "None");
 				this.AppModel.setProperty(sPath + "/valueStateTextWbs", "");
 				if (!oWBSData.EtOutput || (oWBSData.EtOutput && oWBSData.EtOutput.item &&
-						oWBSData.EtOutput.item.EvStatus === 'E') || oWBSkey) {
+					oWBSData.EtOutput.item.EvStatus === 'E') || oWBSkey) {
 					var keymsg = !oWBSData.EtOutput ? "Invalid WBS: " + sWBS : wbsValidateModel.getData().EtOutput.item.EvMsg;
 					var modifiedMessage = keymsg.replace(/\bexists\b/g, "exist");
 					var oMsg = oWBSkey ? "Entry already exist" : modifiedMessage;

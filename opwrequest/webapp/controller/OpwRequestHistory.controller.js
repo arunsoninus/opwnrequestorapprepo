@@ -8,11 +8,9 @@ sap.ui.define([
 	"sap/m/MessageBox",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/model/FilterType",
 	"sap/ui/model/Sorter",
 	"../utils/services",
 	"../utils/appconstant",
-	"../model/models",
 	"../utils/validation",
 	"sap/ui/export/library",
 	"sap/ui/export/Spreadsheet",
@@ -21,7 +19,7 @@ sap.ui.define([
 	"../utils/massuploadhelper",
 	"../utils/processInstanceFlow"
 ], function (BaseController, ExtendedValueHelp, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
-	FilterOperator, FilterType, Sorter, Services, AppConstant, models, Validation, exportLibrary, Spreadsheet, Utility, Config,
+	FilterOperator, Sorter, Services, AppConstant, Validation, exportLibrary, Spreadsheet, Utility, Config,
 	MassUploadHelper, ProcessInstanceFlow) {
 	"use strict";
 	return BaseController.extend("nus.edu.sg.opwrequest.controller.OpwRequestHistory", {
@@ -70,26 +68,26 @@ sap.ui.define([
 		 */
 		_setDefaultIconTabFilter: function (sParam) {
 			switch (sParam) {
-			case "c":
-				this.AppModel.setProperty("/iconTabBarSelectedKey", "Post");
-				break;
-			case "p":
-				this.AppModel.setProperty("/iconTabBarSelectedKey", "Process");
-				break;
-			case "r":
-				this.AppModel.setProperty("/iconTabBarSelectedKey", "RejReq");
-				break;
-			case "d":
-				this.AppModel.setProperty("/iconTabBarSelectedKey", "Deleted");
-				break;
-			case "w":
-				this.AppModel.setProperty("/iconTabBarSelectedKey", "Withdrawn");
-				break;
-			case "cl":
-				this.AppModel.setProperty("/iconTabBarSelectedKey", "ClosedReq");
-				break;
-			default:
-				break;
+				case "c":
+					this.AppModel.setProperty("/iconTabBarSelectedKey", "Post");
+					break;
+				case "p":
+					this.AppModel.setProperty("/iconTabBarSelectedKey", "Process");
+					break;
+				case "r":
+					this.AppModel.setProperty("/iconTabBarSelectedKey", "RejReq");
+					break;
+				case "d":
+					this.AppModel.setProperty("/iconTabBarSelectedKey", "Deleted");
+					break;
+				case "w":
+					this.AppModel.setProperty("/iconTabBarSelectedKey", "Withdrawn");
+					break;
+				case "cl":
+					this.AppModel.setProperty("/iconTabBarSelectedKey", "ClosedReq");
+					break;
+				default:
+					break;
 			}
 		},
 		generateTokenForLoggedInUser: function () {
@@ -169,9 +167,9 @@ sap.ui.define([
 			// Begin of change - CW0084
 			var oViewModel = this.getView().getModel("ViewModel");
 			var oSorter = new Sorter({
-					path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "REQ_UNIQUE_ID",
-					descending: oViewModel.getProperty("/SortCwTable/sortDescending") !== "" ? oViewModel.getProperty("/SortCwTable/sortDescending") : true,
-				}),
+				path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "REQ_UNIQUE_ID",
+				descending: oViewModel.getProperty("/SortCwTable/sortDescending") !== "" ? oViewModel.getProperty("/SortCwTable/sortDescending") : true,
+			}),
 				oGroup,
 				aFilters = [];
 			if (oViewModel.getProperty("/GroupCwTable/groupKey") !== "") {
@@ -255,7 +253,7 @@ sap.ui.define([
 			this.AppModel.setProperty("/isTypeSelected", (type) ? true : false);
 			if (type) {
 				this.AppModel.setProperty("/InstructionMessage", (type === "EXT") ? this.getI18n("CwsRequest.Instruction1") + this.getI18n(
-						"CwsRequest.Instruction2") :
+					"CwsRequest.Instruction2") :
 					this.getI18n("CwsRequest.Instruction3") + this.getI18n("CwsRequest.Instruction4"));
 				this._fnRequestType();
 			}
@@ -596,7 +594,7 @@ sap.ui.define([
 				this.AppModel.setProperty("/isEditableType", false);
 			}
 			if (oCont.length === 1 && oCont[0].STAFF_USER_GRP === this.getI18n("CwsRequest.DepAdmin") && oCont[0].PROCESS_CODE === this.getI18n(
-					"CwsRequest.ProcessCode.201")) {
+				"CwsRequest.ProcessCode.201")) {
 				this.AppModel.setProperty("/isRequestType", true);
 			}
 			this.closeMessageStrip("cwsRequestDialogMStripId", "NewRequestTypeSelectionDialog");
@@ -675,13 +673,13 @@ sap.ui.define([
 							});
 							if (sEmpGrp !== this.getI18n("CwsRequest.EmployeeGroup")) {
 								var utcStartDate = new Date(Date.UTC(
-										startDate.getFullYear(),
-										startDate.getMonth(),
-										startDate.getDate(),
-										startDate.getHours(),
-										startDate.getMinutes(),
-										startDate.getSeconds()
-									)),
+									startDate.getFullYear(),
+									startDate.getMonth(),
+									startDate.getDate(),
+									startDate.getHours(),
+									startDate.getMinutes(),
+									startDate.getSeconds()
+								)),
 									utcEndDate = new Date(Date.UTC(
 										endDate.getFullYear(),
 										endDate.getMonth(),
@@ -939,7 +937,7 @@ sap.ui.define([
 						}
 					} catch (oError) {
 						MessageBox.error("Failed to upload request data.");
-					} finally {}
+					} finally { }
 				}.bind(component))
 				.fail(function (response) {
 					var parseResponse = JSON.parse(response.responseText);
@@ -1007,22 +1005,22 @@ sap.ui.define([
 			if (this.AppModel.getProperty("/oMassAttachmentID") && key === "S") {
 				MessageBox.warning(
 					"Do you want to cancel this mass request Submission? Please note that both request and attachment will also be deleted.", {
-						title: "Warning",
-						actions: [sap.m.MessageBox.Action.YES,
-							sap.m.MessageBox.Action.NO
-						],
-						emphasizedAction: sap.m.MessageBox.Action.OK,
-						onClose: function (oAction) {
-							if (oAction === "YES") {
-								that._fnDeleteAttachment("N");
-								that.AppModel.setProperty("/oMassAttachmentID", "");
-								that._oMassUploadResponse.close();
-								that._oMassUploadResponse.destroy();
-								that._oMassUploadResponse = undefined;
-								that._oMassUploadResponse = null;
-							}
+					title: "Warning",
+					actions: [sap.m.MessageBox.Action.YES,
+					sap.m.MessageBox.Action.NO
+					],
+					emphasizedAction: sap.m.MessageBox.Action.OK,
+					onClose: function (oAction) {
+						if (oAction === "YES") {
+							that._fnDeleteAttachment("N");
+							that.AppModel.setProperty("/oMassAttachmentID", "");
+							that._oMassUploadResponse.close();
+							that._oMassUploadResponse.destroy();
+							that._oMassUploadResponse = undefined;
+							that._oMassUploadResponse = null;
 						}
-					});
+					}
+				});
 			} else {
 				that.AppModel.setProperty("/oMassAttachmentID", "");
 				that._oMassUploadResponse.close();
@@ -1216,7 +1214,7 @@ sap.ui.define([
 				MessageBox.error("Please upload attachment zip.");
 				return;
 			}
-			
+
 			this.confirmOnActionSubmit(this.getI18n("CwsRequest.Submit.Declaration"), "I", function () {
 				this.fnSaveMassRequest();
 			}.bind(this));
@@ -1559,16 +1557,16 @@ sap.ui.define([
 					}
 					// Begin of change - CCEV3364
 					switch (AuditLogs.auditLog[i].tabName) {
-					case "HeaderData":
-						AuditLogs.auditLog[i].data.forEach(function (oHeaders) {
-							aHeaderLogData.push(oHeaders);
-						});
-						break;
-					default:
-						AuditLogs.auditLog[i].data.forEach(function (oItems) {
-							aItemLogData.push(oItems);
-						});
-						break;
+						case "HeaderData":
+							AuditLogs.auditLog[i].data.forEach(function (oHeaders) {
+								aHeaderLogData.push(oHeaders);
+							});
+							break;
+						default:
+							AuditLogs.auditLog[i].data.forEach(function (oItems) {
+								aItemLogData.push(oItems);
+							});
+							break;
 					}
 					// End of change - CCEV3364
 				}
@@ -1696,7 +1694,7 @@ sap.ui.define([
 						} catch (oError) {
 							this.hideBusyIndicator();
 							MessageBox.error("Failed to upload request data.");
-						} finally {}
+						} finally { }
 					}.bind(this))
 					.fail(function (response) {
 						this.hideBusyIndicator();
@@ -1718,7 +1716,7 @@ sap.ui.define([
 			MessageBox.confirm("Do you want to delete the attachment?", {
 				title: "Confirmation",
 				actions: [sap.m.MessageBox.Action.YES,
-					sap.m.MessageBox.Action.NO
+				sap.m.MessageBox.Action.NO
 				],
 				emphasizedAction: sap.m.MessageBox.Action.OK,
 				onClose: function (oAction) {

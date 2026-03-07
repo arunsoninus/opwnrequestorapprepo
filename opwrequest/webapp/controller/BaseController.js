@@ -1,12 +1,11 @@
 sap.ui.define([
 	"sap/ui/model/json/JSONModel",
 	"sap/ui/core/mvc/Controller",
-	"sap/ui/core/UIComponent", "sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
-	"sap/ui/model/FilterType", "../utils/dataformatter", "../utils/services", "sap/ui/core/Fragment", "../utils/utility",
+	"sap/ui/model/Filter",
+	"sap/ui/model/FilterOperator", "../utils/dataformatter", "../utils/services", "sap/ui/core/Fragment", "../utils/utility",
 	"../utils/configuration", "sap/m/MessageBox", "../utils/validation"
-], function (JSONModel, Controller, UIComponent, Filter,
-	FilterOperator, FilterType, Formatter, Services, Fragment, Utility, Config, MessageBox, Validation) {
+], function (JSONModel, Controller, Filter,
+	FilterOperator, Formatter, Services, Fragment, Utility, Config, MessageBox, Validation) {
 	"use strict";
 
 	return Controller.extend("nus.edu.sg.opwrequest.controller.BaseController", {
@@ -271,7 +270,7 @@ sap.ui.define([
 			this.AppModel.setProperty("/isWbsChangeAllowed", data.wbsChangeAllowed);
 			this.AppModel.setProperty("/derivePropUsage", data.derivePropUsage);
 			if (this.viaRequestorForm && this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS") === "38" && !this.AppModel.getProperty(
-					"/isEditAllowed")) {
+				"/isEditAllowed")) {
 				this.AppModel.setProperty("/exitFullScreen", false);
 				this.AppModel.setProperty("/showWithdrawButton", false);
 				this.AppModel.setProperty("/showEditButtonApproved", false);
@@ -441,10 +440,10 @@ sap.ui.define([
 					},
 					"ClaimDetailView": {
 						"wbs": false
-							// "Date" : true,
-							// "StartDate" : false,
-							// "EndDate" : false,
-							// "SelectDates" : false
+						// "Date" : true,
+						// "StartDate" : false,
+						// "EndDate" : false,
+						// "SelectDates" : false
 					},
 					"SelectPlanningDateFromCalendar": {
 						"wbs": false
@@ -498,8 +497,8 @@ sap.ui.define([
 			Utility._fnAppModelSetProperty(this, "/visibility", {
 				"ClaimTypeDialog": {
 					"claimTypeDialogStaffId": false
-						// "proceedButton" : false,
-						// "massuploadButton" : false
+					// "proceedButton" : false,
+					// "massuploadButton" : false
 				},
 				"ClaimDetailView": {
 					"Date": true,
@@ -826,11 +825,11 @@ sap.ui.define([
 
 			var orFilter = new Filter({
 				filters: [new Filter("EMPL_STS_C", FilterOperator.EQ, "A"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "U"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "P"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "T"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "R"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "RNS")
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "U"),
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "P"),
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "T"),
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "R"),
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "RNS")
 				],
 				and: false
 			});
@@ -928,49 +927,49 @@ sap.ui.define([
 						appModel.setProperty("/cwsRequest/createCWSRequest/DEPT_T", "");
 						appModel.setProperty("/isFdluEnabled", true);
 						break;*/
-			case "/cwsRequest/createCWSRequest/ULU_T":
-				appModel.setProperty("/cwsRequest/createCWSRequest/ULU", selectedObj.ULU_C);
-				appModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", selectedObj.ULU_T);
-				appModel.setProperty("/cwsRequest/createCWSRequest/FDLU", "");
-				appModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", "");
-				// Begin of change - Change Program Manager when ULU changed
-				this.AppModel.setProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR", []);
-				this._bindItemProgramManager();
-				// End of change - change Program Manager
-				break;
-			case "/cwsRequest/createCWSRequest/FDLU_T":
-				appModel.setProperty("/cwsRequest/createCWSRequest/FDLU", selectedObj.FDLU_C);
-				appModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", selectedObj.FDLU_T);
-				// Begin of change - Change Program Manager when FDLU changed
-				this.AppModel.setProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR", []);
-				this._bindItemProgramManager();
-				// End of change - change Program Manager
-				break;
-			case "CURRENCY":
-				appModel.setProperty(bindingPath + "/BIZ_EXP_CRNCY", selectedObj.CONFIG_KEY);
-				break;
-			case "BIZ_EXP_CRNCY":
-				appModel.setProperty(bindingPath + "/CURRENCY", selectedObj.CONFIG_KEY);
-				break;
-			case "STAFF_ULU_T":
-				appModel.setProperty(bindingPath + "/STAFF_ULU", selectedObj.ULU_C);
-				appModel.setProperty(bindingPath + "/STAFF_ULU_T", selectedObj.ULU_T);
-				appModel.setProperty(bindingPath + "/STAFF_FDLU", "");
-				appModel.setProperty(bindingPath + "/STAFF_FDLU_T", "");
-				appModel.setProperty(bindingPath + "/isFdluEnabled", true);
-				break;
-			case "STAFF_FDLU_T":
-				appModel.setProperty(bindingPath + "/STAFF_FDLU", selectedObj.FDLU_C);
-				appModel.setProperty(bindingPath + "/STAFF_FDLU_T", selectedObj.FDLU_T);
-				break;
-			case "/cwsRequest/createCWSRequest/FULL_NM":
-				selectedObj.STF_NUMBER = selectedObj.STF_NUMBER.replace("(" + selectedObj.NUSNET_ID + ")", "").trim();
-				appModel.setProperty("/cwsRequest/createCWSRequest/STAFF_ID", selectedObj.STF_NUMBER);
-				appModel.setProperty("/cwsRequest/createCWSRequest/FULL_NM", selectedObj.FULL_NM);
-				appModel.setProperty("/cwsRequest/createCWSRequest/STAFF_NUSNET_ID", selectedObj.NUSNET_ID);
-				break;
-			default:
-				break;
+				case "/cwsRequest/createCWSRequest/ULU_T":
+					appModel.setProperty("/cwsRequest/createCWSRequest/ULU", selectedObj.ULU_C);
+					appModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", selectedObj.ULU_T);
+					appModel.setProperty("/cwsRequest/createCWSRequest/FDLU", "");
+					appModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", "");
+					// Begin of change - Change Program Manager when ULU changed
+					this.AppModel.setProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR", []);
+					this._bindItemProgramManager();
+					// End of change - change Program Manager
+					break;
+				case "/cwsRequest/createCWSRequest/FDLU_T":
+					appModel.setProperty("/cwsRequest/createCWSRequest/FDLU", selectedObj.FDLU_C);
+					appModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", selectedObj.FDLU_T);
+					// Begin of change - Change Program Manager when FDLU changed
+					this.AppModel.setProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR", []);
+					this._bindItemProgramManager();
+					// End of change - change Program Manager
+					break;
+				case "CURRENCY":
+					appModel.setProperty(bindingPath + "/BIZ_EXP_CRNCY", selectedObj.CONFIG_KEY);
+					break;
+				case "BIZ_EXP_CRNCY":
+					appModel.setProperty(bindingPath + "/CURRENCY", selectedObj.CONFIG_KEY);
+					break;
+				case "STAFF_ULU_T":
+					appModel.setProperty(bindingPath + "/STAFF_ULU", selectedObj.ULU_C);
+					appModel.setProperty(bindingPath + "/STAFF_ULU_T", selectedObj.ULU_T);
+					appModel.setProperty(bindingPath + "/STAFF_FDLU", "");
+					appModel.setProperty(bindingPath + "/STAFF_FDLU_T", "");
+					appModel.setProperty(bindingPath + "/isFdluEnabled", true);
+					break;
+				case "STAFF_FDLU_T":
+					appModel.setProperty(bindingPath + "/STAFF_FDLU", selectedObj.FDLU_C);
+					appModel.setProperty(bindingPath + "/STAFF_FDLU_T", selectedObj.FDLU_T);
+					break;
+				case "/cwsRequest/createCWSRequest/FULL_NM":
+					selectedObj.STF_NUMBER = selectedObj.STF_NUMBER.replace("(" + selectedObj.NUSNET_ID + ")", "").trim();
+					appModel.setProperty("/cwsRequest/createCWSRequest/STAFF_ID", selectedObj.STF_NUMBER);
+					appModel.setProperty("/cwsRequest/createCWSRequest/FULL_NM", selectedObj.FULL_NM);
+					appModel.setProperty("/cwsRequest/createCWSRequest/STAFF_NUSNET_ID", selectedObj.NUSNET_ID);
+					break;
+				default:
+					break;
 			}
 		},
 
@@ -1006,39 +1005,39 @@ sap.ui.define([
 			}
 			MessageBox.confirm(
 				"Please confirm to delete ?", {
-					icon: "sap-icon://question-mark",
-					title: "Confirmation",
-					actions: [sap.m.MessageBox.Action.DELETE, sap.m.MessageBox.Action.CANCEL],
-					emphasizedAction: MessageBox.Action.DELETE,
-					onClose: function (oAction) {
-						if (oAction === sap.m.MessageBox.Action.DELETE) {
-							var aParameter = {
-								"inputList": []
-							};
+				icon: "sap-icon://question-mark",
+				title: "Confirmation",
+				actions: [sap.m.MessageBox.Action.DELETE, sap.m.MessageBox.Action.CANCEL],
+				emphasizedAction: MessageBox.Action.DELETE,
+				onClose: function (oAction) {
+					if (oAction === sap.m.MessageBox.Action.DELETE) {
+						var aParameter = {
+							"inputList": []
+						};
 
-							aParameter.inputList.push({
-								"DRAFT_ID": reqUniqueId
-							});
-							Services._loadDataUsingJsonModel(this, Config.dbOperations.deleteReqUrl, aParameter, "POST", function (oData) {
-								if (!oData.getSource().getData().error) {
-									if (oEvent !== "D") {
-										MessageBox.success("Request has been deleted successfully.");
-									} else {
-										Utility._fnSuccessDialog(this, oData.getSource().getData().message, function () {
-											this._fnClearLocal();
-											this.oRouter.navTo("master", {
-												layout: "OneColumn"
-											}, true);
-										}.bind(this));
-									}
-									this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("CwsSrvModel"));
+						aParameter.inputList.push({
+							"DRAFT_ID": reqUniqueId
+						});
+						Services._loadDataUsingJsonModel(this, Config.dbOperations.deleteReqUrl, aParameter, "POST", function (oData) {
+							if (!oData.getSource().getData().error) {
+								if (oEvent !== "D") {
+									MessageBox.success("Request has been deleted successfully.");
 								} else {
-									MessageBox.error(oData.getSource().getData().message);
+									Utility._fnSuccessDialog(this, oData.getSource().getData().message, function () {
+										this._fnClearLocal();
+										this.oRouter.navTo("master", {
+											layout: "OneColumn"
+										}, true);
+									}.bind(this));
 								}
-							}.bind(this));
-						}
-					}.bind(this)
-				}
+								this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("CwsSrvModel"));
+							} else {
+								MessageBox.error(oData.getSource().getData().message);
+							}
+						}.bind(this));
+					}
+				}.bind(this)
+			}
 			);
 		},
 
