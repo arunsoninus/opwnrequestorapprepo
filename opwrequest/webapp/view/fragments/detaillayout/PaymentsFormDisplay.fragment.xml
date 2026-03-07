@@ -1,0 +1,109 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified" xmlns:tnt="sap.tnt" xmlns:rt="sap.ui.richtexteditor">
+	<VBox>
+		<f:SimpleForm editable="true" layout="ResponsiveGridLayout" maxContainerCols="3" title="" backgroundDesign="Solid" adjustLabelSpan="true"
+			singleContainerFullSize="false" labelSpanL="4" columnsL="3">
+			<f:content>
+				<!--	<core:Title text="Remuneration for {AppModel>YEAR}"/>-->
+				<core:Title text="Remuneration"/>
+				<Label text="Select Year" required="true"/>
+				<ComboBox showSecondaryValues="true" placeholder="Select Year..." selectedKey="{AppModel>YEAR}"
+					items="{AppModel>/cwsRequest/createCWSRequest/paymentYearList}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}">
+					<core:Item key="{AppModel>year}" text="{AppModel>year}"/>
+				</ComboBox>
+				<Label text="Remuneration Type" required="true" visible="{=${AppModel>PAYMENT_TYPE}==='A' ? true : false}"/>
+				<ComboBox showSecondaryValues="true" placeholder="Select Remuneration Type.." selectedKey="{AppModel>REMUNERATION_TYPE}"
+					items="{ path: 'AppModel>/remunerationList', templateShareable:false}" change="onChangeRemunerationType"
+					editable="{AppModel>/isFormEditable}" visible="{=${AppModel>PAYMENT_TYPE}==='A' ? true : false}">
+					<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
+				</ComboBox>
+				<Label text="Remuneration Type" required="true" visible="{=${AppModel>PAYMENT_TYPE}==='R' ? true : false}"/>
+				<ComboBox showSecondaryValues="true" placeholder="Select Remuneration Type.." selectedKey="{AppModel>REMUNERATION_TYPE}"
+					items="{path: 'AppModel>/receivedPaymentRemType', templateShareable:false}" change="onChangeRemunerationType"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}"
+					visible="{=${AppModel>PAYMENT_TYPE}==='R' ? true : false}">
+					<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
+				</ComboBox>
+				<Label text="Amount (Stock Option)" required="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.StockOption}}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.StockOption}}"/>
+				<Input type="Number" value="{AppModel>STOCK_OPTION_QNTY}" valueState="{AppModel>stockOptionQntyVState}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.StockOption}}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}" placeholder="Enter Stock Option"/>
+				<Label text="Currency" wrapping="true" visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Monetary}}"
+					required="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Monetary}}"/>
+				<CWSExtMultiInput placeholder="Select Currency" dataPath="/d/results"
+					urlAttr="/CwsAppConfigs?$select=CONFIG_KEY,CONFIG_VALUE&amp;$filter=REFERENCE_KEY eq 'CURRENCY'" dialogCodeLbl="CONFIG_KEY"
+					dialogDescLbl="CONFIG_VALUE" dialogTitle="Select Currency" showValueHelp="true" setOnUI="CONFIG_KEY" valueHelpOnly="true"
+					valueHelpRequest="lookupValueHelp" value="{AppModel>CURRENCY}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}"
+					visible="{= ${AppModel>REMUNERATION_TYPE} === ${i18n>CwsRequest.Rmn.Monetary}}"/>
+				<Label text="Amount" required="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Monetary}}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Monetary}}"/>
+				<!--	value="{path:'AppModel>AMOUNT', type:'sap.ui.model.type.Float',formatOptions: { maxFractionDigits: 2 }}"-->
+				<Input placeholder="Enter Amount..."
+					value="{path:'AppModel>AMOUNT', type:'sap.ui.model.type.Float',formatOptions: { maxFractionDigits: 2 }}"
+					valueState="{AppModel>/cwsRequest/validationRequest/amountVState}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Monetary}}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}" change="onEnterFormatAmount"/>
+				<Label text="Amount (Stock)" required="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Stock}}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Stock}}"/>
+				<Input type="Number" placeholder="Enter Stock Quantity.." value="{AppModel>STOCK_QNTY}" valueState="{AppModel>amountStockVState}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Stock}}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}"/>
+				<Label text="Amount (Shares)" required="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Shares}}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Shares}}"/>
+				<Input type="Number" placeholder="Enter Amount.." value="{AppModel>SHARES}" valueState="{AppModel>shareVState}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Shares}}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}"></Input>
+				<!--<ComboBox placeholder="Select Unit type" valueState="{AppModel>/cwsRequest/validationRequest/unitVState}" items="{AppModel>/unitTypes}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Shares}}" selectedKey="{AppModel>UNIT_TYPE}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}">
+					<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
+				</ComboBox>-->
+				<Label text="Unit Type" visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Stock}}"/>
+				<ComboBox placeholder="Select Unit type" valueState="{AppModel>/cwsRequest/validationRequest/stockunitVState}" items="{AppModel>/unitTypes}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Stock}}" selectedKey="{AppModel>UNIT_TYPE}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}">
+					<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
+				</ComboBox>
+				<Label text="Description" required="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.Other}}"
+					visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.ToBeConfirmed} ? false : true }" wrapping="true"/>
+				<TextArea placeholder="Enter Description" value="{AppModel>DESCRIPTION}" rows="2" maxLength="250" liveChange="handleLiveChangeTa"
+					showExceededText="true" visible="{= ${AppModel>REMUNERATION_TYPE}=== ${i18n>CwsRequest.Rmn.ToBeConfirmed} ? false : true }"
+					valueState="{AppModel>/descVState}" editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}"/>
+				<!-- Amount Details -->
+				<core:Title text="Business Expenses"/>
+				<Label text="Currency" wrapping="true"/>
+				<CWSExtMultiInput placeholder="Select Currency..." dataPath="/d/results"
+					urlAttr="/CwsAppConfigs?$select=CONFIG_KEY,CONFIG_VALUE&amp;$filter=REFERENCE_KEY eq 'CURRENCY'" dialogCodeLbl="CONFIG_KEY"
+					dialogDescLbl="CONFIG_VALUE" dialogTitle="Select Currency" showValueHelp="true" setOnUI="CONFIG_KEY" valueHelpOnly="true"
+					valueHelpRequest="lookupValueHelp" value="{AppModel>BIZ_EXP_CRNCY}" editable="false"/>
+				<!--editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}"-->
+				<Label text="Amount" wrapping="true"/>
+				<Input placeholder="Enter Amount..."
+					value="{path:'AppModel>BIZ_EXP_AMT', type:'sap.ui.model.type.Float',formatOptions: { maxFractionDigits: 2 }}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}" change="onEnterFormatAmount"/>
+				<Label text="Payment Reference No." required="true" visible="{= ${AppModel>PAYMENT_TYPE}==='R'}"/>
+				<Input placeholder="Provide Payment Reference No..." value="{AppModel>PAYMENT_REF_NO}" visible="{= ${AppModel>PAYMENT_TYPE}==='R'}"/>
+				<Label text="Payment Date" required="true" visible="{= ${AppModel>PAYMENT_TYPE}==='R'}"/>
+				<DatePicker value="{ path: 'AppModel>PAYMENT_DATE',type: 'sap.ui.model.type.Date', formatOptions: { UTC: true, pattern: 'dd MMM yyyy' } }"
+					change="onChangeNewRequestParams" visible="{= ${AppModel>PAYMENT_TYPE}==='R'}"></DatePicker>
+				<core:Title text="Levy"/>
+				<Label text="Levy Amount" wrapping="true"/>
+				<Input
+					value="{ parts: [ {path:'AppModel>'}, {value: 'LEVY_AMOUNT', model: 'AppModel'},{path: 'AppModel>AMOUNT'},{path: 'AppModel>BIZ_EXP_AMT'},{path: 'AppModel>IS_WAIVED'},{path:'AppModel>/cwsRequest/createCWSRequest/LEVY_PERCENT'} ], formatter: '.formatter.computeLevyAmount' }"
+					editable="false"/>
+				<Label text="Waiver" wrapping="true"/>
+				<ComboBox showSecondaryValues="true" placeholder="Select Waiver.." selectedKey="{AppModel>IS_WAIVED}"
+					items="{path: 'AppModel>/waiverList', templateShareable:false}"
+					editable="{=(${AppModel>/isFormEditable}) ? true : ${AppModel>PAYMENT_TYPE}==='R' ? true : false}">
+					<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
+				</ComboBox>
+				<Label text=""/>
+				<FormattedText
+					htmlText="&lt;p&gt;Total Amount: &lt;strong&gt;{ parts: [ {path:'AppModel>'}, {value: 'TOTAL_AMOUNT', model: 'AppModel'},{path: 'AppModel>AMOUNT'},{path: 'AppModel>BIZ_EXP_AMT'},{path: 'AppModel>IS_WAIVED'},{path:'AppModel>/cwsRequest/createCWSRequest/LEVY_PERCENT'} ], formatter: '.formatter.computeLevyAmount' }&lt;/p&gt;"/>
+			</f:content>
+		</f:SimpleForm>
+	</VBox>
+</core:FragmentDefinition>

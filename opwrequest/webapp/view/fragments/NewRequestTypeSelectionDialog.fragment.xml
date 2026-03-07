@@ -1,0 +1,91 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form" xmlns:layout="sap.ui.layout"
+	xmlns:suite="sap.suite.ui.commons" xmlns:u="sap.ui.unified" xmlns:calendar="sap.ui.unified.calendar">
+	<Dialog class="sapUiSizeCompact" beforeClose="onBeforeCloseDialog" showHeader="false" contentWidth="40%">
+		<layout:VerticalLayout width="100%">
+			<layout:content>
+				<f:SimpleForm editable="true" layout="ResponsiveGridLayout" maxContainerCols="1" backgroundDesign="Solid" singleContainerFullSize="false">
+					<f:content>
+						<core:Title text="Create New Request"/>
+						<Label text="Type" visible="false"/>
+						<ComboBox visible="false" placeholder="Select Type" selectedKey="{AppModel>/cwsRequest/createCWSRequest/TYPE}" items="{AppModel>/typesList}"
+							change="onSelectType" editable="{AppModel>/isEditableType}">
+							<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
+						</ComboBox>
+						<Label/>
+						<!--<HBox class="sapUiTinyMarginTop" visible="{AppModel>/isDepartmentAdmin}">
+							<RadioButton text="Single Submission" selected="{AppModel>/cwsRequest/SingleSubRadioSelected}" visible="{AppModel>/isDepartmentAdmin}"
+								select="onSelectSingleSubmission"/>
+							<RadioButton text="Mass Upload" selected="{AppModel>/cwsRequest/massUploadRadioSelected}" visible="{AppModel>/isDepartmentAdmin}"
+								select="onSelectMassUpload"/>
+						</HBox>-->
+						<RadioButtonGroup id="rbg3" columns="5" select="onSelectRequestType" visible="{AppModel>/isDepartmentAdmin}">
+							<RadioButton id="RB3-1" text="Single Submission" selected="{AppModel>/cwsRequest/SingleSubRadioSelected}"/>
+							<RadioButton id="RB3-2" text="Mass Upload" selected="{AppModel>/cwsRequest/massUploadRadioSelected}"/>
+						</RadioButtonGroup>
+						<!--</RadioButtonGroup>-->
+						<Label text="{i18n>CwsRequest.Staff.Dialogtitle}" required="true"
+							visible="{=(${AppModel>/isDepartmentAdmin} &amp;&amp; ${AppModel>/cwsRequest/SingleSubRadioSelected}) === true ? true : false}"/>
+						<!--<CWSExtMultiInput placeholder="Enter Emp No." dataPath="/d/results" urlAttr="/ChrsJobInfos?$select=NUSNET_ID,FULL_NM,STF_NUMBER"
+							dialogCodeLbl="FULL_NM" amendCode="NUSNET_ID" dialogDescLbl="STF_NUMBER" dialogTitle="Select Staff.." showValueHelp="true" setOnUI="FULL_NM"
+							valueHelpOnly="true" valueHelpRequest="lookupValueHelp" value="{AppModel>/cwsRequest/createCWSRequest/FULL_NM}"
+							visible="{=(${AppModel>/isDepartmentAdmin} &amp;&amp; ${AppModel>/cwsRequest/SingleSubRadioSelected}) === true ? true : false}"/>-->
+						<Input placeholder="Enter Emp No.." showValueHelp="true" valueHelpRequest=".onValueHelpRequest" valueHelpOnly="true"
+							value="{AppModel>/cwsRequest/createCWSRequest/FULL_NM}"
+							visible="{=(${AppModel>/isDepartmentAdmin} &amp;&amp; ${AppModel>/cwsRequest/SingleSubRadioSelected}) === true ? true : false}"></Input>
+						<Label text="Start Date" required="true" visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+						<DatePicker placeholder="DD MMM YYYY" dateValue="{AppModel>/cwsRequest/createCWSRequest/START_DATE}" valueFormat="yyyy-MM-dd"
+							displayFormat="dd MMM, yyyy" change="onChangeNewRequestParams"
+							visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+						<Label text="End Date" required="true" visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+						<DatePicker placeholder="DD MMM YYYY" dateValue="{AppModel>/cwsRequest/createCWSRequest/END_DATE}" valueFormat="yyyy-MM-dd"
+							displayFormat="dd MMM, yyyy" change="onChangeNewRequestParams"
+							visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"></DatePicker>
+						<Label text="Actual days of OPWN" required="true" visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+						<VBox>
+							<Input placeholder="Enter Actual days..."
+								value="{path:'AppModel>/cwsRequest/createCWSRequest/DURATION_DAYS', type: 'sap.ui.model.type.Float', formatOptions: { minFractionDigits: 2, preserveDecimals: false }}"
+								change="onChangeNewRequestParams($event, 'DR')" visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+							<Text text="(enter in days where 1 day = 8 hrs)" visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+						</VBox>
+						<Label text="Amount Payable to Staff" required="true" visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+						<Input placeholder="{i18n>opwnrequest.amount}" change="onEnterFormatAmount"
+							value="{path:'AppModel>/cwsRequest/createCWSRequest/AMOUNT', type: 'sap.ui.model.type.Float', formatOptions: { minFractionDigits: 2, preserveDecimals: false }}"
+							valueState="{AppModel>/cwsRequest/validationRequest/basicamountVState}"
+							visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+						<Label text="Request Type" required="{AppModel>/cwsRequest/SingleSubRadioSelected}" visible="false"/>
+						<RadioButtonGroup id="idrbg1" columns="1" class="sapUiMediumMarginBottom" select="onSelectRequestType" buttons="{AppModel>/RequestType}"
+							visible="false">
+							<RadioButton text="{AppModel>CONFIG_VALUE}" valueState="{AppModel>/cwsRequest/validationRequest/requestTypeVState}" selected="false"/>
+						</RadioButtonGroup>
+						<!--<Label text="No. of Header Rows (in the upload template)"
+							visible="{=${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false }"/>
+						<Input type="Number" placeholder="Enter no. of header rows used as header in excel."
+							value="{AppModel>/cwsRequest/createCWSRequest/noOfHeaderRows}"
+							visible="{=${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}" width="60%"/>
+						<FormattedText htmlText="{i18n>CwsRequest.TemplateDownload}"
+							visible="{=${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}"/>-->
+						<Label visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}"/>
+						<HBox visible="{=${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}">
+							<Text text="{i18n>CwsRequest.TemplateDownloadi}"/>
+							<Link class="sapUiTinyMarginBegin" subtle="true" text="here" target="_blank" href="{AppModel>/oTemplateLink}"/>
+						</HBox>
+						<Label visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}"/>
+						<HBox visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}">
+							<u:FileUploader id="massClaimsUploadId" placeholder="Upload Mass Requests..." uploadUrl="" fileType="xls,xlsx"
+								typeMissmatch="handletypemismatch" value="{ClaimRequest>/massUploadFile}"
+								visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}"/>
+						</HBox>
+					</f:content>
+				</f:SimpleForm>
+				<MessageStrip id="cwsRequestDialogMStripId" class="sapUiTinyMargin"></MessageStrip>
+			</layout:content>
+		</layout:VerticalLayout>
+		<buttons>
+			<Button text="Proceed" icon="sap-icon://process" press="onPressProceedToCreate"
+				visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
+			<Button text="Upload" icon="sap-icon://upload" press="onPressMassUploadTemplate"
+				visible="{= ${AppModel>/cwsRequest/SingleSubRadioSelected} === true ? false: true}"/>
+			<Button icon="sap-icon://decline" press="closeNewRequestTypeDialog" tooltip="Cancel"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

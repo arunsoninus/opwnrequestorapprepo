@@ -1,0 +1,15 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+	<Dialog type="Message" title="Confirmation">
+		<content>
+			<Label required="true" design="Bold" text="{i18n>RejectionRemarks}"/>
+			<TextArea width="100%" placeholder="Enter remarks" value="{AppModel>/rejectionRemarks}" valueState="{AppModel>/oRejectState}"
+				liveChange="onChangeRejRemarks" rows="5" maxLength="5000"/>
+			<MessageStrip class="sapUiLargeMarginTop" text="{i18n>RejectChangeRequestMessageStrip}"
+				visible="{= ${AppModel>/cwsRequest/createCWSRequest/SUBMISSION_TYPE} === 'U' ? true : false}"></MessageStrip>
+		</content>
+		<buttons>
+			<Button text="Proceed" icon="sap-icon://process" press="onSubmitRejectReason"></Button>
+			<Button text="Cancel" press="onCancelRejectReason"></Button>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,97 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified" xmlns:upload="sap.m.upload">
+	<l:VerticalLayout width="100%">
+		<l:content>
+			<Title class="h2Title" text="{i18n>CwsRequest.Attachments.Notes}"/>
+			<FormattedText
+				htmlText="{i18n>CwsRequest.Attachments.Notes1}{i18n>CwsRequest.Attachments.Notes2}{i18n>CwsRequest.Attachments.Notes3}{i18n>CwsRequest.Attachments.Notes4}"/>
+			<Text/>
+			<Title class="h2Title" text="{i18n>CwsRequest.Attachments.Upload}"/>
+			<FormattedText
+				htmlText="{i18n>CwsRequest.Attachments.InfoList1}{i18n>CwsRequest.Attachments.InfoList2}{i18n>CwsRequest.Attachments.InfoList3}{i18n>CwsRequest.Attachments.InfoList4}{i18n>CwsRequest.Attachments.InfoList5}{i18n>CwsRequest.Attachments.InfoList6}{i18n>CwsRequest.Attachments.InfoList7}{i18n>CwsRequest.Attachments.InfoList8}{i18n>CwsRequest.Attachments.InfoList9}"/>
+			<Text/>
+			<VBox visible="{AppModel>/isFormEditable}">
+				<Label text="Document Type" required="true"
+					visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}"/>
+				<HBox>
+					<ComboBox showSecondaryValues="true" placeholder="Select Document Type..." width="14em"
+						valueState="{AppModel>/cwsRequest/validationRequest/cbDoctypeVState}"
+						valueStateText="{AppModel>/cwsRequest/validationRequest/cbDoctypeVStateText}" editable="{AppModel>/isFormEditable}"
+						selectedKey="{AppModel>/cwsRequest/createCWSRequest/attachmentType}" items="{AppModel>/attachmentTypes}" change="onSelectDocumentType"
+						visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}">
+						<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
+					</ComboBox>
+					<u:FileUploader class="sapUiSmallMarginBegin" change="onChangeFileUpload" id="fileUploader" name="myFileUpload" tooltip="Upload Attachments"
+						uploadComplete="handleUploadComplete" buttonOnly="true" fileSizeExceed="handleFileSizeExceed" maximumFileSize="10"
+						maximumFilenameLength="100" filenameLengthExceed="handleFilenameLength" sameFilenameAllowed="false"
+						fileType="jpg,jpeg,png,pdf,xls,xlsx,doc,docx" typeMissmatch="handlefileTypemismatch"
+						visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}"
+						enabled="{AppModel>/isFormEditable}"/>
+					<Button class="sapUiSmallMarginBegin" text="Upload File" icon="sap-icon://upload" press="onUploadFile" enabled="{AppModel>/isFormEditable}"
+						visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}"></Button>
+				</HBox>
+				<ObjectStatus visible="{AppModel>/visfileName}" class="sapUiSmallMarginTop" title="Selected File" text="{AppModel>/fileName}"
+					state="Success"/>
+				<!--<Input placeholder="Provide Document Name..." value="{AppModel>/cwsRequest/createCWSRequest/otherAttachmentName}" width="14em"
+				visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentType} === 'ATT04' ? true : false}"/>-->
+			</VBox>
+			<Text/>
+			<List mode="{=${AppModel>/isFormEditable}=== true ? 'Delete': 'None'}" delete="handleDeleteAttachment" enableBusyIndicator="true"
+				items="{ path: 'AppModel>/cwsRequest/createCWSRequest/attachmentList/results' }">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="Attachments"/>
+						<ToolbarSpacer/>
+						<Button text="Sync. Attachments" icon="sap-icon://synchronize" type="Transparent" press="onPressSyncAttach"
+							visible="{AppModel>/oSyncAttach}"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<CustomListItem highlight="Success">
+					<HBox>
+						<VBox width="4%">
+							<core:Icon size="2rem" src="{parts: [ {path:'AppModel>ATTACHMENT_NAME'}], formatter: '.formatter.attachmentIconSet'}"
+								class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom"/>
+						</VBox>
+						<VBox width="92%" class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom">
+							<Link text="{AppModel>ATTACHMENT_NAME}" press="openAttachment"
+								visible="{parts: [ {path:'AppModel>ATTACHMENT_NAME'}], formatter: '.formatter.attachmentLink'}"/>
+							<Text text="{AppModel>ATTACHMENT_NAME}" visible="{parts: [ {path:'AppModel>ATTACHMENT_NAME'}], formatter: '.formatter.attachmentLinkv'}"/>
+							<Text text="{AppModel>ATTACHMENT_TYPE}"/>
+						</VBox>
+						<VBox width="5%" alignContent="End">
+							<Button type="Transparent" icon="sap-icon://download" press="handleDownloadPress" class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
+						</VBox>
+					</HBox>
+					<!--</l:HorizontalLayout>-->
+				</CustomListItem>
+			</List>
+			<!--<upload:UploadSet id="UploadSet" instantUpload="true" showIcons="true" icon="sap-icon://attachment" uploadEnabled="true"
+				terminationEnabled="true" fileTypes="{i18n>ClaimRequest.Attachments.AllowedExtensions}" maxFileNameLength="50" maxFileSize="5"
+				mediaTypes="{i18n>ClaimRequest.Attachments.MediaT}" uploadUrl="../../../../upload"
+				items="{path: '{ClaimRequest>/attachmentList}', templateShareable: false}" width="80%" fileTypeMismatch="handleFileTypeMismatch">
+				<upload:toolbar>
+					<OverflowToolbar>
+						<Button icon="sap-icon://download" text="Download selected" press="onDownloadSelectedButton"/>
+					</OverflowToolbar>
+				</upload:toolbar>
+				<upload:items>
+					<upload:UploadSetItem fileName="{ClaimRequest>fileName}" mediaType="{ClaimRequest>mediaType}" url="{ClaimRequest>url}"
+						thumbnailUrl="{ClaimRequest>thumbnailUrl}" attributes="{path: 'attributes', templateShareable: false}"
+						markers="{path: 'ClaimRequest>markers', templateShareable: false}" statuses="{path: 'ClaimRequest>statuses', templateShareable: false}"
+						uploadState="{ClaimRequest>uploadState}" visibleEdit="false" removePressed="onPressRemoveAttachment">
+						<upload:attributes>
+							<ObjectAttribute title="{ClaimRequest>title}" text="{ClaimRequest>text}" active="{ClaimRequest>active}"/>
+						</upload:attributes>
+						<upload:markers>
+							<ObjectMarker type="{ClaimRequest>type}" visibility="{visibility}"/>
+						</upload:markers>
+						<upload:statuses>
+							<ObjectStatus title="{ClaimRequest>title}" text="{ClaimRequest>text}" state="{ClaimRequest>state}" icon="{ClaimRequest>icon}"
+								active="{ClaimRequest>active}"/>
+						</upload:statuses>
+					</upload:UploadSetItem>
+				</upload:items>
+			</upload:UploadSet>-->
+		</l:content>
+	</l:VerticalLayout>
+</core:FragmentDefinition>
