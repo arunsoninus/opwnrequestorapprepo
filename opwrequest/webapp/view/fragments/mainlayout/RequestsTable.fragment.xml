@@ -1,17 +1,12 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:u="sap.uxap"
 	xmlns:tnt="sap.tnt">
 	<Table id="idCWSRequestTable" inset="false" growing="true" growingThreshold="50" fixedLayout="Strict"
-		items="{ path: 'CwsSrvModel>/CwsRequestViews', sorter: { path: 'SUBMITTED_ON_TS', descending: true},templateShareable:true}"
+		items="{ path: 'CwsSrvModel>/cwsRequestViews', sorter: { path: 'SUBMITTED_ON_TS', descending: true},templateShareable:true}"
 		sticky="ColumnHeaders,HeaderToolbar">
 		<headerToolbar>
 			<OverflowToolbar>
-				<!--<content>-->
-				<!--<Title text="Claim Requests" level="H3"/>-->
 				<Button icon="sap-icon://refresh" text="Refresh" tooltip="Refresh" press="onRefreshClaim" type="Transparent"/>
 				<ToolbarSpacer/>
-				<!--<Button icon="sap-icon://create" press="onPressCreateCWSRequest" text="Create Request" type="Transparent" visible="true"/>-->
-				<!--<Button icon="sap-icon://multiselect-all" press="onPressMassUploadClaimRequests" text="Mass Upload of Claims" type="Transparent"-->
-				<!--	visible="{= ${AppModel>/userRole} === 'CA' ? true : false }"/>-->
 				<SearchField visible="{= ${AppModel>/showSearchField} ? true : false}" id="srchFldCWSRequest" placeholder="Search request.."
 					search="onPressSearchCWSRequest" width="20%"/>
 				<Button visible="{= ${AppModel>/showSearchField} ? false : true}" tooltip="Add Filter" icon="sap-icon://filter" press="onPressFilterButton"/>
@@ -19,17 +14,10 @@
 					press="onPressFilterButton"/>
 				<Button icon="sap-icon://sort" press="onPressSortRequest" type="Transparent" visible="true"/>
 				<Button tooltip="Group" icon="sap-icon://group-2" press="onPressGroupRequest"/>
-				<!--<Button icon="sap-icon://download" tooltip="{i18n>CwsRequest.Export}" press="onPressExport" visible="true"/>-->
-				<!--<Button id="filterButton" press="handleFilterButtonPressed" class="sapUiSmallMarginBegin" icon="sap-icon://action-settings"-->
-				<!--	tooltip="Filtering and Sorting" type="Transparent"/>-->
-				<!--</content>-->
 			</OverflowToolbar>
 		</headerToolbar>
 		<columns>
-			<!--<Column id="clColumn0" hAlign="Center" width="2em"
-				visible="{= ${AppModel>/iconTabBarSelectedKey} === 'Draft' ? false : ${AppModel>/iconTabBarSelectedKey}==='RejReq' ? false : true }">
-				<Label text=" "/>
-			</Column>-->
+			
 			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" width="2em">
 				<Label design="Bold" text=" "/>
 			</Column>
@@ -42,9 +30,6 @@
 			<Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true" width="8.5em" visible="{AppModel>/isDepartmentAdmin}">
 				<Label design="Bold" text="{i18n>CwsRequest.RequestTable.RequestedFor}"/>
 			</Column>
-			<!--	<Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
-				<Text text="Client Name"/>
-			</Column>-->
 			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
 				<Label design="Bold" text="Start Date"/>
 			</Column>
@@ -82,7 +67,6 @@
 					<Text text="{ path: 'CwsSrvModel>START_DATE', type: 'sap.ui.model.type.DateTime', formatOptions: { pattern: 'dd MMM, yyyy' } }"/>
 					<Text text="{ path: 'CwsSrvModel>END_DATE', type: 'sap.ui.model.type.DateTime', formatOptions: { pattern: 'dd MMM, yyyy' } }"/>
 					<Text text="{CwsSrvModel>PROGRAM_NAME}"/>
-					<!--<Text text="{path:'CwsSrvModel>DURATION_DAYS',formatter:'.formatter.formatRequestAmount' }"/>-->
 					<Text text="{path:'CwsSrvModel>AMOUNT',formatter:'.formatter.decimalSeparator' }"/>
 					<tnt:InfoLabel text="{=${CwsSrvModel>STATUS_ALIAS}==='Save As Draft' ? 'Draft': ${CwsSrvModel>STATUS_ALIAS}}"
 						tooltip="{CwsSrvModel>STATUS_ALIAS}" colorScheme="{CwsSrvModel>STATUS_COLOR_CODE}" displayOnly="false"/>
