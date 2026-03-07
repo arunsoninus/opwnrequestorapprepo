@@ -29,3 +29,16 @@ server:
       afterMiddleware: compression
       configuration:
         ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        backend:
+        - path: /odata/v2/cwned
+          url: https://national-university-of-singapore-nus-cf-btp-uat-r2fbv1y400de6b1.cfapps.ap11.hana.ondemand.com
+          destination: nusbtpcwsned  
+        - path: /cwned
+          url: https://national-university-of-singapore-nus-cf-btp-uat-r2fbv1y400de6b1.cfapps.ap11.hana.ondemand.com
+          destination: nusbtpcwsned            
+        - path: /v2/catalog
+          url: https://national-university-of-singapore-nus-cf-btp-uat-r2fbv1y4a91df23.cfapps.ap11.hana.ondemand.com
+          destination: nusbtputil
+        - path: /v2/util
+          url: https://national-university-of-singapore-nus-cf-btp-uat-r2fbv1y4a91df23.cfapps.ap11.hana.ondemand.com
+          destination: nusbtputil
