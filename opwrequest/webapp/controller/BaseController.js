@@ -862,6 +862,7 @@ sap.ui.define([
 			}
 		},
 
+		
 		onNavDashBoard: function () {
 			var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation");
 			var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({

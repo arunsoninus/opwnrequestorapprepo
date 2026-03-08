@@ -547,6 +547,7 @@ sap.ui.define([
 			this._fnRequestType();
 			Utility.retrieveAttachmentTypes(this);
 			this.newRequestTypeDialog.open();
+			
 		},
 		_fnRequestType: function () {
 			var aFilter = [],

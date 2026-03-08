@@ -17,6 +17,7 @@ sap.ui.define([
 	return BaseController.extend("nus.edu.sg.opwrequest.controller.OpwDetailView", {
 		formatter: Formatter,
 
+		
 		onInit: function () {
 			this.oOwnerComponent = this.getOwnerComponent();
 			this.oRouter = this.oOwnerComponent.getRouter();

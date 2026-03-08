@@ -230,6 +230,7 @@ sap.ui.define([
 				return aFilter;
 			},
 
+			
 			retrieveRequestTypes: function (component, isRetrieve, callBack) {
 				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 				var type = component.AppModel.getProperty("/cwsRequest/createCWSRequest/TYPE");
