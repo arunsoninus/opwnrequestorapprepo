@@ -196,8 +196,8 @@ sap.ui.define([
 		// },
 		fetchUserPhoto: function (component, callBackFx) {
 			var sUrl = Config.dbOperations.photoApi;
-			var staffId = component.OverviewDashboardModel.getProperty("/staffInfo/STAFF_ID");
-			component.OverviewDashboardModel.setProperty("/loggedInUserStfNumber", staffId);
+			var staffId = component.AppModel.getProperty("/staffInfo/STAFF_ID");
+			// component.AppModel.setProperty("/loggedInUserStfNumber", staffId);
 
 			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
 			var oHeaders = HeaderHelper._headerToken();
@@ -280,27 +280,33 @@ sap.ui.define([
 			});
 		},
 		getRequestViewCount: function (serviceUrl, oDataModel, component, aFilter, callBackFx) {
-			oDataModel.read(serviceUrl, {
-				filters: aFilter,
-				success: function (oData) {
-					if (oData) {
-						callBackFx(oData);
-
-					}
-				}.bind(component),
-				error: function (oError) { }
-			});
+			this._readDataUsingOdataModel(
+                    Config.dbOperations.requestViewCount,
+                    oDataModel,
+                    component,
+                    aFilter,
+                    function (oResponse) {
+                        callBackFx(oResponse);
+                    }.bind(this),
+                    HeaderHelper._headerToken(),
+                    {}
+                );
 		},
-		getStatusConfig: function (serviceUrl, oDataModel, component, callBackFx) {
-			oDataModel.read(serviceUrl, {
-				success: function (oData) {
-					if (oData) {
-						return callBackFx(oData);
-					}
-				}.bind(component),
-				error: function (oError) { }
-			});
+		getStatusConfig: function (component, callBackFx) {
+			let oDataModel = component.getComponentModel("CatalogSrvModel");
+			this._readDataUsingOdataModel(
+                    Config.dbOperations.statusConfig,
+                    oDataModel,
+                    component,
+                    [],
+                    function (oData) {
+                        callBackFx(oData);
+                    }.bind(this),
+                    HeaderHelper._headerToken(),
+                    {}
+                );
 		},
+		
 		_readDataUsingOdataModel: function (serviceUrl, oDataModel, component, aFilter, callBackFx) {
 			oDataModel.read(serviceUrl, {
 				filters: aFilter,

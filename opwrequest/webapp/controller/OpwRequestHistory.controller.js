@@ -1,6 +1,7 @@
 sap.ui.define([
 	"../controller/BaseController",
 	"../extensions/extendedvaluehelp",
+	"../extensions/extendedvaluehelpodata",
 	"sap/ui/core/Fragment",
 	"sap/ui/model/json/JSONModel",
 	"../utils/dataformatter",
@@ -15,11 +16,12 @@ sap.ui.define([
 	"sap/ui/export/library",
 	"sap/ui/export/Spreadsheet",
 	"../utils/utility",
+	"../utils/headerHelper",
 	"../utils/configuration",
 	"../utils/massuploadhelper",
 	"../utils/processInstanceFlow"
-], function (BaseController, ExtendedValueHelp, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
-	FilterOperator, Sorter, Services, AppConstant, Validation, exportLibrary, Spreadsheet, Utility, Config,
+], function (BaseController, ExtendedValueHelp, ExtendedValueHelpOData, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
+	FilterOperator, Sorter, Services, AppConstant, Validation, exportLibrary, Spreadsheet, Utility, HeaderHelper, Config,
 	MassUploadHelper, ProcessInstanceFlow) {
 	"use strict";
 	return BaseController.extend("nus.edu.sg.opwrequest.controller.OpwRequestHistory", {
@@ -29,7 +31,7 @@ sap.ui.define([
 			this.oOwnerComponent = this.getOwnerComponent();
 			this.oRouter = this.getOwnerComponent().getRouter();
 			this._bDescendingSort = false;
-			// Begin of change - Bug fix - CW0084
+
 			var oViewModel = new JSONModel(),
 				oViewData = {
 					"SortCwTable": {
@@ -44,23 +46,40 @@ sap.ui.define([
 				};
 			oViewModel.setData(oViewData);
 			this.getView().setModel(oViewModel, "ViewModel");
-			// End of change - Bug fix - CW0084
-			//hanling navigation for detail page
+			//Navigation to details page
 			this.oRouter.getRoute("master").attachPatternMatched(this._onProjectMatched, this);
 
 		},
-		_onProjectMatched: function (oEvent) {
+		_onProjectMatched: async function (oEvent) {
 			this.initializeModel();
-			this.generateTokenForLoggedInUser();
-			// this.setClaimRequestTypeList();
+			await this.getUserDetails();
+			// this.generateTokenForLoggedInUser();
+
 			var oCwsRequestTable = this.getView().byId("idCWSRequestTable");
 			this.oTemplate = oCwsRequestTable.getBindingInfo("items").template;
 			oCwsRequestTable.unbindAggregation("items");
-			// Begin of change - CCEV3364 - set selection of icontabfilter based on url(navStat) parameter
+
 			var aUrlParameters = new URLSearchParams(window.location.search),
 				sParam = aUrlParameters.get("navStat");
 			this._setDefaultIconTabFilter(sParam);
-			// End of change - CCEV3364
+		},
+		initializeModel: function () {
+			var readOnly = this.modelAssignment("ReadOnly");
+			readOnly.setProperty("/isMassSubmissionVisible", false);
+			readOnly.setProperty("/isSingleSubmission", true);
+			var oAppModel = this.setComponentModel("AppModel");
+			oAppModel.setData(AppConstant);
+			this.AppModel = oAppModel;
+		},
+		getUserDetails: async function () {
+			await Services.getUserInfoDetails(
+				this,
+				async function (oRetData) {
+					Utility._assignTokenAndUserInfo(oRetData.getUserDetails, this);
+					await this.getAllRequestDetails();
+					Utility._fnFilterCreation(this);
+				}.bind(this)
+			);
 		},
 		/**
 		 * Set icon tab bar filter default selection key
@@ -90,39 +109,30 @@ sap.ui.define([
 					break;
 			}
 		},
-		generateTokenForLoggedInUser: function () {
-			Services.fetchLoggedUserToken(this, function (oRetData) {
-				Utility._assignTokenAndUserInfo(oRetData, this);
-				this.getAllOpwnRequests();
-				Utility._fnFilterCreation(this);
-			}.bind(this));
-		},
-		getAllOpwnRequests: function () {
-			var serviceName = Config.dbOperations.metadataClaims;
-			var oHeaders = Formatter._amendHeaderToken(this);
-			var oDataModel = new sap.ui.model.odata.v2.ODataModel({
-				serviceUrl: serviceName,
-				headers: oHeaders
-			});
-			oDataModel.setUseBatch(false);
-			oDataModel.metadataLoaded().then(function () {
-				this.getOwnerComponent().setModel(oDataModel, "CwsSrvModel");
-				this._fetchLoggedInUserPhoto();
-				this._fnReadAfterMetadataLoaded(oDataModel);
-			}.bind(this));
+		// generateTokenForLoggedInUser: function () {
+		// 	Services.fetchLoggedUserToken(this, function (oRetData) {
+		// 		Utility._assignTokenAndUserInfo(oRetData, this);
+		// 		this.getAllOpwnRequests();
+		// 		Utility._fnFilterCreation(this);
+		// 	}.bind(this));
+		// },
+		getAllRequestDetails: async function () {
+			// this._fetchLoggedInUserPhoto();
+			this.getOpwnRequests();
 		},
 
 		_fetchLoggedInUserPhoto: function () {
 			//fetch photo
-			Services.fetchLoggeInUserImage(this, function (oResponse) {
+			Services.fetchUserPhoto(this, function (oResponse) {
 				this.AppModel.setProperty("/staffPhoto", oResponse.photo ? "data:image/png;base64," + oResponse.photo : null);
 			}.bind(this));
 		},
 
-		_fnReadAfterMetadataLoaded: function (oDataModel) {
+		getOpwnRequests: function () {
 			var selectedKey = this.AppModel.getProperty("/iconTabBarSelectedKey");
 			this.getView().byId("itb1").setSelectedKey(selectedKey);
 			var aFilter = [];
+			let oDataModel = this.getComponentModel("CwsSrvModel");
 			// var userRole = this.AppModel.getProperty("/userRole");
 			// if (userRole === "CW_ESS") {
 			aFilter = Utility._fnEssDraft(this);
@@ -131,14 +141,14 @@ sap.ui.define([
 			// }
 			if (this.AppModel.getProperty("/oParameterNew") === "New") {
 				this.AppModel.setProperty("/oParameterNew", "");
-				this.onPressCreateCWSRequest();
+				this.onPressCreateOpwnRequest();
 			}
 			var serviceUrl = Config.dbOperations.requestViewCount;
 			Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
 				this.getUIControl("itfDraft").setCount(oResponse);
 			}.bind(this));
-			var statusServiceUrl = Config.dbOperations.statusConfig;
-			Services.getStatusConfig(statusServiceUrl, oDataModel, this, function (oResponse) {
+			// var statusServiceUrl = Config.dbOperations.statusConfig;
+			Services.getStatusConfig(this, function (oResponse) {
 				this.AppModel.setProperty("/statusConfigDetails", oResponse.results ? oResponse.results : []);
 				this.setRejStatusCount();
 				this.setInProcessStatusCount();
@@ -162,7 +172,7 @@ sap.ui.define([
 
 		loadTableItemsBasedOnStatusKey: function (selectedKeyOfIconTabBar) {
 			this.getView().byId("itb1").setSelectedKey(selectedKeyOfIconTabBar);
-			var sPath = "CwsSrvModel>/CwsRequestViews";
+			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
 			this.GlobalFilterForTable = Utility._handleIconTabBarSelect(this, selectedKeyOfIconTabBar);
 			// Begin of change - CW0084
 			var oViewModel = this.getView().getModel("ViewModel");
@@ -267,13 +277,8 @@ sap.ui.define([
 		// 	}.bind(this));
 		// },
 		getDraftCwsRequests: function () {
-			// var userRole = this.AppModel.getProperty("/userRole");
-			var sPath = "CwsSrvModel>/CwsRequestViews";
-			// if (userRole === "CW_ESS") {
+			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
 			this.GlobalFilterForTable = Utility._fnEssDraft(this);
-			// } else if (userRole === "CA") {
-			// 	this.GlobalFilterForTable = Utility._fnCADraft(this);
-			// }
 			var oSorter = new sap.ui.model.Sorter({
 				path: "REQ_UNIQUE_ID",
 				descending: true
@@ -286,7 +291,7 @@ sap.ui.define([
 		},
 		onSelectIconFilter: function (oEvent) {
 			this.getUIControl("idCWSRequestTable").setVisible(true);
-			var sPath = "CwsSrvModel>/CwsRequestViews";
+			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
 			// var sKey = oEvent.getParameter("selectedKey");
 			var sKey = oEvent === "Draft" ? "Draft" : oEvent.getParameter("selectedKey");
 			// Begin of change - CCEV3364
@@ -300,7 +305,7 @@ sap.ui.define([
 			if (sKey === "Draft") {
 				this.getDraftCwsRequests();
 			} else if (sKey === "New") {
-				this.onPressCreateCWSRequest();
+				this.onPressCreateOpwnRequest();
 				this.AppModel.setProperty("/cwsRequest/SingleSubRadioSelected", true);
 				this.getUIControl("idCWSRequestTable").setVisible(false);
 			} else {
@@ -483,16 +488,7 @@ sap.ui.define([
 		},
 
 		handleQuickViewBtnPress: function (oEvent) {
-			var userRole = this.AppModel.getProperty("/userRole");
-			// var serviceUrl = "/rest/eclaims/userDetails?userGroup=NUS_CHRS_ECLAIMS_CA";
-			var serviceUrl = "/rest/eclaims/userDetails?userGroup=CLAIM_ASSISTANT";
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
-			if (userRole === "CW_DEPARTMENT_ADMIN") {
-				Utility._fnOpenQuickViewForDepartmentAdmin(this, serviceUrl);
-			} else {
-				serviceUrl = Config.dbOperations.chrsJobInfo;
-				Utility._fnOpenQuickViewForStaff(this, serviceUrl, oDataModel);
-			}
+			Utility._fnOpenQuickViewForStaff(this);
 			this.openQuickView(oEvent);
 		},
 
@@ -527,18 +523,10 @@ sap.ui.define([
 				this.showMessageStrip("cwsRequestDialogMStripId", validateLeaving, "E", "NewRequestTypeSelectionDialog");
 			}
 		},
-		initializeModel: function () {
-			var readOnly = this.modelAssignment("ReadOnly");
-			readOnly.setProperty("/isMassSubmissionVisible", false);
-			readOnly.setProperty("/isSingleSubmission", true);
-			var oAppModel = this.setComponentModel("AppModel");
-			oAppModel.setData(AppConstant);
-			this.AppModel = oAppModel;
-		},
 		/**
 		 * on Press Create CWS Request
 		 */
-		onPressCreateCWSRequest: function () {
+		onPressCreateOpwnRequest: function () {
 			this.initializeModel();
 			this.AppModel.setProperty("/cwsRequest/isMassUploadFeatureVisible", false);
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest", {});
@@ -563,13 +551,13 @@ sap.ui.define([
 		_fnRequestType: function () {
 			var aFilter = [],
 				andFilter = [],
-				serviceUrl = "/CwsAppConfigs",
-				oDataModel = this.getOwnerComponent().getModel("CwsSrvModel"),
+				// serviceUrl = "/CwsAppConfigs",
 				oKey = this.AppModel.getProperty("/cwsRequest/createCWSRequest/TYPE");
+			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			andFilter.push(new Filter("REFERENCE_KEY", FilterOperator.EQ, oKey));
 			aFilter.push(new sap.ui.model.Filter(andFilter, true));
-
-			Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
+			Utility.retrieveRequestTypes(this);
+			Services.getRequestViewCount(null, oCatalogSrvModel, this, aFilter, function (oResponse) {
 				this.AppModel.setProperty("/RequestType", oResponse.results);
 			}.bind(this));
 		},
@@ -1067,19 +1055,13 @@ sap.ui.define([
 
 		onPressSearchCWSRequest: function (oEvent) {
 			var sValue = this.getView().byId("srchFldCWSRequest").getValue();
-			var sPath = "CwsSrvModel>/CwsRequestViews";
-			// Begin of change - CW0084
+			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
 			var oViewModel = this.getView().getModel("ViewModel");
-			// var oSorter = new sap.ui.model.Sorter({
-			// 	path: "REQ_UNIQUE_ID",
-			// 	descending: true
-			// });
 			var oSorter = new Sorter({
 				path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "REQ_UNIQUE_ID",
 				descending: oViewModel.getProperty("/SortCwTable/sortDescending") !== "" ? oViewModel.getProperty("/SortCwTable/sortDescending") : true,
 			});
 			oViewModel.setProperty("/SearchProperty", sValue);
-			// End of change - CW0084
 			var aFilter = Utility._onPressSearchCWRequest(sValue, this);
 			Utility._bindItems(this, "idCWSRequestTable", sPath, oSorter, this.oTemplate, aFilter);
 		},
@@ -1451,10 +1433,9 @@ sap.ui.define([
 		 */
 		onPressExport: function () {
 			this.getView().setBusy(true);
-			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
-			var serviceUrl = "/CwsRequestViews";
+			var CwsSrvModel = this.getComponentModel("CwsSrvModel");
 			this.GlobalFilterForTable = Utility._fnEssAllStatus(this);
-			Services._readDataUsingOdataModel(serviceUrl, CwsSrvModel, this, this.GlobalFilterForTable, function (oData) {
+			Services._readDataUsingOdataModel(Config.dbOperations.openRequestView, CwsSrvModel, this, this.GlobalFilterForTable, function (oData) {
 				if (oData.results.length > 0) {
 					this._fnExportClaims(oData.results);
 				}

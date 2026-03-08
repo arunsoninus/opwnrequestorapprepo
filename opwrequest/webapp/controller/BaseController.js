@@ -818,22 +818,21 @@ sap.ui.define([
 		 */
 		handleSearchStaffs: function (oEvent) {
 			this.showBusyIndicator();
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
 			var sValue = oEvent.getParameter("value").toString();
 			var filterStaffId = new Filter("SF_STF_NUMBER", FilterOperator.EQ, sValue);
 			var filterEXT = new Filter("IS_EXTERNAL", FilterOperator.EQ, 0);
-
+			
 			var orFilter = new Filter({
 				filters: [new Filter("EMPL_STS_C", FilterOperator.EQ, "A"),
-				new Filter("EMPL_STS_C", FilterOperator.EQ, "U"),
-				new Filter("EMPL_STS_C", FilterOperator.EQ, "P"),
-				new Filter("EMPL_STS_C", FilterOperator.EQ, "T"),
-				new Filter("EMPL_STS_C", FilterOperator.EQ, "R"),
-				new Filter("EMPL_STS_C", FilterOperator.EQ, "RNS")
+					new Filter("EMPL_STS_C", FilterOperator.EQ, "U"),
+					new Filter("EMPL_STS_C", FilterOperator.EQ, "P"),
+					new Filter("EMPL_STS_C", FilterOperator.EQ, "T"),
+					new Filter("EMPL_STS_C", FilterOperator.EQ, "R"),
+					new Filter("EMPL_STS_C", FilterOperator.EQ, "RNS")
 				],
 				and: false
 			});
-
+			
 			var aFilters = new Filter({
 				filters: [filterStaffId, filterEXT, orFilter],
 				and: true
@@ -842,7 +841,8 @@ sap.ui.define([
 				this.AppModel.setProperty("/staffList", []);
 				this.hideBusyIndicator();
 			} else {
-				oDataModel.read("/UserLookups", {
+				var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
+				oCatalogSrvModel.read(Config.dbOperations.userLookup, {
 					urlParameters: {
 						"$select": "NUSNET_ID,FULL_NM,STF_NUMBER,IS_EXTERNAL,SF_STF_NUMBER,LEAVING_DATE"
 					},

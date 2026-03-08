@@ -34,7 +34,7 @@
           "odataVersion": "2.0"
         }
       },
-      "cwRunReportService": {
+      "cwsNedService": {
         "uri": "/odata/v2/cwned/",
         "type": "OData",
         "settings": {
@@ -119,8 +119,8 @@
           "earlyRequests": true
         }
       },
-      "CWRunReportSrvModel": {
-        "dataSource": "cwRunReportService",
+      "CwsSrvModel": {
+        "dataSource": "cwsNedService",
         "preload": true,
         "settings": {
           "useBatch": false,

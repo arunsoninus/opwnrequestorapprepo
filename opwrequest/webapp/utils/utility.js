@@ -53,20 +53,21 @@ sap.ui.define([
 				}
 			},
 			_assignTokenAndUserInfo: function (oRetData, component) {
-				component.AppModel.setProperty("/token", oRetData.token);
+				// component.AppModel.setProperty("/token", oRetData.token);
 				component.AppModel.setProperty("/loggedInUserStfNumber", oRetData.staffInfo.primaryAssignment.STF_NUMBER);
 				component.AppModel.setProperty("/loggedInUserSfStfNumber", oRetData.staffInfo.primaryAssignment.SF_STF_NUMBER);
+				component.AppModel.setProperty("/loggedInUserId", oRetData.staffInfo.primaryAssignment.NUSNET_ID);
 				//to incorporate primary and secondary assignments(concurrent case ULU and FDLUs)	
 				component.AppModel.setProperty("/primaryAssigment", oRetData.staffInfo.primaryAssignment);
-				component.AppModel.setProperty("/otherAssignments", oRetData.staffInfo.otherAssignments);
+				component.AppModel.setProperty("/otherAssignments", oRetData.staffInfo.otherAssignment);
 				component.AppModel.setProperty("/appMatrixAuth", (oRetData.staffInfo.approverMatrix) ? oRetData.staffInfo.approverMatrix : []);
 				component.AppModel.setProperty("/staffInfo", oRetData.staffInfo);
 				var sListUluFdluQuickView = oRetData.staffInfo.primaryAssignment.ULU_T.concat("(", oRetData.staffInfo.primaryAssignment.ULU_C).concat(
 					")\n ", oRetData.staffInfo.primaryAssignment.FDLU_T).concat("(", oRetData.staffInfo.primaryAssignment.FDLU_C).concat(")", "");
 
 				//Concurrent Appointment assigned to the Staff
-				for (var t = 0; t < oRetData.staffInfo.otherAssignments.length; t++) {
-					var oOtherAssign = oRetData.staffInfo.otherAssignments[t];
+				for (var t = 0; t < oRetData.staffInfo.otherAssignment.length; t++) {
+					var oOtherAssign = oRetData.staffInfo.otherAssignment[t];
 					sListUluFdluQuickView = sListUluFdluQuickView.concat("\n\n", oOtherAssign.ULU_T).concat("(", oOtherAssign.ULU_C).concat(") / ",
 						oOtherAssign.FDLU_T).concat("(", oOtherAssign.FDLU_C).concat(")", "");
 				}
@@ -230,10 +231,10 @@ sap.ui.define([
 			},
 
 			retrieveRequestTypes: function (component, isRetrieve, callBack) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 				var type = component.AppModel.getProperty("/cwsRequest/createCWSRequest/TYPE");
 				var that = this;
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY", type),
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY", type),
 					function (oData) {
 						component.AppModel.setProperty("/requestTypes", oData.results);
 						var selectedRequestType = component.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_TYPE");
@@ -263,10 +264,10 @@ sap.ui.define([
 				this.retrieveSubTypes(component);
 			},
 			retrieveSubTypes: function (component) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 				var requestType = component.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_TYPE");
 				if (requestType) {
-					Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
+					Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
 							requestType + "_ST"),
 						function (oData) {
 							component.AppModel.setProperty("/subTypes", oData.results);
@@ -275,22 +276,22 @@ sap.ui.define([
 			},
 
 			retrieveWaivers: function (component) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY", "WAIVER"),
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY", "WAIVER"),
 					function (oData) {
 						component.AppModel.setProperty("/waiverList", oData.results);
 					}.bind(this));
 			},
 			retrieveTypes: function (component) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY", "TYPE"),
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY", "TYPE"),
 					function (oData) {
 						component.AppModel.setProperty("/typesList", oData.results);
 					}.bind(this));
 			},
 			retrieveRemunerationType: function (component, isRetrieve) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
 						"REMUNERATION_TYPE"),
 					function (oData) {
 						component.AppModel.setProperty("/remunerationList", oData.results);
@@ -301,24 +302,24 @@ sap.ui.define([
 					}.bind(this));
 			},
 			retrieveAttachmentTypes: function (component) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
 						"ATTACHMENT_TYPE_OPWN"),
 					function (oData) {
 						component.AppModel.setProperty("/attachmentTypes", oData.results);
 					}.bind(this));
 			},
 			retrieveLocations: function (component) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
 						"LOCATION"),
 					function (oData) {
 						component.AppModel.setProperty("/locations", oData.results);
 					}.bind(this));
 			},
 			retrieveWorkTypes: function (component) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
 						"WORK_TYPE"),
 					function (oData) {
 						component.AppModel.setProperty("/workTypes", oData.results);
@@ -326,8 +327,8 @@ sap.ui.define([
 			},
 
 			retrieveUnitType: function (component) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
 						"UNIT_TYPE"),
 					function (oData) {
 						component.AppModel.setProperty("/unitTypes", oData.results);
@@ -335,8 +336,8 @@ sap.ui.define([
 			},
 
 			retrievePaymentType: function (component) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY",
 						"PAYMENT_TYPE"),
 					function (oData) {
 						component.AppModel.setProperty("/paymentTypes", oData.results);
@@ -344,9 +345,9 @@ sap.ui.define([
 			},
 
 			retrieveLevyDetails: function (component, isRetrieve) {
-				var oClaimSrvModel = component.getComponentModel("CwsSrvModel");
+				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 				var type = component.AppModel.getProperty("/cwsRequest/createCWSRequest/TYPE");
-				Services.readLookups(Config.dbOperations.cwsAppConfigs, oClaimSrvModel, component, this._fnLookupFilter("REFERENCE_KEY", type +
+				Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, this._fnLookupFilter("REFERENCE_KEY", type +
 						"_LEVY"),
 					function (oData) {
 						component.AppModel.setProperty("/levyList", oData.results);
@@ -865,7 +866,7 @@ sap.ui.define([
 					component.AppModel.setProperty("/employeeInformation/groups", [oData.getSource().getData()]);
 				}.bind(component));
 			},
-			_fnOpenQuickViewForStaff: function (component, serviceUrl, oDataModel) {
+			_fnOpenQuickViewForStaff: function (component) {
 				var aFilter = [];
 				aFilter.push(new Filter("NUSNET_ID", FilterOperator.EQ, component.AppModel.getProperty("/loggedInUserId").toString()));
 				aFilter.push(new Filter("STF_NUMBER", FilterOperator.EQ, component.AppModel.getProperty("/loggedInUserStfNumber")));
@@ -874,7 +875,9 @@ sap.ui.define([
 					filters: aFilter,
 					and: true
 				});
-				Services._readDataUsingOdataModel(serviceUrl, oDataModel, component, [filters], function (oData) {
+				let oDataModel = component.getComponentModel("CatalogSrvModel");
+				// var serviceUrl = Config.dbOperations.userLookup;
+				Services._readDataUsingOdataModel(Config.dbOperations.userLookup, oDataModel, component, [filters], function (oData) {
 					if (oData.results.length) {
 						var isEntered = false;
 						var sUluFdlu = "";
