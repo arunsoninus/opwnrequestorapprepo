@@ -243,7 +243,7 @@ sap.ui.define([
 
 		fnPaymentAmount: function (key, model, filter) {
 			var oDeptRole = this.AppModel.getProperty("/isDeptOHRSS");
-			var paymentListHeader = {
+			var paymentListObj = {
 				"REQ_UNIQUE_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID"),
 				"REQUEST_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID"),
 				"ROLE": (oDeptRole === true) ? this.getI18n("CwsRequest.OHRSS") : this.AppModel.getProperty("/userRole"),
@@ -254,14 +254,20 @@ sap.ui.define([
 				"STAFF_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID")
 			};
 
-			var sUrl = Config.dbOperations.oPaymentList;
-			var oHeaders = Formatter._amendHeaderToken(this);
-			var paymentModel = new JSONModel();
-			paymentModel.loadData(sUrl, JSON.stringify(paymentListHeader), null, "POST", null,
-				null, oHeaders);
-			paymentModel.attachRequestCompleted(function (oResponse) {
-				this._fnpopulatePayments(oResponse.getSource().getData(), key);
-			}.bind(this));
+			Services.getPaymentList(this, paymentListObj, function (paymentData) {
+				this._fnpopulatePayments(paymentData, key);
+				resolve();
+			}.bind(this)
+			);
+
+			// var sUrl = Config.dbOperations.oPaymentList;
+			// var oHeaders = Formatter._amendHeaderToken(this);
+			// var paymentModel = new JSONModel();
+			// paymentModel.loadData(sUrl, JSON.stringify(paymentListHeader), null, "POST", null,
+			// 	null, oHeaders);
+			// paymentModel.attachRequestCompleted(function (oResponse) {
+			// 	this._fnpopulatePayments(oResponse.getSource().getData(), key);
+			// }.bind(this));
 		},
 
 		_fnpopulatePayments: function (data, key) {
@@ -821,18 +827,18 @@ sap.ui.define([
 			var sValue = oEvent.getParameter("value").toString();
 			var filterStaffId = new Filter("SF_STF_NUMBER", FilterOperator.EQ, sValue);
 			var filterEXT = new Filter("IS_EXTERNAL", FilterOperator.EQ, 0);
-			
+
 			var orFilter = new Filter({
 				filters: [new Filter("EMPL_STS_C", FilterOperator.EQ, "A"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "U"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "P"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "T"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "R"),
-					new Filter("EMPL_STS_C", FilterOperator.EQ, "RNS")
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "U"),
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "P"),
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "T"),
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "R"),
+				new Filter("EMPL_STS_C", FilterOperator.EQ, "RNS")
 				],
 				and: false
 			});
-			
+
 			var aFilters = new Filter({
 				filters: [filterStaffId, filterEXT, orFilter],
 				and: true
@@ -862,7 +868,7 @@ sap.ui.define([
 			}
 		},
 
-		
+
 		onNavDashBoard: function () {
 			var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation");
 			var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({

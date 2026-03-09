@@ -252,19 +252,38 @@ sap.ui.define([
 			);
 		},
 
-		persistCwsRequest: function (component, oHeaders, oPayload, callBackFx) {
+		persistCwsRequest: async function (component, oHeaders, oPayload, callBackFx) {
 			// var sUrl = Config.dbOperations.saveCwRequest;
-			var sUrl = Config.dbOperations.massUpload;
 			delete oPayload.JOIN_DATE;
 			var oCont = {
 				"cwRequest": []
 			};
 			oCont.cwRequest.push(oPayload);
-			var persistModel = new JSONModel();
-			persistModel.loadData(sUrl, JSON.stringify(oCont), null, "POST", null, null, oHeaders);
-			persistModel.attachRequestCompleted(function (oResponse) {
-				callBackFx(oResponse.getSource().getData());
-			}.bind(component));
+
+			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var serviceUrl = Config.dbOperations.massUpload;
+			await this._createDataUsingOdataModelWithRespObject(
+				serviceUrl,
+				CwsSrvModel,
+				component,
+				function (response) {
+					let oResponse = (response && response.data && response.data.massCwRequestsCreation) ? response.data.massCwRequestsCreation : {};
+					if (!oResponse.error) {
+						callBackFx(oResponse);
+					} else {
+						sap.m.MessageBox.error(oResponse.message);
+					}
+
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				oCont,
+				true
+			);
+			// var persistModel = new JSONModel();
+			// persistModel.loadData(sUrl, JSON.stringify(oCont), null, "POST", null, null, oHeaders);
+			// persistModel.attachRequestCompleted(function (oResponse) {
+			// 	callBackFx(oResponse.getSource().getData());
+			// }.bind(component));
 		},
 
 		readLookups: function (serviceUrl, oDataModel, component, aFilter, callBackFx) {
@@ -382,6 +401,111 @@ sap.ui.define([
 			};
 			oValidateModel.loadData(sUrl, null, false, "GET", null, null, oHeaders);
 			return oValidateModel.getData();
+		},
+		getTotalUtilization: async function (component, oPayload, callBackFx) {
+			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var serviceUrl = Config.dbOperations.utilizationDays;
+			await this._createDataUsingOdataModelWithRespObject(
+				serviceUrl,
+				CwsSrvModel,
+				component,
+				function (response) {
+					let oResponse = (response && response.data && response.data.totalUtilization) ? response.data.totalUtilization : {};
+					if (!oResponse.error) {
+						callBackFx(oResponse);
+					} else {
+						sap.m.MessageBox.error(oResponse.message);
+					}
+
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				oPayload,
+				true
+			);
+		},
+		getPaymentList: async function (component, oPayload, callBackFx) {
+			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var serviceUrl = Config.dbOperations.oPaymentList;
+			await this._createDataUsingOdataModelWithRespObject(
+				serviceUrl,
+				CwsSrvModel,
+				component,
+				function (response) {
+					let oResponse = (response && response.data && response.data.populatePaymentList) ? response.data.populatePaymentList : {};
+					if (!oResponse.error) {
+						callBackFx(oResponse);
+					} else {
+						sap.m.MessageBox.error(oResponse.message);
+					}
+
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				oPayload,
+				true
+			);
+		},
+		getPayrollArea: async function (component, oPayload, callBackFx) {
+			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var serviceUrl = Config.dbOperations.utilizationDays;
+			await this._createDataUsingOdataModelWithRespObject(
+				serviceUrl,
+				CwsSrvModel,
+				component,
+				function (response) {
+					let oResponse = (response && response.data && response.data.totalUtilization) ? response.data.totalUtilization : {};
+					if (!oResponse.error) {
+						callBackFx(oResponse);
+					} else {
+						sap.m.MessageBox.error(oResponse.message);
+					}
+
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				oPayload,
+				true
+			);
+		},
+		validateWbs: async function (component, oPayload, callBackFx) {
+			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			var serviceUrl = Config.dbOperations.checkWbs;
+			await this._createDataUsingOdataModelWithRespObject(
+				serviceUrl,
+				UtilitySrvModel,
+				component,
+				function (response) {
+					let oResponse = (response && response.data && response.data.totalUtilization) ? response.data.totalUtilization : {};
+					if (!oResponse.error) {
+						callBackFx(oResponse);
+					} else {
+						sap.m.MessageBox.error(oResponse.message);
+					}
+
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				oPayload,
+				true
+			);
+		},
+		getTaskAgent: async function (component, oPayload, callBackFx) {
+			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			var serviceUrl = Config.dbOperations.fetchTaskAgent;
+			await this._createDataUsingOdataModelWithRespObject(
+				serviceUrl,
+				UtilitySrvModel,
+				component,
+				function (response) {
+					let oResponse = (response && response.data && response.data.workFlowUserDetails) ? response.data.workFlowUserDetails : {};
+					if (!oResponse.error) {
+						callBackFx(oResponse);
+					} else {
+						sap.m.MessageBox.error(oResponse.message);
+					}
+
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				oPayload,
+				true
+			);
 		},
 		_readDataUsingOdataModel: async function (
 			serviceUrl,

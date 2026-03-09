@@ -463,6 +463,7 @@ sap.ui.define([
 				project: ruleSet,
 				layout: "MidColumnFullScreen"
 			});
+			
 		},
 
 		onPressCopy: function (oEvent) {
