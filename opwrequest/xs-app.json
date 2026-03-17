@@ -14,7 +14,7 @@
       "authenticationType": "none",
       "destination": "ui5"
     },
-     {
+    {
       "source": "^/v2/catalog/(.*)$",
       "destination": "nusbtputil",
       "csrfProtection": false
@@ -27,6 +27,11 @@
     {
       "source": "^/odata/v2/cwned/(.*)$",
       "destination": "nusbtpcwsned",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/odata/v2/eclaims/(.*)$",
+      "destination": "nusbtpeclaim",
       "csrfProtection": false
     },
     {

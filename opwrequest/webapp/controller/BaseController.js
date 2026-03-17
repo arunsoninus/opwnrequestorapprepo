@@ -243,51 +243,83 @@ sap.ui.define([
 
 		fnPaymentAmount: function (key, model, filter) {
 			var oDeptRole = this.AppModel.getProperty("/isDeptOHRSS");
-			var paymentListHeader = {
+			var paymentListObj = {
 				"REQ_UNIQUE_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID"),
 				"REQUEST_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID"),
 				"ROLE": (oDeptRole === true) ? this.getI18n("CwsRequest.OHRSS") : this.AppModel.getProperty("/userRole"),
 				"START_DATE": this.formatDate(this.AppModel.getProperty("/cwsRequest/createCWSRequest/START_DATE")),
 				"END_DATE": this.formatDate(this.AppModel.getProperty("/cwsRequest/createCWSRequest/END_DATE")),
 				"AMOUNT": this.AppModel.getProperty("/cwsRequest/createCWSRequest/AMOUNT"),
-				"NOOFMONTHS": parseInt(this.AppModel.getProperty("/Month")),
+				// "NOOFMONTHS": parseInt(this.AppModel.getProperty("/Month")),
 				"STAFF_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID")
 			};
 
-			var sUrl = Config.dbOperations.oPaymentList;
-			var oHeaders = Formatter._amendHeaderToken(this);
-			var paymentModel = new JSONModel();
-			paymentModel.loadData(sUrl, JSON.stringify(paymentListHeader), null, "POST", null,
-				null, oHeaders);
-			paymentModel.attachRequestCompleted(function (oResponse) {
-				this._fnpopulatePayments(oResponse.getSource().getData(), key);
-			}.bind(this));
+			Services.getPaymentList(this, paymentListObj, function (paymentData) {
+				this._fnpopulatePayments(paymentData, key);
+				// resolve();
+			}.bind(this)
+			);
+
+			// var sUrl = Config.dbOperations.oPaymentList;
+			// var oHeaders = Formatter._amendHeaderToken(this);
+			// var paymentModel = new JSONModel();
+			// paymentModel.loadData(sUrl, JSON.stringify(paymentListHeader), null, "POST", null,
+			// 	null, oHeaders);
+			// paymentModel.attachRequestCompleted(function (oResponse) {
+			// 	this._fnpopulatePayments(oResponse.getSource().getData(), key);
+			// }.bind(this));
 		},
 
 		_fnpopulatePayments: function (data, key) {
-			this.AppModel.setProperty("/isEditAllowed", data.editAllowed);
-			this.AppModel.setProperty("/isadminDetailsEditAllowed", data.adminDetailsEditAllowed);
-			this.AppModel.setProperty("/isWbsChangeAllowed", data.wbsChangeAllowed);
-			this.AppModel.setProperty("/derivePropUsage", data.derivePropUsage);
-			if (this.viaRequestorForm && this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS") === "38" && !this.AppModel.getProperty(
-				"/isEditAllowed")) {
-				this.AppModel.setProperty("/exitFullScreen", false);
-				this.AppModel.setProperty("/showWithdrawButton", false);
-				this.AppModel.setProperty("/showEditButtonApproved", false);
-				this.AppModel.setProperty("/isFormEditable", false);
-			}
+			// this.AppModel.setProperty("/isEditAllowed", data.editAllowed);
+			if (data && Object.keys(data).length > 0) {
 
-			this.AppModel.setProperty("/oPaymentDatatable", false);
-			this.AppModel.setProperty("/PaidStartDate", true);
-			if (data.statusCode === "E") {
-				if (key === "N") {
-					this.showMessageStrip("cwsRequestDialogMStripId", data.message, "E", "NewRequestTypeSelectionDialog");
+				this.AppModel.setProperty("/isEditAllowed", data.isEditAllowed);
+				this.AppModel.setProperty("/isadminDetailsEditAllowed", data.adminDetailsEditAllowed);
+				this.AppModel.setProperty("/isWbsChangeAllowed", data.wbsChangeAllowed);
+				this.AppModel.setProperty("/derivePropUsage", data.derivePropUsage);
+				if (this.viaRequestorForm && this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS") === "38" && !this.AppModel.getProperty(
+					"/isEditAllowed")) {
+					this.AppModel.setProperty("/exitFullScreen", false);
+					this.AppModel.setProperty("/showWithdrawButton", false);
+					this.AppModel.setProperty("/showEditButtonApproved", false);
+					this.AppModel.setProperty("/isFormEditable", false);
+				}
+
+				this.AppModel.setProperty("/oPaymentDatatable", false);
+				this.AppModel.setProperty("/PaidStartDate", true);
+				if (data.statusCode === "E") {
+					if (key === "N") {
+						this.showMessageStrip("cwsRequestDialogMStripId", data.message, "E", "NewRequestTypeSelectionDialog");
+					} else {
+						var aValidation = [];
+						aValidation.push(Validation._formatMessageList("Error", "Payment Error", data.message));
+						this.AppModel.setProperty("/cwsRequest/paymentError", aValidation);
+						this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aValidation);
+						this.AppModel.setProperty("/oPaymentDatatable", true);
+						// var uniqueYears = Array.from(new Set((data.paymentList).map(item => item.YEAR)));
+						// var oUniqueModelData = uniqueYears.map(function (value) {
+						// 	return {
+						// 		YEAR: value
+						// 	};
+						// });
+						if (data.paymentList && data.paymentList.length > 0) {
+							var uniqueYears = Array.from(new Set(data.paymentList.map(item => item.YEAR)));
+							var oUniqueModelData = uniqueYears.map(value => ({ YEAR: value }));
+							this.AppModel.setProperty("/paymentYearList", oUniqueModelData);
+						}
+						this.AppModel.setProperty("/cwsRequest/createCWSRequest/paymentList", data.paymentList);
+						this.onPressErrorMessages();
+					}
 				} else {
-					var aValidation = [];
-					aValidation.push(Validation._formatMessageList("Error", "Payment Error", data.message));
-					this.AppModel.setProperty("/cwsRequest/paymentError", aValidation);
-					this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aValidation);
-					this.AppModel.setProperty("/oPaymentDatatable", true);
+					if (key === "N") {
+						this._fncreateLoad();
+					}
+					var cwRequestData = this.AppModel.getProperty("/cwsRequest/createCWSRequest");
+					delete data.START_DATE;
+					delete data.END_DATE;
+					delete data.REQ_UNIQUE_ID;
+					delete data.REQUEST_ID;
 					var uniqueYears = Array.from(new Set((data.paymentList).map(item => item.YEAR)));
 					var oUniqueModelData = uniqueYears.map(function (value) {
 						return {
@@ -295,44 +327,26 @@ sap.ui.define([
 						};
 					});
 					this.AppModel.setProperty("/paymentYearList", oUniqueModelData);
-					this.AppModel.setProperty("/cwsRequest/createCWSRequest/paymentList", data.paymentList);
-					this.onPressErrorMessages();
-				}
-			} else {
-				if (key === "N") {
-					this._fncreateLoad();
-				}
-				var cwRequestData = this.AppModel.getProperty("/cwsRequest/createCWSRequest");
-				delete data.START_DATE;
-				delete data.END_DATE;
-				delete data.REQ_UNIQUE_ID;
-				delete data.REQUEST_ID;
-				var uniqueYears = Array.from(new Set((data.paymentList).map(item => item.YEAR)));
-				var oUniqueModelData = uniqueYears.map(function (value) {
-					return {
-						YEAR: value
-					};
-				});
-				this.AppModel.setProperty("/paymentYearList", oUniqueModelData);
 
-				if (data.paymentList.length > 0) {
-					var status = data.paymentList.find(function (element) {
-						return element.PAYMENT_REQ_STATUS === "54";
-					}.bind(this));
-					if (cwRequestData.REQUEST_STATUS === "38")
-						this.AppModel.setProperty("/PaidStartDate", !status);
+					if (data.paymentList.length > 0) {
+						var status = data.paymentList.find(function (element) {
+							return element.PAYMENT_REQ_STATUS === "54";
+						}.bind(this));
+						if (cwRequestData.REQUEST_STATUS === "38")
+							this.AppModel.setProperty("/PaidStartDate", !status);
+					}
+
+					Object.assign(cwRequestData, data);
+					this.AppModel.setProperty("/cwsRequest/createCWSRequest/", cwRequestData);
+					this.AppModel.setProperty("/cwsRequest/paymentError", []);
+					if (this.getView().byId("oTableWbs")) {
+						this.onListItemPress();
+					}
 				}
 
-				Object.assign(cwRequestData, data);
-				this.AppModel.setProperty("/cwsRequest/createCWSRequest/", cwRequestData);
-				this.AppModel.setProperty("/cwsRequest/paymentError", []);
-				if (this.getView().byId("oTableWbs")) {
-					this.onListItemPress();
-				}
+				// Manage Levy Details and display
+				this.fnLevyCalculation();
 			}
-
-			// Manage Levy Details and display
-			this.fnLevyCalculation();
 		},
 
 		// Levy display and calculation
@@ -818,7 +832,6 @@ sap.ui.define([
 		 */
 		handleSearchStaffs: function (oEvent) {
 			this.showBusyIndicator();
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
 			var sValue = oEvent.getParameter("value").toString();
 			var filterStaffId = new Filter("SF_STF_NUMBER", FilterOperator.EQ, sValue);
 			var filterEXT = new Filter("IS_EXTERNAL", FilterOperator.EQ, 0);
@@ -842,7 +855,8 @@ sap.ui.define([
 				this.AppModel.setProperty("/staffList", []);
 				this.hideBusyIndicator();
 			} else {
-				oDataModel.read("/UserLookups", {
+				var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
+				oCatalogSrvModel.read(Config.dbOperations.userLookup, {
 					urlParameters: {
 						"$select": "NUSNET_ID,FULL_NM,STF_NUMBER,IS_EXTERNAL,SF_STF_NUMBER,LEAVING_DATE"
 					},
@@ -861,6 +875,7 @@ sap.ui.define([
 				});
 			}
 		},
+
 
 		onNavDashBoard: function () {
 			var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation");
@@ -1018,7 +1033,7 @@ sap.ui.define([
 						aParameter.inputList.push({
 							"DRAFT_ID": reqUniqueId
 						});
-						Services._loadDataUsingJsonModel(this, Config.dbOperations.deleteReqUrl, aParameter, "POST", function (oData) {
+						Services.performDraftDeletion(this, utilizationObj, function (utilisationData) {
 							if (!oData.getSource().getData().error) {
 								if (oEvent !== "D") {
 									MessageBox.success("Request has been deleted successfully.");
@@ -1030,11 +1045,30 @@ sap.ui.define([
 										}, true);
 									}.bind(this));
 								}
-								this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("CwsSrvModel"));
+								this.getOpwnRequests();
+								// this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("CwsSrvModel"));
 							} else {
 								MessageBox.error(oData.getSource().getData().message);
 							}
-						}.bind(this));
+						}.bind(this)
+						);
+						// Services._loadDataUsingJsonModel(this, Config.dbOperations.deleteReqUrl, aParameter, "POST", function (oData) {
+						// 	if (!oData.getSource().getData().error) {
+						// 		if (oEvent !== "D") {
+						// 			MessageBox.success("Request has been deleted successfully.");
+						// 		} else {
+						// 			Utility._fnSuccessDialog(this, oData.getSource().getData().message, function () {
+						// 				this._fnClearLocal();
+						// 				this.oRouter.navTo("master", {
+						// 					layout: "OneColumn"
+						// 				}, true);
+						// 			}.bind(this));
+						// 		}
+						// 		this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("CwsSrvModel"));
+						// 	} else {
+						// 		MessageBox.error(oData.getSource().getData().message);
+						// 	}
+						// }.bind(this));
 					}
 				}.bind(this)
 			}

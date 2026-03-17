@@ -2,13 +2,14 @@ sap.ui.define([
 	"sap/ui/model/Filter",
 	"./services",
 	"./utility",
+	"./headerHelper",
 	"./configuration",
 	"./dataformatter"
-], function (Filter, Services, Utility, Config, Formatter) {
+], function (Filter, Services, Utility,HeaderHelper, Config, Formatter) {
 	"use strict";
 	var requestlockhelper = ("nus.edu.sg.opwrequest.utils.requestlockhelper", {
 		_settingClaimTypeValue: function (component) {
-			var oHeaders = Utility._headerToken(component);
+			var oHeaders = HeaderHelper._headerToken(component);
 			var staffId = component.AppModel.getProperty("/loggedInUserId");
 			var userRole = component.AppModel.getProperty("/userRole");
 			if (userRole === "CA") {
@@ -219,8 +220,6 @@ sap.ui.define([
 			return [finalFilterGrp];
 		},
 		_handleLocking: function (component, requestStatus, draftId, nusnetId, callBackFx) {
-			var oHeaders = Utility._headerToken(component);
-			//Formatter._amendHeaderToken(component);
 			var serviceUrl;
 			if (requestStatus === "LOCK") {
 				serviceUrl = Config.dbOperations.requestLock;
@@ -229,7 +228,7 @@ sap.ui.define([
 			}
 
 			serviceUrl = Config.dbOperations.requestLock;
-			var oParameter = {
+			var requestLockObj = {
 				// "NUSNET_ID": component.AppModel.getProperty("/loggedInUserStfNumber"),
 				"REQUEST_STATUS": requestStatus,
 				"DRAFT_ID": draftId,
@@ -238,19 +237,31 @@ sap.ui.define([
 				"REQUESTOR_GRP": component.AppModel.getProperty("/userRole")
 			};
 
+			Services.getRequestLock(component, requestLockObj, function (lockData) {
+				callBackFx(lockData);
+				if (component.AppModel.getProperty("/isClaimLocked") && lockData.isError) {
+					component.AppModel.setProperty("/isClaimLockedMessage", lockData.message);
+				}
+				if (component.AppModel.getProperty("/isNavigate")) {
+					HeaderHelper._fnCrossAppNavigationToInbox();
+				}
+				// resolve();
+			}.bind(component)
+			);
+
 			/*if (requestStatus === "UNLOCK") {
 				delete oParameter.REQUEST_STATUS;
 			}*/
-			Services._loadDataUsingJsonModel(component, serviceUrl, oParameter, "POST", function (oData) {
-				callBackFx(oData);
-				var oValue = oData.getSource().getData();
-				if (component.AppModel.getProperty("/isClaimLocked") && oValue.error) {
-					component.AppModel.setProperty("/isClaimLockedMessage", oValue.message);
-				}
-				if (component.AppModel.getProperty("/isNavigate")) {
-					Utility._fnCrossAppNavigationToInbox();
-				}
-			}.bind(component));
+			// Services._loadDataUsingJsonModel(component, serviceUrl, oParameter, "POST", function (oData) {
+			// 	callBackFx(oData);
+			// 	var oValue = oData.getSource().getData();
+			// 	if (component.AppModel.getProperty("/isClaimLocked") && oValue.error) {
+			// 		component.AppModel.setProperty("/isClaimLockedMessage", oValue.message);
+			// 	}
+			// 	if (component.AppModel.getProperty("/isNavigate")) {
+			// 		HeaderHelper._fnCrossAppNavigationToInbox();
+			// 	}
+			// }.bind(component));
 
 		}
 	});
