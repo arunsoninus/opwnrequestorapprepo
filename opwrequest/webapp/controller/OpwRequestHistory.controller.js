@@ -117,7 +117,7 @@ sap.ui.define([
 		// 	}.bind(this));
 		// },
 		getAllRequestDetails: async function () {
-			// this._fetchLoggedInUserPhoto();
+			this._fetchLoggedInUserPhoto();
 			this.getOpwnRequests();
 		},
 
@@ -287,7 +287,8 @@ sap.ui.define([
 		},
 
 		onRefreshClaim: function (oEvent) {
-			this._fnReadAfterMetadataLoaded(this.oOwnerComponent.getModel("CwsSrvModel"));
+			this.getOpwnRequests();
+			// this._fnReadAfterMetadataLoaded(this.oOwnerComponent.getModel("CwsSrvModel"));
 		},
 		onSelectIconFilter: function (oEvent) {
 			this.getUIControl("idCWSRequestTable").setVisible(true);
@@ -448,9 +449,9 @@ sap.ui.define([
 		},
 
 		/**
-		 * On Press Preview Cws Request
+		 * On Press Preview Opwn Request
 		 */
-		onPressPreviewCwsRequest: function (oEvent) {
+		onPressPreviewOpwnRequest: function (oEvent) {
 			Utility._clearModelBeforeNavigationToCWDetailView(this);
 			//to set the selected icon tab in the model
 			var prevSelectedKeyOfIconTabBar = this.getView().byId("itb1").getSelectedKey();

@@ -129,6 +129,15 @@
           "synchronizationMode": "None",
           "earlyRequests": true
         }
+      },
+      "LocalData": {
+        "dataSource": "local_data_alias",
+        "preload": true,
+        "settings": {
+          "useBatch": false,
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
       }
     },
     "resources": {

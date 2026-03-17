@@ -53,7 +53,7 @@
 			</Column>
 		</columns>
 		<items>
-			<ColumnListItem type="Active" press="onPressPreviewCwsRequest">
+			<ColumnListItem type="Active" press="onPressPreviewOpwnRequest">
 				<cells>
 					<core:Icon src="sap-icon://request" visible="{= ${CwsSrvModel>SUBMISSION_TYPE} === 'U' ? true : false}" class="sapUiSmallMarginEnd"/>
 					<Text text="{CwsSrvModel>REQUEST_ID}" wrapping="true"/>

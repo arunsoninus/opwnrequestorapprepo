@@ -1,7 +1,7 @@
 sap.ui.define([
 	"sap/ui/model/json/JSONModel",
-	"./configuration", "./dataformatter","./headerHelper"
-], function (JSONModel, Config, Formatter,HeaderHelper) {
+	"./configuration", "./dataformatter", "./headerHelper"
+], function (JSONModel, Config, Formatter, HeaderHelper) {
 	"use strict";
 
 	return {
@@ -103,22 +103,18 @@ sap.ui.define([
 
 		},
 
-		fetchPhotoOfUser: function (sThis, staffId) {
+		fetchPhotoOfUser: function (component, staffId) {
 			var oPhotoModel = new JSONModel();
-			var sUrl = Config.dbOperations.fetchPhotoUser;
+			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			var sUrl = UtilitySrvModel.sServiceUrl + Config.dbOperations.photoApi;
 			sUrl = sUrl + "?userId=" + staffId;
-			var token = sThis.AppModel.getProperty("/token");
-			var oHeaders = {
-				"Accept": "application/json",
-				"Authorization": "Bearer" + " " + token
-			};
-			oPhotoModel.loadData(sUrl, null, null, "GET", null, null, oHeaders);
+			oPhotoModel.loadData(sUrl, null, false, "GET", null, null, HeaderHelper._headerToken());
 			oPhotoModel.attachRequestCompleted(function (oResponse) {
-				sThis.AppModel.setProperty("/cwsRequest/createCWSRequest/Photo", oResponse.getSource().getData().d.results[0] ?
+				component.AppModel.setProperty("/cwsRequest/createCWSRequest/Photo", oResponse.getSource().getData().d.results[0] ?
 					"data:image/png;base64," + oResponse.getSource().getData().d.results[0].photo : null);
-			}.bind(sThis));
+			}.bind(component));
 		},
-		getAuditLogData: function (component,selectedReq, callBackFx) {
+		getAuditLogData: function (component, selectedReq, callBackFx) {
 			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
 			// var staffId = component.AppModel.getProperty("/loggedInUserInfo/userName");
 			var sUrl = Config.dbOperations.auditLogApi;
@@ -127,7 +123,7 @@ sap.ui.define([
 
 			let oParameter = {
 				referenceId: selectedReq.REQUEST_ID,
-				processCode : selectedReq.PROCESS_CODE
+				processCode: selectedReq.PROCESS_CODE
 			};
 			this._readDataUsingOdataModel(
 				sUrl,
@@ -141,7 +137,7 @@ sap.ui.define([
 				oParameter
 			);
 		},
-		requestUnlock: function (component, selectedReq,callBackFx) {
+		requestUnlock: function (component, selectedReq, callBackFx) {
 			// var staffId = component.AppModel.getProperty("/loggedInUserInfo/userName");
 			var sUrl = Config.dbOperations.lockRelease;
 			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
@@ -252,7 +248,7 @@ sap.ui.define([
 			);
 		},
 
-		persistCwsRequest: async function (component, oHeaders, oPayload, callBackFx) {
+		persistCwsRequest: async function (component, oPayload, callBackFx) {
 			// var sUrl = Config.dbOperations.saveCwRequest;
 			delete oPayload.JOIN_DATE;
 			var oCont = {
@@ -300,32 +296,32 @@ sap.ui.define([
 		},
 		getRequestViewCount: function (serviceUrl, oDataModel, component, aFilter, callBackFx) {
 			this._readDataUsingOdataModel(
-                    Config.dbOperations.requestViewCount,
-                    oDataModel,
-                    component,
-                    aFilter,
-                    function (oResponse) {
-                        callBackFx(oResponse);
-                    }.bind(this),
-                    HeaderHelper._headerToken(),
-                    {}
-                );
+				Config.dbOperations.requestViewCount,
+				oDataModel,
+				component,
+				aFilter,
+				function (oResponse) {
+					callBackFx(oResponse);
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				{}
+			);
 		},
 		getStatusConfig: function (component, callBackFx) {
 			let oDataModel = component.getComponentModel("CatalogSrvModel");
 			this._readDataUsingOdataModel(
-                    Config.dbOperations.statusConfig,
-                    oDataModel,
-                    component,
-                    [],
-                    function (oData) {
-                        callBackFx(oData);
-                    }.bind(this),
-                    HeaderHelper._headerToken(),
-                    {}
-                );
+				Config.dbOperations.statusConfig,
+				oDataModel,
+				component,
+				[],
+				function (oData) {
+					callBackFx(oData);
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				{}
+			);
 		},
-		
+
 		_readDataUsingOdataModel: function (serviceUrl, oDataModel, component, aFilter, callBackFx) {
 			oDataModel.read(serviceUrl, {
 				filters: aFilter,
@@ -423,6 +419,27 @@ sap.ui.define([
 				true
 			);
 		},
+		getRequestLock: async function (component, oPayload, callBackFx) {
+			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			var serviceUrl = Config.dbOperations.requestLock;
+			await this._createDataUsingOdataModelWithRespObject(
+				serviceUrl,
+				UtilitySrvModel,
+				component,
+				function (response) {
+					let oResponse = (response && response.data && response.data.requestLock) ? response.data.requestLock : {};
+					if (!oResponse.error) {
+						callBackFx(oResponse);
+					} else {
+						sap.m.MessageBox.error(oResponse.message);
+					}
+
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				oPayload,
+				true
+			);
+		},
 		getPaymentList: async function (component, oPayload, callBackFx) {
 			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
 			var serviceUrl = Config.dbOperations.oPaymentList;
@@ -467,17 +484,19 @@ sap.ui.define([
 		},
 		validateWbs: async function (component, oPayload, callBackFx) {
 			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			//Need to replace with the model pointing to CWSNED CAPM Application
+			// var EclaimValModel = component.getComponentModel("EclaimValModel");
 			var serviceUrl = Config.dbOperations.checkWbs;
 			await this._createDataUsingOdataModelWithRespObject(
 				serviceUrl,
 				UtilitySrvModel,
 				component,
 				function (response) {
-					let oResponse = (response && response.data && response.data.totalUtilization) ? response.data.totalUtilization : {};
-					if (!oResponse.error) {
+					if (response.success) {
+						let oResponse = (response && response.data && response.data.raw) ? response.data.raw : {};
 						callBackFx(oResponse);
 					} else {
-						sap.m.MessageBox.error(oResponse.message);
+						sap.m.MessageBox.error(component.getI18n("CwsRequest.WbsError"));
 					}
 
 				}.bind(this),
@@ -494,13 +513,32 @@ sap.ui.define([
 				UtilitySrvModel,
 				component,
 				function (response) {
-					let oResponse = (response && response.data && response.data.workFlowUserDetails) ? response.data.workFlowUserDetails : {};
-					if (!oResponse.error) {
+					if (response.success) {
+						let oResponse = (response && response.data && response.data.results) ? response.data.results : {};
 						callBackFx(oResponse);
 					} else {
-						sap.m.MessageBox.error(oResponse.message);
+						sap.m.MessageBox.error(response.response.message);
 					}
-
+				}.bind(this),
+				HeaderHelper._headerToken(),
+				oPayload,
+				true
+			);
+		},
+		performDraftDeletion: async function (component, oPayload, callBackFx) {
+			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var serviceUrl = Config.dbOperations.deleteReqUrl;
+			await this._createDataUsingOdataModelWithRespObject(
+				serviceUrl,
+				CwsSrvModel,
+				component,
+				function (response) {
+					if (response.success) {
+						let oResponse = (response && response.data && response.data.workFlowUserDetails) ? response.data.workFlowUserDetails : {};
+						callBackFx(oResponse);
+					} else {
+						sap.m.MessageBox.error(response.response.message);
+					}
 				}.bind(this),
 				HeaderHelper._headerToken(),
 				oPayload,

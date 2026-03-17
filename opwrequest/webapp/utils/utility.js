@@ -138,19 +138,37 @@ sap.ui.define([
 		},
 
 		_fnNavToDashboard: function (component) {
-			var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
-			var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-				target: {
-					semanticObject: "cwsnedrequestscreen",
-					action: "display"
-				},
-				params: {}
-			})) || ""; // generate the Hash to display a Supplier
-			oCrossAppNavigator.toExternal({
-				target: {
-					shellHash: hash
-				}
-			}); // navigate to Supplier application
+			// var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
+			// var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
+			// 	target: {
+			// 		semanticObject: "cwsnedrequestscreen",
+			// 		action: "display"
+			// 	},
+			// 	params: {}
+			// })) || ""; // generate the Hash to display a Supplier
+			// oCrossAppNavigator.toExternal({
+			// 	target: {
+			// 		shellHash: hash
+			// 	}
+			// }); // navigate to Supplier application
+
+			if (sap.ushell && sap.ushell.Container) {
+
+				sap.ushell.Container.getServiceAsync("Navigation")
+					.then(function (oNavigation) {
+						this._fnSaveState();
+						return oNavigation.navigate({
+							target: {
+								semanticObject: "cwsnedrequestscreen",
+								action: "display"
+							},
+							params: {}
+						});
+					}.bind(this))
+					.catch(function (err) {
+						console.error("Request Navigation failed", err);
+					});
+			}
 		},
 
 		_headerToken: function (component) {
@@ -979,54 +997,110 @@ sap.ui.define([
 			}.bind(this));
 		},
 		_fnCrossAppNavigationToInbox: function () {
-			var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
-			var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-				target: {
-					semanticObject: "inbox",
-					action: "Display"
-					// semanticObject: "myinboxdev",
-					// action: "display"
-				},
-				params: {}
-			})) || ""; // generate the Hash to display a Supplier
-			// hash = hash + "&/taskdetail/" + project + "/" + objData.TASK_INST_ID + "/" + layout;
-			oCrossAppNavigator.toExternal({
-				target: {
-					shellHash: hash
-				}
-			}); // navigate to Supplier application
+			// var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
+			// var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
+			// 	target: {
+			// 		semanticObject: "inbox",
+			// 		action: "Display"
+			// 		// semanticObject: "myinboxdev",
+			// 		// action: "display"
+			// 	},
+			// 	params: {}
+			// })) || ""; // generate the Hash to display a Supplier
+			// // hash = hash + "&/taskdetail/" + project + "/" + objData.TASK_INST_ID + "/" + layout;
+			// oCrossAppNavigator.toExternal({
+			// 	target: {
+			// 		shellHash: hash
+			// 	}
+			// }); // navigate to Supplier application
+
+			if (sap.ushell && sap.ushell.Container) {
+
+				sap.ushell.Container.getServiceAsync("Navigation")
+					.then(function (oNavigation) {
+						this._fnSaveState();
+						return oNavigation.navigate({
+							target: {
+								semanticObject: "inbox",
+								action: "Display"
+							},
+							params: {}
+						});
+					}.bind(this))
+					.catch(function (err) {
+						console.error("Request Navigation failed", err);
+					});
+			}
+
 		},
 
 		_fnCrossAppNavigationToReport: function () {
-			var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
-			var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-				target: {
-					semanticObject: "cwnedreport",
-					action: "Display"
-				},
-				params: {}
-			})) || "";
-			oCrossAppNavigator.toExternal({
-				target: {
-					shellHash: hash
-				}
-			});
+			// var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
+			// var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
+			// 	target: {
+			// 		semanticObject: "cwnedreport",
+			// 		action: "Display"
+			// 	},
+			// 	params: {}
+			// })) || "";
+			// oCrossAppNavigator.toExternal({
+			// 	target: {
+			// 		shellHash: hash
+			// 	}
+			// });
+
+			if (sap.ushell && sap.ushell.Container) {
+
+				sap.ushell.Container.getServiceAsync("Navigation")
+					.then(function (oNavigation) {
+						this._fnSaveState();
+						return oNavigation.navigate({
+							target: {
+								semanticObject: "cwnedreport",
+								action: "Display"
+							},
+							params: {}
+						});
+					}.bind(this))
+					.catch(function (err) {
+						console.error("Request Navigation failed", err);
+					});
+			}
 		},
 
 		_fnCrossAppNavigationToofn: function () {
-			var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
-			var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-				target: {
-					semanticObject: "ofnreportview",
-					action: "Display"
-				},
-				params: {}
-			})) || "";
-			oCrossAppNavigator.toExternal({
-				target: {
-					shellHash: hash
-				}
-			});
+			// var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
+			// var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
+			// 	target: {
+			// 		semanticObject: "ofnreportview",
+			// 		action: "Display"
+			// 	},
+			// 	params: {}
+			// })) || "";
+			// oCrossAppNavigator.toExternal({
+			// 	target: {
+			// 		shellHash: hash
+			// 	}
+			// });
+
+			if (sap.ushell && sap.ushell.Container) {
+
+				sap.ushell.Container.getServiceAsync("Navigation")
+					.then(function (oNavigation) {
+						this._fnSaveState();
+						return oNavigation.navigate({
+							target: {
+								semanticObject: "ofnreportview",
+								action: "Display"
+							},
+							params: {}
+						});
+					}.bind(this))
+					.catch(function (err) {
+						console.error("Request Navigation failed", err);
+					});
+			}
+
 		},
 		_fnSuccessDialog: function (component, sText, callBackFx, sDispInfo) {
 			if (!component.oSucessDialog) {
@@ -1252,28 +1326,29 @@ sap.ui.define([
 			}
 			return isOk;
 		},
-		_fnHandleTaskAgent: function (component, loggedInStaffId, staffId, draftId, requestId, userRole, callBackFx) {
+		_fnHandleTaskAgent: function (component, loggedInStaffId, staffId, draftId, requestId, userRole, processCode, callBackFx) {
 			var aRequestPayload = [];
 			var oRequestPayload = {
 				"loggedInStaffId": loggedInStaffId,
 				"staffId": [staffId],
 				"draftId": draftId,
 				"requestId": requestId,
-				"userRole": userRole
+				"userRole": userRole,
+				"processCode": processCode
 			};
 			aRequestPayload.push(oRequestPayload);
 			// var oHeaders = this._headerToken(component);
 			// var serviceUrl = Config.dbOperations.fetchTaskAgent;
-			Services.getTaskAgent(this, aRequestPayload, function (taskAgentData) {
+			Services.getTaskAgent(component, aRequestPayload, function (taskAgentData) {
 				callBackFx(taskAgentData);
-				var bTaskAgentFlag = (taskAgentData.length) ? taskAgentData[0].matchingStaff : false;
+				var bTaskAgentFlag = (taskAgentData.length) ? taskAgentData[0].isMatchingStaff : false;
 				var bMessage = (taskAgentData.length) ? taskAgentData[0].message : '';
 				return {
 					bTaskAgentFlag: bTaskAgentFlag,
 					bMessage: bMessage
 				};
-				resolve();
-			}.bind(this)
+				// resolve();
+			}.bind(component)
 			);
 			// var taskAgentModel = new JSONModel();
 			// taskAgentModel.loadData(serviceUrl, JSON.stringify(aRequestPayload), false, "POST", null, null, oHeaders);

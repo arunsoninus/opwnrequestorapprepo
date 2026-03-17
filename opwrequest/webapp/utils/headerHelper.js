@@ -12,7 +12,7 @@ sap.ui.define([], function () {
 			var searchString = "applicationstudio";
 			if (currentURL.includes(searchString)) {
 				oHeaders["X-User-Id"] = 'alvinfoo';
-				// oHeaders["X-User-Id"] = 'gmssawh';
+				// oHeaders["X-User-Id"] = 'arunsoni';
 				// oHeaders["X-User-Id"] = 'DBSJAYAR';
 			}
 			return oHeaders;

@@ -848,7 +848,7 @@ sap.ui.define([
 				RequestLockHelper._handleLocking(this, this.getI18n("ClaimDetail.Lock"), AppModel.cwsRequest.createCWSRequest.REQ_UNIQUE_ID,
 					Utility._fnHandleStaffId(this),
 					function (oData) {
-						if (oData.error) {
+						if (oData.isError) {
 							MessageBox.show(oData.message);
 						}
 					}.bind(this));
@@ -863,8 +863,8 @@ sap.ui.define([
 			//Matching task agents
 			// var oMatchingAgents = 
 			Utility._fnHandleTaskAgent(this, Utility._fnHandleStaffId(this), requestData.STAFF_ID, requestData.REQ_UNIQUE_ID,
-				requestData.REQUEST_ID, this.AppModel.getProperty("/userRole"), function (taskAgentData) {
-					var bTaskAgentFlag = (taskAgentData.length) ? taskAgentData[0].matchingStaff : false;
+				requestData.REQUEST_ID, this.AppModel.getProperty("/userRole"), requestData.PROCESS_CODE,function (taskAgentData) {
+					var bTaskAgentFlag = (taskAgentData.length) ? taskAgentData[0].isMatchingStaff : false;
 					var bMessage = (taskAgentData.length) ? taskAgentData[0].message : '';
 					if (bTaskAgentFlag) {
 						Utility.handleVisibilityForTaskAgent(this, false);
@@ -1315,10 +1315,7 @@ sap.ui.define([
 		},
 
 		populateMonth: function () {
-			var monthNames = [
-				"January", "February", "March", "April", "May", "June",
-				"July", "August", "September", "October", "November", "December"
-			];
+			var monthNames = this.getComponentModel("LocalData").getProperty("/monthNames");
 			var oMonth = [],
 				currentDate = new Date();
 			var currentMonth = currentDate.getMonth();
@@ -1777,7 +1774,7 @@ sap.ui.define([
 
 				Services.getTotalUtilization(this, utilizationObj, function (utilisationData) {
 					this._fnupdateDurationDays(utilisationData);
-					resolve();
+					// resolve();
 				}.bind(this)
 				);
 				// var sUrl = Config.dbOperations.utilizationDays;
@@ -2317,14 +2314,12 @@ sap.ui.define([
 			this.hideBusyIndicator();
 		},
 		persistentOperationCalled: function (cwsRequest) {
-			var oHeaders = Formatter._amendHeaderToken(this);
 			cwsRequest = Formatter.parseObjectData(cwsRequest);
 			delete (cwsRequest.Photo);
-			var that = this;
 			//Handle for Save and Submission
-			Services.persistCwsRequest(this, oHeaders, cwsRequest, function (response) {
-				that.handleAfterPosting(response);
-			});
+			Services.persistCwsRequest(this, cwsRequest, function (response) {
+				this.handleAfterPosting(response);
+			}.bind(this));
 		},
 		handleAfterPosting: function (postResponse) {
 			this.lastSuccessRun = new Date();
@@ -3249,33 +3244,32 @@ sap.ui.define([
 		_fnWbsDesc: function () {
 			var oData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/wbsList");
 			var oWBSData = oData.filter(val => val.IS_DELETED !== "Y");
-			var token = this.AppModel.getProperty("/token");
-			var saveObj = {};
-			saveObj.WBSRequest = {};
-			saveObj.WBSRequest.WBS = [];
-			jQuery.sap.each(oWBSData, function (i, obj) {
-				saveObj.WBSRequest.WBS.push(obj.WBS);
-			});
+			// var token = this.AppModel.getProperty("/token");
+			const saveObj = {
+				WBSRequest: {
+					WBS: []
+				}
+			};
+			// oWBSData.forEach(obj => saveObj.WBSRequest.WBS.push(obj.WBS));
 
-			var uniqueWBSList = Array.from(new Set(oWBSData.map(item => item.WBS))).map(wbs => {
-				return oWBSData.find(item => item.WBS === wbs);
-			});
+			// var uniqueWBSList = Array.from(new Set(oWBSData.map(item => item.WBS))).map(wbs => {
+			// 	return oWBSData.find(item => item.WBS === wbs);
+			// });
 
-			// var oHeaders = {
-			// 	"Accept": "application/json",
-			// 	"Authorization": "Bearer" + " " + token,
-			// 	"AccessPoint": "A",
-			// 	"Content-Type": "application/json"
-			// };
+			const seen = new Set();
+			const uniqueWBSList = oWBSData.reduce((acc, obj) =>
+				seen.has(obj.WBS) ? acc : (seen.add(obj.WBS), acc.push(obj), acc), []);
 
-			Services.validateWbs(this, saveObj, function (oWBSData) {
+			saveObj.WBSRequest.WBS = uniqueWBSList.map(i => i.WBS);
 
-				if (oWBSData.EtOutput && oWBSData.EtOutput.item) {
-					if (wbsValidateModel.getData().EtOutput.item.EvStatus === 'E') {
-						var oMsg = wbsValidateModel.getData().EtOutput.item.EvMsg;
+			Services.validateWbs(this, saveObj, function (wbsDataResp) {
+
+				if (wbsDataResp.EtOutput && wbsDataResp.EtOutput.item) {
+					if (wbsDataResp.EtOutput.item.EvStatus === 'E') {
+						var oMsg = wbsDataResp.EtOutput.item.EvMsg;
 					} else {
 						var oWBS = [],
-							oCont = wbsValidateModel.getData().EtOutput.item;
+							oCont = wbsDataResp.EtOutput.item;
 						if (!Array.isArray(oCont)) {
 							oWBS.push(oCont);
 						} else {
@@ -3297,7 +3291,7 @@ sap.ui.define([
 				}
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/wbsList", []);
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/wbsList", uniqueWBSList);
-				resolve();
+				// resolve();
 			}.bind(this)
 			);
 			// var url = Config.dbOperations.checkWbs;
