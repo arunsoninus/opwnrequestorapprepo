@@ -560,9 +560,13 @@ sap.ui.define([
 			andFilter.push(new Filter("REFERENCE_KEY", FilterOperator.EQ, oKey));
 			aFilter.push(new sap.ui.model.Filter(andFilter, true));
 			Utility.retrieveRequestTypes(this);
-			Services.getRequestViewCount(null, oCatalogSrvModel, this, aFilter, function (oResponse) {
-				this.AppModel.setProperty("/RequestType", oResponse.results);
-			}.bind(this));
+			// Services.getRequestViewCount(null, oCatalogSrvModel, this, aFilter, function (oResponse) {
+			// 	this.AppModel.setProperty("/RequestType", oResponse.results);
+			// }.bind(this));
+			Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, this, aFilter,
+				function (oData) {
+					this.AppModel.setProperty("/RequestType", oData.results);
+				}.bind(this));
 		},
 
 		/**
@@ -641,7 +645,7 @@ sap.ui.define([
 			var validateLeaving = Validation.validateLeavingDate(data, this);
 			this.closeMessageStrip("cwsRequestDialogMStripId", "NewRequestTypeSelectionDialog");
 
-			var oCwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			var sStaffId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID");
 
 			var filters = that.generateFilter("SF_STF_NUMBER", [sStaffId]);
@@ -652,7 +656,7 @@ sap.ui.define([
 				this.showMessageStrip("cwsRequestDialogMStripId", validateLeaving, "E", "NewRequestTypeSelectionDialog");
 			} else {
 
-				oCwsSrvModel.read("/ChrsJobInfos", {
+				oCatalogSrvModel.read(Config.dbOperations.userLookup, {
 					filters: filters,
 					success: function (oData) {
 						if (oData.results.length) {
