@@ -55,9 +55,9 @@ sap.ui.define([
 			await this.getUserDetails();
 			// this.generateTokenForLoggedInUser();
 
-			var oCwsRequestTable = this.getView().byId("idCWSRequestTable");
-			this.oTemplate = oCwsRequestTable.getBindingInfo("items").template;
-			oCwsRequestTable.unbindAggregation("items");
+			var oOpwnRequestTable = this.getView().byId("idOpwnRequestTable");
+			this.oTemplate = oOpwnRequestTable.getBindingInfo("items").template;
+			oOpwnRequestTable.unbindAggregation("items");
 
 			var aUrlParameters = new URLSearchParams(window.location.search),
 				sParam = aUrlParameters.get("navStat");
@@ -163,7 +163,7 @@ sap.ui.define([
 				} else if (selectedKey && selectedKey !== 'Draft') {
 					this.loadTableItemsBasedOnStatusKey(selectedKey);
 				} else {
-					this.getDraftCwsRequests();
+					this.getDraftRequests();
 				}
 				// Utility._fnFilterCreation(this);
 			}.bind(this));
@@ -191,8 +191,8 @@ sap.ui.define([
 			} else {
 				aFilters = this.GlobalFilterForTable;
 			}
-			var oControl = this.getUIControl("idCWSRequestTable");
-			oControl.bindItems({
+			var oOpwnTable = this.getUIControl("idOpwnRequestTable");
+			oOpwnTable.bindItems({
 				path: sPath,
 				sorter: oGroup ? oGroup : oSorter,
 				template: this.oTemplate,
@@ -202,7 +202,7 @@ sap.ui.define([
 			// 	path: "REQ_UNIQUE_ID",
 			// 	descending: true
 			// });
-			// Utility._bindItems(this, "idCWSRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
+			// Utility._bindItems(this, "idOpwnRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
 			// End of change - CW0084
 		},
 
@@ -276,14 +276,14 @@ sap.ui.define([
 		// 		this.getUIControl("itfPendReq").setCount(oResponse);
 		// 	}.bind(this));
 		// },
-		getDraftCwsRequests: function () {
+		getDraftRequests: function () {
 			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
 			this.GlobalFilterForTable = Utility._fnEssDraft(this);
 			var oSorter = new sap.ui.model.Sorter({
 				path: "REQ_UNIQUE_ID",
 				descending: true
 			});
-			Utility._bindItems(this, "idCWSRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
+			Utility._bindItems(this, "idOpwnRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
 		},
 
 		onRefreshClaim: function (oEvent) {
@@ -291,7 +291,7 @@ sap.ui.define([
 			// this._fnReadAfterMetadataLoaded(this.oOwnerComponent.getModel("CwsSrvModel"));
 		},
 		onSelectIconFilter: function (oEvent) {
-			this.getUIControl("idCWSRequestTable").setVisible(true);
+			this.getUIControl("idOpwnRequestTable").setVisible(true);
 			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
 			// var sKey = oEvent.getParameter("selectedKey");
 			var sKey = oEvent === "Draft" ? "Draft" : oEvent.getParameter("selectedKey");
@@ -304,11 +304,11 @@ sap.ui.define([
 			}
 			// End of change - CCEV3364
 			if (sKey === "Draft") {
-				this.getDraftCwsRequests();
+				this.getDraftRequests();
 			} else if (sKey === "New") {
 				this.onPressCreateOpwnRequest();
 				this.AppModel.setProperty("/cwsRequest/SingleSubRadioSelected", true);
-				this.getUIControl("idCWSRequestTable").setVisible(false);
+				this.getUIControl("idOpwnRequestTable").setVisible(false);
 			} else {
 				this.GlobalFilterForTable = Utility._handleIconTabBarSelect(this, sKey);
 				// Begin of change - CW0084
@@ -328,8 +328,8 @@ sap.ui.define([
 							"/SortCwTable/sortDescending") : true,
 					});
 				}
-				// End of change - CW0084
-				Utility._bindItems(this, "idCWSRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
+				
+				Utility._bindItems(this, "idOpwnRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
 			}
 		},
 		onPressSortRequest: function (oEvent) {
@@ -374,7 +374,7 @@ sap.ui.define([
 			});
 		},
 		handleConfirm: function (oEvent) {
-			var oTable = this.getUIControl("idCWSRequestTable");
+			var oTable = this.getUIControl("idOpwnRequestTable");
 			var sValue = this.getUIControl("srchFldCWSRequest").getValue();
 			var oSelectedSort = oEvent.getParameter("sortItem");
 			var sortingMethod = oEvent.getParameter("sortDescending");
@@ -1066,7 +1066,7 @@ sap.ui.define([
 			});
 			oViewModel.setProperty("/SearchProperty", sValue);
 			var aFilter = Utility._onPressSearchCWRequest(sValue, this);
-			Utility._bindItems(this, "idCWSRequestTable", sPath, oSorter, this.oTemplate, aFilter);
+			Utility._bindItems(this, "idOpwnRequestTable", sPath, oSorter, this.oTemplate, aFilter);
 		},
 
 		handleValueHelpStaff: function (oEvent, searchValue) {

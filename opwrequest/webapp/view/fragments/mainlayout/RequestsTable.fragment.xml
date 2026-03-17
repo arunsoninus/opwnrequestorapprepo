@@ -1,6 +1,6 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:u="sap.uxap"
 	xmlns:tnt="sap.tnt">
-	<Table id="idCWSRequestTable" inset="false" growing="true" growingThreshold="50" fixedLayout="Strict"
+	<Table id="idOpwnRequestTable" inset="false" growing="true" growingThreshold="50" fixedLayout="Strict"
 		items="{ path: 'CwsSrvModel>/cwsRequestViews', sorter: { path: 'SUBMITTED_ON_TS', descending: true},templateShareable:true}"
 		sticky="ColumnHeaders,HeaderToolbar">
 		<headerToolbar>
