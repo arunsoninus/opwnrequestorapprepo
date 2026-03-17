@@ -129,6 +129,16 @@
           "synchronizationMode": "None",
           "earlyRequests": true
         }
+      },
+      "CwsSrvModel": {
+        "dataSource": "cwRunReportService",
+        "preload": true,
+        "settings": {
+          "useBatch": false,
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
       }
     },
     "resources": {
