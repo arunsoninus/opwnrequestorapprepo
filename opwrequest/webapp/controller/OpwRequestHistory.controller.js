@@ -1485,101 +1485,80 @@ sap.ui.define([
 		onPressAuditLog: function (oEvent) {
 			//making rest call to get Audit Log data
 			var sPath = oEvent.getSource().getBindingContext("CwsSrvModel").getPath();
-			var objData = this.oOwnerComponent.getModel("CwsSrvModel").getProperty(sPath);
-			this.AppModel.setProperty("/claimRequestType", objData.CLAIM_REQUEST_TYPE);
+			var selectedReq = this.getComponentModel("CwsSrvModel").getProperty(sPath);
 
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
-			this.AppModel.setProperty("/claimRequest/draftId", objData.REQ_UNIQUE_ID);
-			this.AppModel.setProperty("/claimRequest/oDataModel", oDataModel);
-			this.AppModel.setProperty("/prevPath", []);
-			var url = "/rest/utils/getAuditLogData?referenceId=" + objData.REQUEST_ID + '&processCode=' + objData.PROCESS_CODE;
-			var token = this.AppModel.getProperty("/token");
-			var oHeaders = {
-				"Content-Type": "application/json",
-				"Authorization": "Bearer" + " " + token
-			};
+			this.AppModel.setProperty("/claimRequest/draftId", selectedReq.REQ_UNIQUE_ID);
 
-			var AuditLogModel = new JSONModel();
-			AuditLogModel.loadData(url, null, false, "GET", null, null, oHeaders);
-			this.AppModel.setProperty("/claimRequest/auditLogs", AuditLogModel.getProperty("/"));
-			var AuditLogs = AuditLogModel.getProperty("/");
-			// Begin of change - CCEV3364
-			var aAuditLogData = [];
-			// End of change - CCEV3364
+			Services.getAuditLogData(this, selectedReq, async function (auditResp) {
+				if (auditResp && auditResp.auditLog) {
+					// Begin of change - CCEV3364
+					var aHeaderLogData = [],
+						aItemLogData = [], aAuditLogData = [],
+						oAuditLogHeader = {
+							data: aHeaderLogData,
+							tabName: this.getI18n("AuditLogHeaderData")
+						},
+						oAuditLogItems = {
+							data: aItemLogData,
+							tabName: this.getI18n("AuditLogItemData")
+						};
 
-			if (AuditLogs && AuditLogs.auditLog) {
-				// Begin of change - CCEV3364
-				var aHeaderLogData = [],
-					aItemLogData = [],
-					oI18nModel = this.getOwnerComponent().getModel("i18n"),
-					oAuditLogHeader = {
-						data: aHeaderLogData,
-						tabName: oI18nModel.getProperty("AuditLogHeaderData")
-					},
-					oAuditLogItems = {
-						data: aItemLogData,
-						tabName: oI18nModel.getProperty("AuditLogItemData")
-					};
-				// End of change - CCEV3364
-				for (var i = 0; i < AuditLogs.auditLog.length; i++) {
-					if (AuditLogs.auditLog[i].tabName === 'EClaims Items') {
-						for (var j = 0; j < AuditLogs.auditLog[i].data.length; j++) {
-							var dates = AuditLogs.auditLog[i].data[j].IDENTITY.split(" ");
-							var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
-								pattern: "dd MMM, yyyy"
-							});
-							if (dates[0] && dates[1] && dates[2]) {
-								dates[0] = oDateFormat.format(new Date(dates[0]));
-								dates[2] = oDateFormat.format(new Date(dates[2]));
-								dates = dates[0] + ' ' + 'to' + ' ' + dates[2];
-								AuditLogs.auditLog[i].data[j].IDENTITY = dates;
-							} else if (dates[0]) {
-								dates[0] = oDateFormat.format(new Date(dates[0]));
-								AuditLogs.auditLog[i].data[j].IDENTITY = dates[0];
+
+					for (var i = 0; i < auditResp.auditLog.length; i++) {
+						if (auditResp.auditLog[i].tabName === 'EClaims Items') {
+							for (var j = 0; j < auditResp.auditLog[i].data.length; j++) {
+
+								var dates = auditResp.auditLog[i].data[j].IDENTITY.split(" ");
+								var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
+									pattern: "d MMM, yyyy"
+								});
+								if (dates[0] && dates[1] && dates[2]) {
+									dates[0] = oDateFormat.format(new Date(dates[0]));
+									dates[2] = oDateFormat.format(new Date(dates[2]));
+									dates = dates[0] + ' ' + 'to' + ' ' + dates[2];
+									auditResp.auditLog[i].data[j].IDENTITY = dates;
+								} else if (dates[0]) {
+									dates[0] = oDateFormat.format(new Date(dates[0]));
+									auditResp.auditLog[i].data[j].IDENTITY = dates[0];
+								}
 							}
 						}
+
+						switch (auditResp.auditLog[i].tabName) {
+							case "HeaderData":
+								auditResp.auditLog[i].data.forEach(function (oHeaders) {
+									aHeaderLogData.push(oHeaders);
+								});
+								break;
+							default:
+								auditResp.auditLog[i].data.forEach(function (oItems) {
+									aItemLogData.push(oItems);
+								});
+								break;
+						}
 					}
-					// Begin of change - CCEV3364
-					switch (AuditLogs.auditLog[i].tabName) {
-						case "HeaderData":
-							AuditLogs.auditLog[i].data.forEach(function (oHeaders) {
-								aHeaderLogData.push(oHeaders);
-							});
-							break;
-						default:
-							AuditLogs.auditLog[i].data.forEach(function (oItems) {
-								aItemLogData.push(oItems);
-							});
-							break;
+					if (aHeaderLogData.length > 0) {
+						oAuditLogHeader.data = aHeaderLogData;
+						oAuditLogHeader.tabName = this.getI18n("AuditLogHeaderData");
+						aAuditLogData.push(oAuditLogHeader);
 					}
-					// End of change - CCEV3364
+					if (aItemLogData.length > 0) {
+						oAuditLogItems.data = aItemLogData;
+						oAuditLogItems.tabName = this.getI18n("AuditLogItemData");
+						aAuditLogData.push(oAuditLogItems);
+					}
 				}
-				// Begin of change - CCEV3364
-				if (aHeaderLogData.length > 0) {
-					oAuditLogHeader.data = aHeaderLogData;
-					oAuditLogHeader.tabName = oI18nModel.getProperty("AuditLogHeaderData");
-					aAuditLogData.push(oAuditLogHeader);
+				this.AppModel.setProperty("/AudLogs", aAuditLogData);
+				if (!this._oDialogAddAuditLogs) {
+					this._oDialogAddAuditLogs = sap.ui.xmlfragment(this.createId("AuditLog"),
+						"nus.edu.sg.opwrequest.view.fragments.AuditLogDataView", this);
+					this.getView().addDependent(this._oDialogAddAuditLogs);
+					this._oDialogAddAuditLogs.setEscapeHandler(function () {
+						return;
+					});
+					this._oDialogAddAuditLogs.open();
 				}
-				if (aItemLogData.length > 0) {
-					oAuditLogItems.data = aItemLogData;
-					oAuditLogItems.tabName = oI18nModel.getProperty("AuditLogItemData");
-					aAuditLogData.push(oAuditLogItems);
-				}
-				// End of change - CCEV3364
-			}
-			// Begin of change - CCEV3364
-			// this.AppModel.setProperty("/AudLogs", AuditLogs);
-			this.AppModel.setProperty("/AudLogs", aAuditLogData);
-			// End of change - CCEV3364
-			if (!this._oDialogAddAuditLogs) {
-				this._oDialogAddAuditLogs = sap.ui.xmlfragment(this.createId("AuditLog"),
-					"nus.edu.sg.opwrequest.view.fragments.AuditLogDataView", this);
-				this.getView().addDependent(this._oDialogAddAuditLogs);
-				this._oDialogAddAuditLogs.setEscapeHandler(function () {
-					return;
-				});
-				this._oDialogAddAuditLogs.open();
-			}
+			}.bind(this));
 		},
 
 		onCancelAuditLog: function (oEvent) {

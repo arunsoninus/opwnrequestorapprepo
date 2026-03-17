@@ -45,7 +45,8 @@ sap.ui.define([],
 				deleteMassAttachment: "/deleteAttachmentById",
 				massUploadAttach: "/uploadZipAttachmentUpload",
 				fetchTaskAgent: "/workFlowUserDetails",
-				weekendValidateUrl: "/validateWorkingHours"
+				weekendValidateUrl: "/validateWorkingHours",
+				auditLogApi : "/getAuditLogData"
 			}
 
 		};
