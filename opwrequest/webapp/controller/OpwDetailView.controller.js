@@ -2317,7 +2317,7 @@ sap.ui.define([
 			cwsRequest = Formatter.parseObjectData(cwsRequest);
 			delete (cwsRequest.Photo);
 			//Handle for Save and Submission
-			Services.persistCwsRequest(this, cwsRequest, function (response) {
+			Services.persistOpwnRequest(this, cwsRequest, function (response) {
 				this.handleAfterPosting(response);
 			}.bind(this));
 		},

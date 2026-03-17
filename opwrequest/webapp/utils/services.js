@@ -248,7 +248,7 @@ sap.ui.define([
 			);
 		},
 
-		persistCwsRequest: async function (component, oPayload, callBackFx) {
+		persistOpwnRequest: async function (component, oPayload, callBackFx) {
 			// var sUrl = Config.dbOperations.saveCwRequest;
 			delete oPayload.JOIN_DATE;
 			var oCont = {
