@@ -1491,7 +1491,6 @@ sap.ui.define([
 
 			Services.getAuditLogData(this, selectedReq, async function (auditResp) {
 				if (auditResp && auditResp.auditLog) {
-					// Begin of change - CCEV3364
 					var aHeaderLogData = [],
 						aItemLogData = [], aAuditLogData = [],
 						oAuditLogHeader = {

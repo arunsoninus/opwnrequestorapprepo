@@ -178,18 +178,16 @@ sap.ui.define([
 				}
 			}.bind(sThis));
 		},
-		// fetchUserImageAsync: function (sThis, staffId) {
-		// 	var oPhotoModel = new JSONModel();
-		// 	var sUrl = Config.dbOperations.fetchPhotoUser;
-		// 	sUrl = sUrl + "?userId=" + staffId;
-		// 	var token = sThis.AppModel.getProperty("/token");
-		// 	var oHeaders = {
-		// 		"Accept": "application/json",
-		// 		"Authorization": "Bearer" + " " + token
-		// 	};
-		// 	oPhotoModel.loadData(sUrl, null, false, "GET", null, null, oHeaders);
-		// 	return oPhotoModel.getData().d.results;
-		// },
+		
+		fetchUserImageAsync: function (component, staffId) {
+			var oPhotoModel = new JSONModel();
+			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			var sUrl = UtilitySrvModel.sServiceUrl + Config.dbOperations.photoApi;
+			sUrl = sUrl + "?userId=" + staffId;
+			oPhotoModel.loadData(sUrl, null, false, "GET", null, null, HeaderHelper._headerToken());
+			return !oPhotoModel.getData().d ? [] : oPhotoModel.getData().d.results;
+		},
+
 		fetchUserPhoto: function (component, callBackFx) {
 			var sUrl = Config.dbOperations.photoApi;
 			var staffId = component.AppModel.getProperty("/staffInfo/STAFF_ID");

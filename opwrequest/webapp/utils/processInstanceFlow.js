@@ -1,21 +1,13 @@
 sap.ui.define([
-	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator",
-	"sap/ui/model/FilterType",
-	"sap/ui/core/Fragment",
-	"sap/ui/model/Sorter",
-	"sap/ui/model/json/JSONModel",
-	"./services",
-	"./utility",
-	"./configuration",
-	"./dataformatter"
-], function (Filter, FilterOperator, FilterType, Fragment, Sorter, JSONModel, Services, Utility, Config, Formatter) {
+	"./services"
+], function (Services) {
 	"use strict";
 	var processInstanceFlow = ("nus.edu.sg.opwrequest.utils.processInstanceFlow", {
-		_onPressProcessInstance: function (oEvent, component) {
-			component.showBusyIndicator();
+
+		_onPressProcessInstance: async function (oEvent, component) {
+			// component.showBusyIndicator();
 			var sPath = oEvent.getSource().getBindingContext("CwsSrvModel").getPath();
-			var objData = component.getComponentModel("CwsSrvModel").getProperty(sPath);
+			var selectedReq = component.getComponentModel("CwsSrvModel").getProperty(sPath);
 			if (!component._oProcessInstanceNode) {
 				component._oProcessInstanceNode = sap.ui.xmlfragment(component.createId("fragProcessInstanceNodeTest"),
 					"nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow", component);
@@ -27,26 +19,26 @@ sap.ui.define([
 				});
 			}
 			//component.leaveDetails();
-			component.AppModel.setProperty("/processFlowRequestID", objData.REQUEST_ID);
-			this._fnFrameProcessData(objData, component);
-			component._oProcessInstanceNode.open();
+			component.AppModel.setProperty("/processFlowRequestID", selectedReq.REQUEST_ID);
+			await this._fnFrameProcessData(component,selectedReq);
+			// component._oProcessInstanceNode.open();
 		},
-		_fnFrameProcessData: function (objData, component) {
-			component.showBusyIndicator();
-			component.AppModel.setProperty("/processFlowRequestID", objData.REQUEST_ID);
-			Services.fetchTaskProcessDetails(component, objData, function (oResponse) {
+		_fnFrameProcessData: async function (component, selectedReq) {
+			// component.showBusyIndicator();
+			component.AppModel.setProperty("/processFlowRequestID", selectedReq.REQUEST_ID);
+			await Services.fetchTaskProcessDetails(component, selectedReq, function (oResponse) {
 				var aSortedKeys = Object.keys(oResponse.changeHistoryMap).sort(
-						(a, b) => {
-							if (b[4] === "M" && a[4] === "M") {
-								return b.slice(5, 15) - a.slice(5, 15)
-							} else if (b[4] !== "M" && a[4] === "M") {
-								return b.slice(4, 14) - a.slice(5, 15)
-							} else if (b[4] === "M" && a[4] !== "M") {
-								return b.slice(5, 15) - a.slice(4, 14)
-							} else {
-								return b.slice(4, 14) - a.slice(4, 14)
-							}
-						}),
+					(a, b) => {
+						if (b[4] === "M" && a[4] === "M") {
+							return b.slice(5, 15) - a.slice(5, 15)
+						} else if (b[4] !== "M" && a[4] === "M") {
+							return b.slice(4, 14) - a.slice(5, 15)
+						} else if (b[4] === "M" && a[4] !== "M") {
+							return b.slice(5, 15) - a.slice(4, 14)
+						} else {
+							return b.slice(4, 14) - a.slice(4, 14)
+						}
+					}),
 					ochangeHistoryMap = {};
 				aSortedKeys.forEach(key => {
 					ochangeHistoryMap[key] = oResponse.changeHistoryMap[key];
@@ -160,6 +152,7 @@ sap.ui.define([
 				});
 
 				component.AppModel.setProperty("/oFlowProcess", oFlowProcess);
+				component._oProcessInstanceNode.open();
 				component.hideBusyIndicator();
 			}.bind(component));
 
