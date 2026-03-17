@@ -525,6 +525,28 @@ sap.ui.define([
 				true
 			);
 		},
+		getRequestStatusDetails: function (component, reqUniqueId, requestId, callBackFx) {
+			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var sUrl = Config.dbOperations.requestDetails;
+
+			var oHeaders = HeaderHelper._headerToken();
+
+			let oParameter = {
+				requestUniqueId: reqUniqueId,
+				requestId: requestId
+			};
+			this._readDataUsingOdataModel(
+				sUrl,
+				CwsSrvModel,
+				component,
+				[],
+				function (response) {
+					callBackFx(response.results);
+				}.bind(component),
+				oHeaders,
+				oParameter
+			);
+		},
 		performDraftDeletion: async function (component, oPayload, callBackFx) {
 			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
 			var serviceUrl = Config.dbOperations.deleteReqUrl;

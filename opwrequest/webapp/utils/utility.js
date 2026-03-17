@@ -156,7 +156,7 @@ sap.ui.define([
 
 				sap.ushell.Container.getServiceAsync("Navigation")
 					.then(function (oNavigation) {
-						this._fnSaveState();
+						// this._fnSaveState();
 						return oNavigation.navigate({
 							target: {
 								semanticObject: "cwsnedrequestscreen",
@@ -1018,7 +1018,7 @@ sap.ui.define([
 
 				sap.ushell.Container.getServiceAsync("Navigation")
 					.then(function (oNavigation) {
-						this._fnSaveState();
+						// this._fnSaveState();
 						return oNavigation.navigate({
 							target: {
 								semanticObject: "inbox",
@@ -1050,10 +1050,10 @@ sap.ui.define([
 			// });
 
 			if (sap.ushell && sap.ushell.Container) {
-
+				// var that = this;
 				sap.ushell.Container.getServiceAsync("Navigation")
 					.then(function (oNavigation) {
-						this._fnSaveState();
+						// that._fnSaveState();
 						return oNavigation.navigate({
 							target: {
 								semanticObject: "cwnedreport",
@@ -1061,7 +1061,7 @@ sap.ui.define([
 							},
 							params: {}
 						});
-					}.bind(this))
+					})
 					.catch(function (err) {
 						console.error("Request Navigation failed", err);
 					});
@@ -1084,10 +1084,10 @@ sap.ui.define([
 			// });
 
 			if (sap.ushell && sap.ushell.Container) {
-
+				// var that = this;
 				sap.ushell.Container.getServiceAsync("Navigation")
 					.then(function (oNavigation) {
-						this._fnSaveState();
+						// that._fnSaveState();
 						return oNavigation.navigate({
 							target: {
 								semanticObject: "ofnreportview",
@@ -1095,7 +1095,7 @@ sap.ui.define([
 							},
 							params: {}
 						});
-					}.bind(this))
+					})
 					.catch(function (err) {
 						console.error("Request Navigation failed", err);
 					});

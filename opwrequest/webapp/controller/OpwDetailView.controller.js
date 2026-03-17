@@ -3466,15 +3466,10 @@ sap.ui.define([
 			var oView = this.getView();
 			var oRqstid = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID"),
 				oUniqueid = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID");
-			var sUrl = Config.dbOperations.requestDetails;
 			if (oRqstid && oUniqueid) {
-				sUrl = sUrl + "?requestUniqueId=" + oUniqueid + "&requestId=" + oRqstid;
-				var oHeaders = Formatter._amendHeaderToken(this);
-				var oRqstmodel = new JSONModel();
-				oRqstmodel.loadData(sUrl, null, null, "GET", null, null, oHeaders);
-				oRqstmodel.attachRequestCompleted(function (oResponse) {
-					if (oResponse.getSource().getData().length > 1) {
-						this.AppModel.setProperty("/oRequestHistory", oResponse.getSource().getData());
+				Services.getRequestStatusDetails(this, oUniqueid, oRqstid, function (reqStatusDetails) {
+					if (reqStatusDetails.length > 1) {
+						this.AppModel.setProperty("/oRequestHistory", reqStatusDetails);
 						this.AppModel.setProperty("/showHistoryButton", true);
 						this._fnRefreshAttachment();
 						this.fnHandlechangeRequest();
@@ -3482,7 +3477,23 @@ sap.ui.define([
 						this.AppModel.setProperty("/oRequestHistory", []);
 						this.AppModel.setProperty("/showHistoryButton", false);
 					}
-				}.bind(this));
+				}.bind(this)
+				);
+				// sUrl = sUrl + "?requestUniqueId=" + oUniqueid + "&requestId=" + oRqstid;
+				// var oHeaders = Formatter._amendHeaderToken(this);
+				// var oRqstmodel = new JSONModel();
+				// oRqstmodel.loadData(sUrl, null, null, "GET", null, null, oHeaders);
+				// oRqstmodel.attachRequestCompleted(function (oResponse) {
+				// 	if (oResponse.getSource().getData().length > 1) {
+				// 		this.AppModel.setProperty("/oRequestHistory", oResponse.getSource().getData());
+				// 		this.AppModel.setProperty("/showHistoryButton", true);
+				// 		this._fnRefreshAttachment();
+				// 		this.fnHandlechangeRequest();
+				// 	} else {
+				// 		this.AppModel.setProperty("/oRequestHistory", []);
+				// 		this.AppModel.setProperty("/showHistoryButton", false);
+				// 	}
+				// }.bind(this));
 			}
 			if (oEvent) {
 				var oButton = oEvent.getSource();
