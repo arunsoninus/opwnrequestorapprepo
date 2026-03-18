@@ -328,7 +328,7 @@ sap.ui.define([
 							"/SortCwTable/sortDescending") : true,
 					});
 				}
-				
+
 				Utility._bindItems(this, "idOpwnRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
 			}
 		},
@@ -464,7 +464,7 @@ sap.ui.define([
 				project: ruleSet,
 				layout: "MidColumnFullScreen"
 			});
-			
+
 		},
 
 		onPressCopy: function (oEvent) {
@@ -549,7 +549,7 @@ sap.ui.define([
 			this._fnRequestType();
 			Utility.retrieveAttachmentTypes(this);
 			this.newRequestTypeDialog.open();
-			
+
 		},
 		_fnRequestType: function () {
 			var aFilter = [],
@@ -699,35 +699,46 @@ sap.ui.define([
 		},
 
 		_payrollCheck: function (startDate, endDate) {
-			var tHeader = {
+			var payrollReq = {
 				"staffId": this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID"),
 				"startDate": startDate,
 				"endDate": endDate
 			};
-			var sUrl = Config.dbOperations.payrollArea;
-			var oHeaders = Formatter._amendHeaderToken(this);
-			var uModel = new JSONModel();
-			uModel.loadData(sUrl, JSON.stringify(tHeader), null, "POST", null, null, oHeaders);
-			uModel.attachRequestCompleted(function (oResponse) {
-				var oCode = oResponse.getSource().getProperty("/statusCode");
+			// var sUrl = Config.dbOperations.payrollArea;
+			Services.getPayrollArea(this, payrollReq, function (payrollData) {
+				var oCode = payrollData.statusCode;
 				if (oCode === "S") {
 					this.fnPaymentAmount('N');
 				} else {
-					this.showMessageStrip("cwsRequestDialogMStripId", oResponse.getSource().getProperty("/message"), "E",
+					this.showMessageStrip("cwsRequestDialogMStripId", payrollData.message, "E",
 						"NewRequestTypeSelectionDialog");
 				}
-			}.bind(this));
+			}.bind(this)
+			);
+
+			// var oHeaders = Formatter._amendHeaderToken(this);
+			// var uModel = new JSONModel();
+			// uModel.loadData(sUrl, JSON.stringify(tHeader), null, "POST", null, null, oHeaders);
+			// uModel.attachRequestCompleted(function (oResponse) {
+			// 	var oCode = oResponse.getSource().getProperty("/statusCode");
+			// 	if (oCode === "S") {
+			// 		this.fnPaymentAmount('N');
+			// 	} else {
+			// 		this.showMessageStrip("cwsRequestDialogMStripId", oResponse.getSource().getProperty("/message"), "E",
+			// 			"NewRequestTypeSelectionDialog");
+			// 	}
+			// }.bind(this));
 		},
 
 		_fncreateLoad: function () {
-			var oCwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			// var oCwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			var staffNusNetId = this.AppModel.getProperty("/primaryAssigment/NUSNET_ID");
 			var filters = this.generateFilter("NUSNET_ID", [staffNusNetId]);
-			var oKey = this.AppModel.getProperty("/staffInfo/IS_EXTERNAL_USER");
-			var oURL = (oKey && oKey === "X") ? "/ChrsExternalUsersInfos" : "/ChrsJobInfos";
-			oCwsSrvModel.read(oURL, {
-				filters: filters,
-				success: function (oData) {
+			// var oKey = this.AppModel.getProperty("/staffInfo/IS_EXTERNAL_USER");
+			// var oURL = (oKey && oKey === "X") ? "/ChrsExternalUsersInfos" : "/ChrsJobInfos";
+			Services.readLookups(Config.dbOperations.userLookup, oCatalogSrvModel, this, filters,
+				function (oData) {
 					if (oData.results.length) {
 						var oEmpGrp = oData.results[0].EMP_GP_C;
 						if (oEmpGrp !== this.getI18n("CwsRequest.EmployeeGroup")) {
@@ -741,11 +752,28 @@ sap.ui.define([
 								"NewRequestTypeSelectionDialog");
 						}
 					}
-				}.bind(this),
-				error: function (oError) {
+				}.bind(this));
+			// oCatalogSrvModel.read(Config.dbOperations.userLookup, {
+			// 	filters: filters,
+			// 	success: function (oData) {
+			// 		if (oData.results.length) {
+			// 			var oEmpGrp = oData.results[0].EMP_GP_C;
+			// 			if (oEmpGrp !== this.getI18n("CwsRequest.EmployeeGroup")) {
+			// 				this.closeNewRequestTypeDialog();
+			// 				this.oRouter.navTo("detail", {
+			// 					project: "NEW",
+			// 					layout: "MidColumnFullScreen"
+			// 				});
+			// 			} else {
+			// 				this.showMessageStrip("cwsRequestDialogMStripId", "User not allowed to submit CW/NED or OPWN request in the system", "E",
+			// 					"NewRequestTypeSelectionDialog");
+			// 			}
+			// 		}
+			// 	}.bind(this),
+			// 	error: function (oError) {
 
-				}
-			});
+			// 	}
+			// });
 		},
 
 		/**

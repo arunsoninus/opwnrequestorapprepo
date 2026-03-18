@@ -405,11 +405,11 @@ sap.ui.define([
 				component,
 				function (response) {
 					let oResponse = (response && response.data && response.data.totalUtilization) ? response.data.totalUtilization : {};
-					if (!oResponse.error) {
+					// if (!oResponse.error) {
 						callBackFx(oResponse);
-					} else {
-						sap.m.MessageBox.error(oResponse.message);
-					}
+					// } else {
+						// sap.m.MessageBox.error(oResponse.message);
+					// }
 
 				}.bind(this),
 				HeaderHelper._headerToken(),
@@ -461,14 +461,14 @@ sap.ui.define([
 		},
 		getPayrollArea: async function (component, oPayload, callBackFx) {
 			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
-			var serviceUrl = Config.dbOperations.utilizationDays;
+			var serviceUrl = Config.dbOperations.payrollArea;
 			await this._createDataUsingOdataModelWithRespObject(
 				serviceUrl,
 				CwsSrvModel,
 				component,
 				function (response) {
-					let oResponse = (response && response.data && response.data.totalUtilization) ? response.data.totalUtilization : {};
-					if (!oResponse.error) {
+					let oResponse = (response && response.data && response.data.payrollAreaDetails) ? response.data.payrollAreaDetails : {};
+					if (!oResponse.isError) {
 						callBackFx(oResponse);
 					} else {
 						sap.m.MessageBox.error(oResponse.message);

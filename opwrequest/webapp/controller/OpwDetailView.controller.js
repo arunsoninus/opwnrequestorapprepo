@@ -190,10 +190,10 @@ sap.ui.define([
 			// var sPath = "/EclaimsApprovalMatrixViews";
 			var oStaffUserGroupFilter = new Filter("STAFF_USER_GRP", FilterOperator.EQ, 'CW_PROGRAM_MANAGER'),
 				oProcessCode = new Filter("CLAIM_TYPE", FilterOperator.EQ, '203'),
-				oItemTemplate = new sap.ui.core.ListItem({
-					text: "{CwsSrvModel>FULL_NM}",
-					key: "{CwsSrvModel>STAFF_ID}"
-				}),
+				// oItemTemplate = new sap.ui.core.ListItem({
+				// 	text: "{CwsSrvModel>FULL_NM}",
+				// 	key: "{CwsSrvModel>STAFF_ID}"
+				// }),
 				dToday = new Date(),
 				iMonth = parseInt(dToday.getMonth()) + 1,
 				iMonth = iMonth.toString().length === 1 ? "0" + iMonth : iMonth,
@@ -203,11 +203,11 @@ sap.ui.define([
 				oApmValidFrom = new Filter("APM_VALID_FROM", FilterOperator.LE, dFormattedToday),
 				oApmValidTo = new Filter("APM_VALID_TO", FilterOperator.GE, dFormattedToday),
 				oCwdProgramManager = this.byId("idCwDProgramManager"),
-				aFilters = [],
-				oSorter = new sap.ui.model.Sorter({
-					path: "FULL_NM",
-					descending: true
-				});
+				aFilters = [];
+			// oSorter = new sap.ui.model.Sorter({
+			// 	path: "FULL_NM",
+			// 	descending: true
+			// });
 			if (!aUluFdluFilterGroup) {
 				var iFDLU = this.AppModel.getProperty("/cwsRequest/createCWSRequest/FDLU"),
 					iULU = this.AppModel.getProperty("/cwsRequest/createCWSRequest/ULU"),
@@ -254,7 +254,9 @@ sap.ui.define([
 		},
 		_displayCwdProgramManager: function () {
 			var aProcessParticipantFilter = [],
-				oRefId = new Filter("REFERENCE_ID", FilterOperator.EQ, this._project.split("'")[1]),
+				// oRefId = new Filter("REFERENCE_ID", FilterOperator.EQ, this._project.split("'")[1]),
+				draftId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID"),
+				oRefId = new Filter("REFERENCE_ID", FilterOperator.EQ, draftId ? draftId : ""),
 				oIsNoDeleted = new Filter("IS_DELETED", FilterOperator.EQ, "N"),
 				oUserDesignation = new Filter("USER_DESIGNATION", FilterOperator.EQ, "CW_PROGRAM_MANAGER"),
 				oProgramManager = this.byId("idCwDProgramManager"),
@@ -691,16 +693,16 @@ sap.ui.define([
 		 * Handle New Request Submission
 		 */
 		_fnHandleNewRequest: function () {
-			var userRole = this.AppModel.getProperty("/userRole");
-			var staffId = this.AppModel.getProperty("/loggedInUserStfNumber");
-			var loggedInUserNid = this.AppModel.getProperty("/primaryAssigment/NUSNET_ID");
-			var selectedStaffNid = this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_NUSNET_ID");
+			// var userRole = this.AppModel.getProperty("/userRole");
+			// var staffId = this.AppModel.getProperty("/loggedInUserStfNumber");
+			// var loggedInUserNid = this.AppModel.getProperty("/primaryAssigment/NUSNET_ID");
+			// var selectedStaffNid = this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_NUSNET_ID");
 			var selectedsid = this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID");
 			var concurrentStaffId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/CONCURRENT_STAFF_ID");
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", []);
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", []);
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/LOCATION", "L");
-			this._fnFetchUserDetailFromChrsJobInfo(selectedsid, concurrentStaffId);
+			this._fnFetchSelectedStaffDetails(selectedsid, concurrentStaffId);
 			// this._fnFetchLoginUserDetail(selectedsid);
 			this.initializeModel(this._project);
 		},
@@ -750,7 +752,7 @@ sap.ui.define([
 			if (requestData.MASS_REF_UPLOAD_ID && requestData.MASS_REF_VAL && (!oData || oData.length === 0)) {
 				this.AppModel.setProperty("/oSyncAttach", true);
 			}
-			this._fnFetchUserDetailFromChrsJobInfo(requestData.STAFF_ID, requestData.CONCURRENT_STAFF_ID, requestData);
+			this._fnFetchSelectedStaffDetails(requestData.STAFF_ID, requestData.CONCURRENT_STAFF_ID, requestData);
 			this.initializeModel(this._project, true);
 
 			if (this.AppModel.getProperty("/cwsRequest/createCWSRequest/wbsList").length === 0 && (requestData.STATUS_CODE === "31" ||
@@ -863,7 +865,7 @@ sap.ui.define([
 			//Matching task agents
 			// var oMatchingAgents = 
 			Utility._fnHandleTaskAgent(this, Utility._fnHandleStaffId(this), requestData.STAFF_ID, requestData.REQ_UNIQUE_ID,
-				requestData.REQUEST_ID, this.AppModel.getProperty("/userRole"), requestData.PROCESS_CODE,function (taskAgentData) {
+				requestData.REQUEST_ID, this.AppModel.getProperty("/userRole"), requestData.PROCESS_CODE, function (taskAgentData) {
 					var bTaskAgentFlag = (taskAgentData.length) ? taskAgentData[0].isMatchingStaff : false;
 					var bMessage = (taskAgentData.length) ? taskAgentData[0].message : '';
 					if (bTaskAgentFlag) {
@@ -1149,7 +1151,7 @@ sap.ui.define([
 			}
 		},
 
-		_fnFetchUserDetailFromChrsJobInfo: function (nusNetId, concurrentStaffId, requestData) {
+		_fnFetchSelectedStaffDetails: function (nusNetId, concurrentStaffId, requestData) {
 			// Need to enhance this method if engaging dept to modify in future
 			// fetch 
 			// var that = this,
@@ -1275,11 +1277,11 @@ sap.ui.define([
 				that.AppModel.setProperty("/claimRequest/statusDisplay", 'Draft');
 				that.AppModel.setProperty("/cwsRequest/createCWSRequest/IS_WAIVED", "N");
 
-				var month;
-				var year;
-				var ulu = this.AppModel.getProperty("/cwsRequest/createCWSRequest/uluSelectedCode");
-				var fdlu = this.AppModel.getProperty("/cwsRequest/createCWSRequest/fdluSelectedCode");
-				var saveSource = "initialViewLoadSave";
+				// var month;
+				// var year;
+				// var ulu = this.AppModel.getProperty("/cwsRequest/createCWSRequest/uluSelectedCode");
+				// var fdlu = this.AppModel.getProperty("/cwsRequest/createCWSRequest/fdluSelectedCode");
+				// var saveSource = "initialViewLoadSave";
 				this.onAddWbsElement();
 				this.onPressAddPayment();
 				if (this.viaRequestorForm) {
