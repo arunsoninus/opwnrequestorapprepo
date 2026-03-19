@@ -278,7 +278,9 @@ sap.ui.define([
 							component.AppModel.setProperty("/cwsRequest/createCWSRequest/REQUEST_TYPE_DESC", oData.results[0].CONFIG_VALUE);
 						}
 						that.initializeDependentLookups(component);
-						// callBack();
+						if (callBack) {
+							callBack();
+						}
 					}
 				}.bind(this));
 		},

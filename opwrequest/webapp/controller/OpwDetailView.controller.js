@@ -1237,7 +1237,10 @@ sap.ui.define([
 					}
 
 					this._editProgramManager();
-				}.bind(this)
+				}.bind(this),
+				error: function (oError) {
+					jQuery.sap.log.error("Failed to fetch selected staff details", oError);
+				}
 			});
 
 		},
@@ -1321,13 +1324,14 @@ sap.ui.define([
 			var oMonth = [],
 				currentDate = new Date();
 			var currentMonth = currentDate.getMonth();
+			var previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
 			oMonth.push({
 				"cKey": 0,
-				"Month": monthNames[currentDate.getMonth()]
+				"Month": monthNames[currentMonth]
 			});
 			oMonth.push({
 				"cKey": -1,
-				"Month": monthNames[currentMonth - 1]
+				"Month": monthNames[previousMonth]
 			});
 			this.AppModel.setProperty("/months", oMonth)
 		},
