@@ -565,17 +565,16 @@ sap.ui.define([
 		},
 		performDraftDeletion: async function (component, oPayload, callBackFx) {
 			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
-			var serviceUrl = Config.dbOperations.deleteReqUrl;
 			await this._createDataUsingOdataModelWithRespObject(
-				serviceUrl,
+				Config.dbOperations.deleteReqUrl,
 				CwsSrvModel,
 				component,
 				function (response) {
-					if (response.success) {
-						let oResponse = (response && response.data && response.data.workFlowUserDetails) ? response.data.workFlowUserDetails : {};
+					let oResponse = (response && response.data && response.data.purgeCWRequest) ? response.data.purgeCWRequest : {};
+					if (!oResponse.isError) {
 						callBackFx(oResponse);
 					} else {
-						sap.m.MessageBox.error(response.response.message);
+						sap.m.MessageBox.error(oResponse.message);
 					}
 				}.bind(this),
 				HeaderHelper._headerToken(),

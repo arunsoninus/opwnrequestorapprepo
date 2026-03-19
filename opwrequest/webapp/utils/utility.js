@@ -1190,6 +1190,7 @@ sap.ui.define([
 			var uiData = component.AppModel.getProperty("/cwsRequest/createCWSRequest");
 			uiData.REQ_UNIQUE_ID = postResponse.REQ_UNIQUE_ID;
 			uiData.REQUEST_ID = postResponse.REQUEST_ID;
+			uiData.ID = postResponse.ID;
 
 			var postResponseElement;
 

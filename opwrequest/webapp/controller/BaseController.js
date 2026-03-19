@@ -1048,7 +1048,7 @@ sap.ui.define([
 						aParameter.inputList.push({
 							"DRAFT_ID": reqUniqueId
 						});
-						Services.performDraftDeletion(this, utilizationObj, function (utilisationData) {
+						Services.performDraftDeletion(this, aParameter, function (utilisationData) {
 							if (!oData.getSource().getData().error) {
 								if (oEvent !== "D") {
 									MessageBox.success("Request has been deleted successfully.");
