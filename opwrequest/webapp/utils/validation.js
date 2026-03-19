@@ -51,7 +51,7 @@ sap.ui.define([
 					this.validateBasicInfoNDuration(data, validationElement, validateResponse.messageList, component);
 					this.validateDuration(data.durationSplitList, validationElement, validateResponse.messageList, component);
 					this.validateClientWorkDetails(data, validationElement, validateResponse.messageList, component);
-					this.validateAttachments(data.attachmentList, validationElement, validateResponse.messageList, component);
+					// this.validateAttachments(data.attachmentList, validationElement, validateResponse.messageList, component);
 					this.validateCostDistribution(data.wbsList, validationElement, validateResponse.messageList, component);
 					this.validateCostDistributionPerc(data.wbsList, validationElement, validateResponse.messageList, component);
 					this.validateSelectedProgramManager(data.SELECTED_PROGRAM_MGR, data.STAFF_ID, validationElement, validateResponse.messageList,

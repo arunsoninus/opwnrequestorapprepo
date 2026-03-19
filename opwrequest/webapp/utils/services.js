@@ -385,9 +385,27 @@ sap.ui.define([
 				}
 			});
 		},
-		validateForWeekend: function (sThis) {
-			var oValidateModel = new JSONModel();
-			var sUrl = Config.dbOperations.weekendValidateUrl;
+		validateForWeekend: async function (component, callBackFx) {
+			// var oValidateModel = new JSONModel();
+			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var oHeaders = HeaderHelper._headerToken();
+
+			// let oParameter = {
+			// 	referenceId: selectedReq.REQUEST_ID,
+			// 	processCode: selectedReq.PROCESS_CODE
+			// };
+			this._readDataUsingOdataModel(
+				Config.dbOperations.weekendValidateUrl,
+				CwsSrvModel,
+				component,
+				[],
+				function (response) {
+					callBackFx(response.validateWorkingHours);
+				}.bind(component),
+				oHeaders,
+				null
+			);
+
 			var token = sThis.AppModel.getProperty("/token");
 			var oHeaders = {
 				"Accept": "application/json",

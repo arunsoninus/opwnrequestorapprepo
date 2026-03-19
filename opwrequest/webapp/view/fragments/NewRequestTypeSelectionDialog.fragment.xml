@@ -29,7 +29,7 @@
 							dialogCodeLbl="FULL_NM" amendCode="NUSNET_ID" dialogDescLbl="STF_NUMBER" dialogTitle="Select Staff.." showValueHelp="true" setOnUI="FULL_NM"
 							valueHelpOnly="true" valueHelpRequest="lookupValueHelp" value="{AppModel>/cwsRequest/createCWSRequest/FULL_NM}"
 							visible="{=(${AppModel>/isDepartmentAdmin} &amp;&amp; ${AppModel>/cwsRequest/SingleSubRadioSelected}) === true ? true : false}"/>-->
-						<Input placeholder="Enter Emp No.." showValueHelp="true" valueHelpRequest=".onValueHelpRequest" valueHelpOnly="true"
+						<Input placeholder="Enter Emp No.." showValueHelp="true" valueHelpRequest=".onValueHelpRequest" 
 							value="{AppModel>/cwsRequest/createCWSRequest/FULL_NM}"
 							visible="{=(${AppModel>/isDepartmentAdmin} &amp;&amp; ${AppModel>/cwsRequest/SingleSubRadioSelected}) === true ? true : false}"></Input>
 						<Label text="Start Date" required="true" visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>

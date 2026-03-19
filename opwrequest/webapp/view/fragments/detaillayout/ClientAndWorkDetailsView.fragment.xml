@@ -11,8 +11,8 @@
 						<!--Begin of change - CCEV3364-->
 						<!--<Text text="{AppModel>/cwsRequest/createCWSRequest/ULU_T}" visible="{AppModel>/isDeptOHRSS}"/>-->
 						<!--End of change - CCEV3364-->
-						<CWSExtMultiInput placeholder="{i18n>CwsRequest.Faculty.Ph}" dataPath="/d/results" urlAttr="/ChrsFdluUlus?$select=ULU_C,ULU_T"
-							dialogCodeLbl="ULU_T" dialogDescLbl="ULU_C" dialogTitle="{i18n>CwsRequest.Faculty.Dialogtitle}" showValueHelp="true" setOnUI="ULU_T"
+						<CWSExtMultiInputOData placeholder="{i18n>CwsRequest.Faculty.Ph}" dataPath="/results" urlAttr="/fdluulu_data"
+							additionalParams="ULU_C,ULU_T" dialogCodeLbl="ULU_T" dialogDescLbl="ULU_C" dialogTitle="{i18n>CwsRequest.Faculty.Dialogtitle}" showValueHelp="true" setOnUI="ULU_T"
 							valueHelpOnly="true" valueHelpRequest="lookupValueHelp" value="{AppModel>/cwsRequest/createCWSRequest/ULU_T}" duplicates="merge"
 							editable="{= (${AppModel>/isUluEnabled} &amp;&amp; ${AppModel>/isFormEditable})? true : false}"
 							valueState="{AppModel>/cwsRequest/validationRequest/facultyVState}"/>
@@ -20,8 +20,8 @@
 					</VBox>
 					<Label text="Faculty/Department-Level Unit of Engaging Department" required="true"/>
 					<!--<Text text="{AppModel>/cwsRequest/createCWSRequest/FDLU_T}"/>-->
-					<CWSExtMultiInput placeholder="{i18n>CwsRequest.Department.Ph}" dataPath="/d/results" urlAttr="/ChrsFdluUlus?$select=FDLU_C,FDLU_T"
-						dialogCodeLbl="FDLU_T" dialogDescLbl="FDLU_C" dialogTitle="{i18n>CwsRequest.Department.Dialogtitle}" showValueHelp="true" setOnUI="FDLU_T"
+					<CWSExtMultiInputOData placeholder="{i18n>CwsRequest.Department.Ph}" dataPath="/results" urlAttr="/fdluulu_data"
+						additionalParams="FDLU_C,FDLU_T" dialogCodeLbl="FDLU_T" dialogDescLbl="FDLU_C" dialogTitle="{i18n>CwsRequest.Department.Dialogtitle}" showValueHelp="true" setOnUI="FDLU_T"
 						valueHelpOnly="true" valueHelpRequest="lookupValueHelp" value="{AppModel>/cwsRequest/createCWSRequest/FDLU_T}" duplicates="merge"
 						editable="{= (${AppModel>/isFdluEnabled} &amp;&amp; ${AppModel>/isFormEditable})? true : false}"
 						valueState="{AppModel>/cwsRequest/validationRequest/deptVState}"/>

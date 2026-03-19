@@ -1,6 +1,5 @@
 sap.ui.define([
-	"../controller/BaseController", "../extensions/extendedvaluehelp", "sap/ui/core/Fragment",
-	"sap/ui/model/json/JSONModel",
+	"../controller/BaseController", "../extensions/extendedvaluehelpodata", "sap/ui/core/Fragment",
 	"../utils/dataformatter", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/services",
 	"../utils/appconstant",
 	"sap/ui/model/Filter",
@@ -10,7 +9,7 @@ sap.ui.define([
 	"../utils/requestlockhelper",
 	"../utils/validation",
 	"sap/ui/core/ValueState"
-], function (BaseController, ExtendedValueHelp, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Services,
+], function (BaseController, ExtendedValueHelpOData, Fragment, Formatter, MessageToast, MessageBox, Services,
 	AppConstant, Filter, FilterOperator, Utility, Config, RequestLockHelper, Validation, ValueState) {
 	"use strict";
 
@@ -3252,11 +3251,6 @@ sap.ui.define([
 					WBS: []
 				}
 			};
-			// oWBSData.forEach(obj => saveObj.WBSRequest.WBS.push(obj.WBS));
-
-			// var uniqueWBSList = Array.from(new Set(oWBSData.map(item => item.WBS))).map(wbs => {
-			// 	return oWBSData.find(item => item.WBS === wbs);
-			// });
 
 			const seen = new Set();
 			const uniqueWBSList = oWBSData.reduce((acc, obj) =>
@@ -3379,7 +3373,7 @@ sap.ui.define([
 							this.AppModel.setProperty(sPath + "/WBS_Desc", oWBSData.EtOutput.item.EvWbsdesc);
 						}
 					}
-					resolve();
+					// resolve();
 				}.bind(this)
 				);
 
@@ -3415,7 +3409,7 @@ sap.ui.define([
 
 		onClear: function (key) {
 			if (key === "Info") {
-				this.AppModel.setProperty("/cwsRequest/createCWSRequest/BASIC_AMOUNT", "");
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/AMOUNT", "");
 			}
 			if (key === "Client") {
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/FACULTY_T", "");
@@ -3428,7 +3422,7 @@ sap.ui.define([
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/PROPERTY_DETAILS", "");
 			}
 			if (key === "Payment") {
-				this.AppModel.setProperty("/cwsRequest/createCWSRequest/BASIC_AMOUNT", "");
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/AMOUNT", "");
 			}
 			this.AppModel.refresh(true);
 		},

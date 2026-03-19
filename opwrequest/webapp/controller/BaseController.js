@@ -538,50 +538,52 @@ sap.ui.define([
 				})
 			);
 
-			var weekendCheck = Services.validateForWeekend(this);
+			// var weekendCheck = Services.validateForWeekend(this);
+			Services.validateForWeekend(this, function (weekendData) {
+				if (weekendData && weekendData.showMessage && weekendData.message) {
+					// Add vertical space using an HBox with fixed height
+					dialogContent.push(
+						new sap.m.HBox({
+							height: "20px", // Or any height you prefer
+							items: [] // No items, pure spacing
+						})
+					);
 
-			if (weekendCheck && weekendCheck.showMessage && weekendCheck.message) {
-				// Add vertical space using an HBox with fixed height
-				dialogContent.push(
-					new sap.m.HBox({
-						height: "20px", // Or any height you prefer
-						items: [] // No items, pure spacing
-					})
-				);
-
-				dialogContent.push(
-					new sap.m.MessageStrip({
-						text: weekendCheck.message,
-						type: "Warning",
-						showIcon: true,
-						showCloseButton: false
-					})
-				);
-			}
-
-			var dialog = new sap.m.Dialog({
-				title: "Confirmation",
-				state: (messageState === "I") ? "Information" : "Warning",
-				type: "Message",
-				content: dialogContent,
-				beginButton: new sap.m.Button({
-					text: "Yes",
-					press: function () {
-						dialog.close();
-						submissionCallBack();
-					}
-				}),
-				endButton: new sap.m.Button({
-					text: 'No',
-					press: function () {
-						dialog.close();
-					}
-				}),
-				afterClose: function () {
-					dialog.destroy();
+					dialogContent.push(
+						new sap.m.MessageStrip({
+							text: weekendData.message,
+							type: "Warning",
+							showIcon: true,
+							showCloseButton: false
+						})
+					);
 				}
-			});
-			dialog.open();
+
+				var dialog = new sap.m.Dialog({
+					title: "Confirmation",
+					state: (messageState === "I") ? "Information" : "Warning",
+					type: "Message",
+					content: dialogContent,
+					beginButton: new sap.m.Button({
+						text: "Yes",
+						press: function () {
+							dialog.close();
+							submissionCallBack();
+						}
+					}),
+					endButton: new sap.m.Button({
+						text: 'No',
+						press: function () {
+							dialog.close();
+						}
+					}),
+					afterClose: function () {
+						dialog.destroy();
+					}
+				});
+				dialog.open();
+			}.bind(this)
+			);
 		},
 		/**
 		 * Confirmation On Action
@@ -734,47 +736,60 @@ sap.ui.define([
 			var src = oEvent.getSource();
 			var bindingControl = oEvent.getSource().getBindingInfo("value").parts[0].path;
 			var urlPath = src.getUrlAttr();
-			var sServiceUrl = Config.dbOperations.metadataClaims + urlPath;
+			// var sServiceUrl = Config.dbOperations.metadataClaims + urlPath;
 
 			var bindingPath = (oEvent.getSource().getBindingContext("AppModel")) ? oEvent.getSource().getBindingContext("AppModel").getPath() :
 				"";
-			src.setUrlPath(sServiceUrl);
+			src.setUrlPath(urlPath);
 			var modelData = null;
-			sServiceUrl = this.manageServiceUrlToInvoke(bindingPath, bindingControl, sServiceUrl);
+			var lookupFilter = this.manageServiceUrlToInvoke(bindingControl);
 			var isAsync = Boolean(bindingControl === "/cwsRequest/createCWSRequest/FULL_NM");
-			src.setUrlPath(sServiceUrl);
-			var oHeaders = Formatter._amendHeaderToken(this);
-			src.openValueHelp(oEvent, null, isAsync, modelData, true, oHeaders, function (selectedObj) {
+			// src.setUrlPath(sServiceUrl);
+			// var oHeaders = Formatter._amendHeaderToken(this);
+			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
+			// src.openValueHelp(oEvent, null, isAsync, modelData, true, oHeaders, function (selectedObj) {
+			// 	this.setValuesFromLookup(bindingControl, bindingPath, selectedObj);
+			// }.bind(this));
+
+			src.openValueHelp(oEvent, null, oCatalogSrvModel, lookupFilter, false, modelData, true, function (selectedObj) {
 				this.setValuesFromLookup(bindingControl, bindingPath, selectedObj);
 			}.bind(this));
 		},
-		manageServiceUrlToInvoke: function (bindingPath, bindingControl, sServiceUrl) {
+		manageServiceUrlToInvoke: function (bindingControl) {
 			// Manage Selection for Faculty and Department
 			// var selectedFaculty = this.AppModel.getProperty("/cwsRequest/createCWSRequest/FACULTY_C");
+			var lookupFilter = [];
 			var selectedUlu = this.AppModel.getProperty("/cwsRequest/createCWSRequest/ULU");
 			if (bindingControl === "/cwsRequest/createCWSRequest/FDLU_T" && selectedUlu) {
-				sServiceUrl += "&$filter=ULU_C eq '" + selectedUlu + "'";
+				// sServiceUrl += "&$filter=ULU_C eq '" + selectedUlu + "'";
+				lookupFilter.push(new Filter("ULU_C", FilterOperator.EQ, selectedUlu));
 			}
 
 			// Manage Selection for Staff by Department Admin
 			if (bindingControl === "/cwsRequest/createCWSRequest/FULL_NM") {
 				var appMatrixAuth = this.AppModel.getProperty("/appMatrixAuth");
 				var appMatrixUrl = "";
+				var staffFilter = [];
 				jQuery.sap.each(appMatrixAuth, function (i, appElement) {
-					if (appElement.STAFF_USER_GRP === this.getI18n("CwsRequest.User.DeptAdminAlias")) {
-						appMatrixUrl += (!appMatrixUrl) ? "&$filter=" : "";
-						var key = appMatrixAuth.length === i + 1 ? "" : " or ";
-						appMatrixUrl += "ULU_C eq '" + appElement.ULU_C + "' and FDLU_C eq '" + appElement.FDLU_C + "'" + key;
-					}
-				}.bind(this));
+					// if (appElement.STAFF_USER_GRP === this.getI18n("CwsRequest.User.DeptAdminAlias")) {
+					// 	appMatrixUrl += (!appMatrixUrl) ? "&$filter=" : "";
+					// 	var key = appMatrixAuth.length === i + 1 ? "" : " or ";
+					// 	appMatrixUrl += "ULU_C eq '" + appElement.ULU_C + "' and FDLU_C eq '" + appElement.FDLU_C + "'" + key;
+					// }
+					staffFilter.push(new Filter("ULU_C", FilterOperator.EQ, appElement.ULU_C));
+					staffFilter.push(new Filter("FDLU_C", FilterOperator.EQ, appElement.FDLU_C));
 
-				var lastOrIndex = appMatrixUrl.lastIndexOf("or");
-				if (lastOrIndex !== -1) {
-					appMatrixUrl = appMatrixUrl.substring(0, lastOrIndex);
-				}
-				sServiceUrl += appMatrixUrl;
+				}.bind(this));
+				lookupFilter.push(new Filter(staffFilter, false));
+
+
+				// var lastOrIndex = appMatrixUrl.lastIndexOf("or");
+				// if (lastOrIndex !== -1) {
+				// 	appMatrixUrl = appMatrixUrl.substring(0, lastOrIndex);
+				// }
+				// sServiceUrl += appMatrixUrl;
 			}
-			return sServiceUrl;
+			return lookupFilter;
 		},
 
 		onValueHelpRequest: function () {

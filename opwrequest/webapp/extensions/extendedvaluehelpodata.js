@@ -1,5 +1,5 @@
-jQuery.sap.declare("sap.m.MatrixMultiInputOData");
-sap.m.Input.extend("sap.m.MatrixMultiInputOData", {
+jQuery.sap.declare("sap.m.CWSExtMultiInputOData");
+sap.m.Input.extend("sap.m.CWSExtMultiInputOData", {
 
     metadata: {
         properties: {
