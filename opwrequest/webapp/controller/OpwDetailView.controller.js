@@ -8,10 +8,11 @@ sap.ui.define([
 	"../utils/configuration",
 	"../utils/requestlockhelper",
 	"../utils/validation",
-	"sap/ui/core/ValueState"
+	"sap/ui/core/library"
 ], function (BaseController, ExtendedValueHelpOData, Fragment, Formatter, MessageToast, MessageBox, Services,
-	AppConstant, Filter, FilterOperator, Utility, Config, RequestLockHelper, Validation, ValueState) {
+	AppConstant, Filter, FilterOperator, Utility, Config, RequestLockHelper, Validation, coreLibrary) {
 	"use strict";
+	var ValueState = coreLibrary.ValueState;
 
 	return BaseController.extend("nus.edu.sg.opwrequest.controller.OpwDetailView", {
 		formatter: Formatter,
