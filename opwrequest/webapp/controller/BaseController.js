@@ -893,19 +893,19 @@ sap.ui.define([
 
 
 		onNavDashBoard: function () {
-			var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation");
-			var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-				target: {
-					semanticObject: "cwdashboard",
-					action: "Display"
-				},
-				params: {}
-			})) || "";
-			oCrossAppNavigator.toExternal({
-				target: {
-					shellHash: hash
-				}
-			});
+			sap.ushell.Container.getServiceAsync("Navigation")
+				.then(function (oNavigation) {
+					oNavigation.navigate({
+						target: {
+							semanticObject: "cwdashboard",
+							action: "Display"
+						},
+						params: {}
+					});
+				})
+				.catch(function (err) {
+					console.error("Dashboard App Navigation failed", err);
+				});
 		},
 
 		showDialogWithTimer: function () {
