@@ -86,6 +86,7 @@
       "libs": {
         "sap.m": {},
         "sap.ui.core": {}
+        // "sap.suite.ui.commons.statusindicator": {}
       }
     },
     "contentDensities": {

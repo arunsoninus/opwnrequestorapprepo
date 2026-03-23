@@ -1,6 +1,5 @@
 sap.ui.define([
 	"../controller/BaseController",
-	"../extensions/extendedvaluehelp",
 	"../extensions/extendedvaluehelpodata",
 	"sap/ui/core/Fragment",
 	"sap/ui/model/json/JSONModel",
@@ -16,12 +15,11 @@ sap.ui.define([
 	"sap/ui/export/library",
 	"sap/ui/export/Spreadsheet",
 	"../utils/utility",
-	"../utils/headerHelper",
 	"../utils/configuration",
 	"../utils/massuploadhelper",
 	"../utils/processInstanceFlow"
-], function (BaseController, ExtendedValueHelp, ExtendedValueHelpOData, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
-	FilterOperator, Sorter, Services, AppConstant, Validation, exportLibrary, Spreadsheet, Utility, HeaderHelper, Config,
+], function (BaseController, ExtendedValueHelpOData, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
+	FilterOperator, Sorter, Services, AppConstant, Validation, exportLibrary, Spreadsheet, Utility, Config,
 	MassUploadHelper, ProcessInstanceFlow) {
 	"use strict";
 	return BaseController.extend("nus.edu.sg.opwrequest.controller.OpwRequestHistory", {
@@ -1424,9 +1422,36 @@ sap.ui.define([
 		},
 
 		onPressShowProcessTracker: function (oEvent) {
-			this.showBusyIndicator();
-			ProcessInstanceFlow._onPressProcessInstance(oEvent, this);
+			// this.showBusyIndicator();
+			this.initiateProcessInstanceRendering(oEvent);
+			// ProcessInstanceFlow._onPressProcessInstance(oEvent, this);
 		},
+		initiateProcessInstanceRendering: async function (oEvent) {
+			this.showBusyIndicator();
+			var sPath = oEvent.getSource().getBindingContext("CwsSrvModel").getPath();
+			var selectedReq = this.getComponentModel("CwsSrvModel").getProperty(sPath);
+			if (!this._oProcessInstanceNode) {
+				// this._oProcessInstanceNode = sap.ui.xmlfragment(this.createId("fragProcessInstanceNodeTest"),
+				// 	"nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow", component);
+
+				this._oProcessInstanceNode = await Fragment.load({
+					id: this.createId("fragProcessInstanceNodeTest"),
+					name: "nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow",
+					controller: this
+				});
+				this.getView().addDependent(this._oProcessInstanceNode);
+				// sap.ui.core.Fragment.byId(component.createId("fragExistingPromotion"), "tblExistingPromotion").setModel(
+				// 	"ExistingPromotionModel");
+				this._oProcessInstanceNode.setEscapeHandler(function () {
+					return;
+				});
+			}
+			//component.leaveDetails();
+			this.AppModel.setProperty("/processFlowRequestID", selectedReq.REQUEST_ID);
+			// await this._fnFrameProcessData(component,selectedReq);
+			await ProcessInstanceFlow._fnFrameProcessData(this, selectedReq);
+		},
+
 		onPressCloseProcessNode: function () {
 			ProcessInstanceFlow._onPressCloseProcessNode(this);
 		},
