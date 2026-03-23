@@ -1,0 +1,6 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<MessagePopover items="{AppModel>/cwsRequest/createCWSRequest/singleRequestErrorMessages}" id="singleRequestErrorPopOver" groupItems="true">
+		<MessageItem groupName="Active Error List" type="{AppModel>type}" title="{AppModel>sTitle}" subtitle="{AppModel>message}"
+			activeTitle="false" description="{AppModel>message}"/>
+	</MessagePopover>
+</core:FragmentDefinition>

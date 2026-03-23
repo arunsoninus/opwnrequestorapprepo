@@ -1,0 +1,84 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified" xmlns:tnt="sap.tnt">
+	<l:VerticalLayout width="100%">
+		<l:content>
+			<f:SimpleForm layout="ResponsiveGridLayout" editable="true" maxContainerCols="2" backgroundDesign="Solid" labelSpanL="3" emptySpanL="4"
+				emptySpanM="4" emptySpanS="0">
+				<f:content>
+					<core:Title text="Basic Information"/>
+					<Label text="Request Type"/>
+					<!--<RadioButtonGroup id="rbg1" columns="1" class="sapUiMediumMarginBottom" select="onSelectRequestType" buttons="{AppModel>/requestTypes}">
+						<RadioButton text="{AppModel>CONFIG_VALUE}" editable="false" selected="{AppModel>isSelected}"
+							valueState="{AppModel>/cwsRequest/validationRequest/requestTypeVState}"/>
+					</RadioButtonGroup>-->
+					<Text text="{AppModel>/requestTypes/0/CONFIG_VALUE}"/>
+					<Label text="Sub-Type" required="true"/>
+					<ComboBox showSecondaryValues="true" placeholder="Select Sub-Type" change="onChangeSubType"
+						selectedKey="{AppModel>/cwsRequest/createCWSRequest/SUB_TYPE}" items="{ path: 'AppModel>/subTypes', templateShareable:false}"
+						editable="{AppModel>/isFormEditable}" valueState="{AppModel>/cwsRequest/validationRequest/subTypeVState}">
+						<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
+					</ComboBox>
+					<Label text="Amount Payable to Staff" required="true"/>
+					<Input placeholder="{i18n>opwnrequest.amount}" change="onEnterFormatAmount($event, 'Payment')"
+						value="{path:'AppModel>/cwsRequest/createCWSRequest/AMOUNT', type: 'sap.ui.model.type.Float', formatOptions: { minFractionDigits: 2, preserveDecimals: false }}"
+						valueState="{AppModel>/cwsRequest/validationRequest/basicamountVState}" editable="{AppModel>/isFormEditable}"/>
+					<core:Title text="Dates Selection"/>
+					<Label text="Start Date" required="true"/>
+					<DatePicker enabled="{AppModel>/PaidStartDate}" dateValue="{AppModel>/cwsRequest/createCWSRequest/START_DATE}"
+						placeholder="Select Start Date.." valueFormat="yyyy-MM-dd" displayFormat="dd MMM, yyyy" change="onChangeDatesNDuration"
+						editable="{AppModel>/isFormEditable}" valueState="{AppModel>/cwsRequest/validationRequest/startDateVState}"/>
+					<Label text="End Date" required="true"/>
+					<DatePicker dateValue="{AppModel>/cwsRequest/createCWSRequest/END_DATE}" placeholder="Select End Date.." valueFormat="yyyy-MM-dd"
+						displayFormat="dd MMM, yyyy" change="onChangeDatesNDuration" editable="{AppModel>/isFormEditable}"
+						valueState="{AppModel>/cwsRequest/validationRequest/endDateVState}"/>
+					<Label text="Actual days of {AppModel>/cwsRequest/createCWSRequest/REQUEST_TYPE}" required="true"/>
+					<VBox>
+						<Input placeholder="Enter Actual days..."
+							value="{path:'AppModel>/cwsRequest/createCWSRequest/DURATION_DAYS', type: 'sap.ui.model.type.Float', formatOptions: { minFractionDigits: 2, preserveDecimals: false }}"
+							change="onChangeDatesNDuration($event, 'DR')" editable="{AppModel>/isFormEditable}"
+							valueState="{AppModel>/cwsRequest/validationRequest/durationVState}"/>
+						<Text text="(enter in days where 1 day = 8 hrs)"/>
+					</VBox>
+				</f:content>
+			</f:SimpleForm>
+			<Table inset="false" items="{ path: 'AppModel>/cwsRequest/createCWSRequest/durationSplitList', sorter: { path: 'YEAR' } }">
+				<infoToolbar>
+					<Toolbar active=" true">
+						<Label design="Bold" text="Duration (in Years) - "/>
+						<Label text="Please adjust the actual days of OPWN by year if necessary " class="fontLabel"/>
+					</Toolbar>
+				</infoToolbar>
+				<columns>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+						<Text text="Year"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+						<Text text="Start Date"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+						<Text text="End Date"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+						<Text text="Actual days of {AppModel>/cwsRequest/createCWSRequest/REQUEST_TYPE} (by Year)" wrapping="true"/>
+					</Column>
+					<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+						<Text text="Total Utilization (by Year)" wrapping="true"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem vAlign="Middle">
+						<cells>
+							<ObjectIdentifier title="{AppModel>YEAR}"/>
+							<DatePicker dateValue="{AppModel>START_DATE}" valueFormat="yyyy-MM-dd" displayFormat="dd MMM yyyy" editable="false"/>
+							<DatePicker dateValue="{AppModel>END_DATE}" valueFormat="yyyy-MM-dd" displayFormat="dd MMM yyyy" editable="false"/>
+							<Input valueState="{AppModel>/durationState}"
+								value="{path:'AppModel>DURATION', type: 'sap.ui.model.type.Float', formatOptions: { minFractionDigits: 2, preserveDecimals: false }}"
+								editable="{AppModel>/isFormEditable}" change="fnUtilizeService"/>
+							<Text text="{AppModel>TOTAL_UTILIZATION_YR}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</l:content>
+	</l:VerticalLayout>
+</core:FragmentDefinition>

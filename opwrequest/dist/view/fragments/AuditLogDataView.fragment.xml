@@ -1,0 +1,66 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:u="sap.uxap"
+	xmlns:tnt="sap.tnt">
+	<!--<ScrollContainer height="350px" vertical="true">-->
+	<Dialog titleAlignment="Center" horizontalScrolling="true" draggable="true" contentWidth="auto" contentHeight="auto" showHeader="true"
+		verticalScrolling="true" title="Audit Log" afterClose="onCancelSelectDatesForPlanningClaim">
+		<content>
+			<IconTabBar items="{ path : 'AppModel>/AudLogs'}" selectedKey="{AppModel>/iconTabBarSelectedKey}" upperCase="false">
+				<items>
+					<IconTabFilter text="{AppModel>tabName}" key="Header" count=" " tooltip="Header">
+						<!--<l:Grid class="sapUiSmallMarginTop" width="auto" hSpacing="1" vSpacing="1" defaultSpan="XL5 L5 M6 S12" defaultIndent="XL0 L0 M0 S0">
+							<l:content>-->
+						<Table inset="false" growing="true" growingScrollToLoad="true" sticky="ColumnHeaders,HeaderToolbar"
+							items="{ path : 'AppModel>data', sorter :[{ path : 'SUBMITTED_ON', descending : true}, { path : 'TEMP_CHANGED_ON', descending : true}], groupHeaderFactory: '.getGroupHeader'}">
+							<columns>
+								<Column width="2rem" hAlign="Left" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" mergeDuplicates="false"
+									class="indicatorRow"></Column>
+								<Column width="15rem" hAlign="Left" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" mergeDuplicates="false">
+									<Label design="Bold" text="Submitted On"/>
+								</Column>
+								<Column width="15rem" hAlign="Left" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" mergeDuplicates="false">
+									<Label design="Bold" text="Changed On"/>
+								</Column>
+								<Column width="10rem" hAlign="Left" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" mergeDuplicates="false">
+									<Label design="Bold" text="Field label"/>
+								</Column>
+								<Column width="10rem" hAlign="Left" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" mergeDuplicates="false">
+									<Label design="Bold" text="Old Value"/>
+								</Column>
+								<Column width="10rem" hAlign="Left" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" mergeDuplicates="false">
+									<Label design="Bold" text="New Value"/>
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem type="Active" press="onPressPreviewClaimRequest">
+									<cells class="indicatorRow">
+										<core:Icon src="sap-icon://circle-task-2" size="0.75rem"
+											color="{= ${AppModel>ACTION_TYPE} === 'ADDED' ? '#33cc33' : (${AppModel>ACTION_TYPE} === 'MODIFIED' ? '#ff9933' : '#ff3333') }"/>
+										<VBox>
+											<Text text="{path: 'AppModel>SUBMITTED_ON', formatter : '.formatter.convertDatesnew'}"/>
+											<Text text="{AppModel>SUBMITTED_BY_NID}"/>
+											<Text text="{AppModel>SUBMITTED_BY_FULLNAME}"/>
+										</VBox>
+										<VBox>
+											<Text text="{path: 'AppModel>TEMP_CHANGED_ON', formatter : '.formatter.convertDatesnew'}"/>
+											<Text text="{AppModel>CHANGED_BY_NID}"/>
+											<Text text="{AppModel>CHANGED_BY_FULLNM}"/>
+										</VBox>
+										<Text text="{AppModel>FIELD_LABEL}"/>
+										<Text text="{AppModel>OLD_VALUE}"/>
+										<Text text="{AppModel>NEW_VALUE}"/>
+									</cells>
+								</ColumnListItem>
+							</items>
+						</Table>
+						<!--</l:content>
+						</l:Grid>-->
+					</IconTabFilter>
+				</items>
+				<content></content>
+			</IconTabBar>
+		</content>
+		<buttons>
+			<Button text="Cancel" type="Transparent" press="onCancelAuditLog" visible="true"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

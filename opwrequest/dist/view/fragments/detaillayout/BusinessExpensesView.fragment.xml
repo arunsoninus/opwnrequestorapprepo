@@ -1,0 +1,20 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified" xmlns:tnt="sap.tnt">
+	<l:VerticalLayout width="100%">
+		<l:content>
+			<f:SimpleForm layout="ResponsiveLayout" labelSpanL="2" editable="true" maxContainerCols="2">
+				<f:content>
+					<core:Title/>
+					<Label text="Currency"/>
+					<ExtMultiInput dataPath="/" dialogCodeLbl="text" dialogDescLbl="NA" dialogTitle="Currency Selection" showValueHelp="true"
+						urlAttr="/currencies" setOnUI="text" valueHelpOnly="true" valueHelpRequest="lookupValueHelp" value="{CWFRequest>/currencyLevy}"
+						sorter="deptDesc" editable="false"/>
+					<core:Title/>
+					<Label text="Amount"/>
+					<Input value="{path:'CWFRequest>/businessExpenseAmount', type:'sap.ui.model.type.Float',formatOptions: { maxFractionDigits: 2 }}"
+						type="Number"/>
+				</f:content>
+			</f:SimpleForm>
+		</l:content>
+	</l:VerticalLayout>
+</core:FragmentDefinition>

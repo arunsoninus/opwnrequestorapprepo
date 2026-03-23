@@ -1,0 +1,24 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:cmmns="sap.ui.commons" xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified">
+	<Dialog id="ackDialogId" beforeClose="closeAcknowledgementDialog" class="sapUiSizeCompact" contentHeight="40em" contentWidth="75em"
+		title="Mass Requests submitted for Synthesis">
+		<content>
+			<List items="{/ackList}" headerText="Requests submitted for Synthesis">
+				<items>
+					<ObjectListItem title="{requestNumber}" type="Inactive">
+						<attributes>
+							<ObjectAttribute text="{message}" tooltip="{message}"/>
+						</attributes>
+						<firstStatus>
+							<ObjectStatus text="{statusText}" state="{statusState}"/>
+						</firstStatus>
+						<attributes></attributes>
+					</ObjectListItem>
+				</items>
+			</List>
+		</content>
+		<buttons>
+			<Button text="{i18n>BillingReq.FR.BillingDateCalendar.Ok}" press="onPressCloseAck"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>
