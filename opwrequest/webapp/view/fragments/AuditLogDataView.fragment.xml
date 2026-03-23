@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:u="sap.uxap"
-	xmlns:tnt="sap.tnt" xmlns:si="sap.suite.ui.commons.statusindicator">
+	xmlns:tnt="sap.tnt">
 	<!--<ScrollContainer height="350px" vertical="true">-->
 	<Dialog titleAlignment="Center" horizontalScrolling="true" draggable="true" contentWidth="auto" contentHeight="auto" showHeader="true"
 		verticalScrolling="true" title="Audit Log" afterClose="onCancelSelectDatesForPlanningClaim">
@@ -33,40 +33,8 @@
 							<items>
 								<ColumnListItem type="Active" press="onPressPreviewClaimRequest">
 									<cells class="indicatorRow">
-										<HBox>
-											<VBox>
-												<si:StatusIndicator value="100" visible="{=${AppModel>ACTION_TYPE}=== 'ADDED' ? true : false}" width="10px" height="50px"
-													class="sapUiNoContentPadding sapUiNoMargin indicatorRow">
-													<si:ShapeGroup>
-														<si:Rectangle width="20" height="100%" strokeWidth="0.25" verticalAlignment="Top" strokeColor="#841dbd" fillColor="#841dbd"
-															horizontalAlignment="Left" fillingType="Linear" class="indicatorRow"/>
-													</si:ShapeGroup>
-													<si:propertyThresholds>
-														<si:PropertyThreshold fillColor="#33cc33" toValue="100"/>
-													</si:propertyThresholds>
-												</si:StatusIndicator>
-												<si:StatusIndicator value="100" visible="{=${AppModel>ACTION_TYPE}=== 'MODIFIED' ? true : false}" width="10px" height="50px"
-													class="sapUiNoContentPadding sapUiNoMargin indicatorRow">
-													<si:ShapeGroup>
-														<si:Rectangle width="20" height="100%" strokeWidth="0.25" verticalAlignment="Top" strokeColor="#841dbd" fillColor="#841dbd"
-															horizontalAlignment="Left" fillingType="Linear" class="indicatorRow"/>
-													</si:ShapeGroup>
-													<si:propertyThresholds>
-														<si:PropertyThreshold fillColor="#ff9933" toValue="100"/>
-													</si:propertyThresholds>
-												</si:StatusIndicator>
-												<si:StatusIndicator value="100" visible="{=${AppModel>ACTION_TYPE}=== 'DELETED' ? true : false}" width="10px" height="50px"
-													class="sapUiNoContentPadding sapUiNoMargin indicatorRow">
-													<si:ShapeGroup>
-														<si:Rectangle width="20" height="100%" strokeWidth="0.25" verticalAlignment="Top" strokeColor="#841dbd" fillColor="#841dbd"
-															horizontalAlignment="Left" fillingType="Linear" class="indicatorRow"/>
-													</si:ShapeGroup>
-													<si:propertyThresholds>
-														<si:PropertyThreshold fillColor="#ff3333" toValue="100"/>
-													</si:propertyThresholds>
-												</si:StatusIndicator>
-											</VBox>
-										</HBox>
+										<core:Icon src="sap-icon://circle-task-2" size="0.75rem"
+											color="{= ${AppModel>ACTION_TYPE} === 'ADDED' ? '#33cc33' : (${AppModel>ACTION_TYPE} === 'MODIFIED' ? '#ff9933' : '#ff3333') }"/>
 										<VBox>
 											<Text text="{path: 'AppModel>SUBMITTED_ON', formatter : '.formatter.convertDatesnew'}"/>
 											<Text text="{AppModel>SUBMITTED_BY_NID}"/>

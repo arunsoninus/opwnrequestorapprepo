@@ -1,8 +1,9 @@
 sap.ui.define([
 		"./configuration", "./dataformatter",
-		"./utility", "sap/ui/core/ValueState"
-	], function (Config, Formatter, Utility, ValueState) {
+		"./utility", "sap/ui/core/library"
+	], function (Config, Formatter, Utility, coreLibrary) {
 		"use strict";
+		var ValueState = coreLibrary.ValueState;
 		var validation = ("nus.edu.sg.opwrequest.utils.validation", {
 
 			initializeAllValueStates: function (component) {
