@@ -1,0 +1,25 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<ResponsivePopover id="myPopover" title="Request History" class="sapUiContentPadding" placement="Bottom">
+		<endButton>
+			<Button text="Close" press="handleCloseButton"/>
+		</endButton>
+		<content>
+			<List items="{path:'AppModel>/oRequestHistory', sorter: { path: 'requestStatusCode', descending: true},templateShareable:true}">
+				<CustomListItem>
+					<HBox>
+						<VBox>
+							<ObjectAttribute class="sapUiTinyMargin" title="Request ID" text="{AppModel>requestId}"/>
+							<ObjectAttribute class="sapUiTinyMargin" title="Submitted By" text="{AppModel>submittedByFullName} ({AppModel>submittedBy})"/>
+							<ObjectAttribute class="sapUiTinyMargin" title="Submitted On"
+								text="{path: 'AppModel>submittedOn', formatter : '.formatter.convertDatesnew'}"/>
+							<ObjectAttribute class="sapUiTinyMargin" title="Modified On" text="{path: 'AppModel>modifiedOn', formatter : '.formatter.convertDatesnew'}"/>
+							<ObjectAttribute class="sapUiTinyMargin" title="Submission Type" text="{AppModel>submissionTypeAlias}"/>
+							<ObjectStatus class="sapUiTinyMargin" title="Status" text="{AppModel>requestStatus}"
+								state="{=${AppModel>requestStatus}==='Approved'? 'Success': 'Warning'}"/>
+						</VBox>
+					</HBox>
+				</CustomListItem>
+			</List>
+		</content>
+	</ResponsivePopover>
+</core:FragmentDefinition>

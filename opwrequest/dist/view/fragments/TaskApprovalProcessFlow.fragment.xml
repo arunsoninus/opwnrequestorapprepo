@@ -1,0 +1,62 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:cmmns="sap.ui.commons" xmlns:suite="sap.suite.ui.commons" xmlns:core="sap.ui.core"
+	xmlns:f="sap.ui.layout.form" xmlns:u="sap.ui.unified" xmlns:l="sap.ui.layout">
+	<Dialog titleAlignment="Center" afterClose="onPressCloseProcessNode" class="sapUiSizeCompact" contentHeight="auto" contentWidth="auto"
+		title="Process Tracker for Request : {AppModel>/processFlowRequestID}">
+		<content>
+			<Panel width="100%" content="{path:'AppModel>/oFlowProcess',templateShareable:false}">
+				<content>
+					<VBox>
+						<Title class="sapUiSmallMargin"
+							text="{=${AppModel>mapData/SUBMISSION_TYPE}==='N' ? 'New Request' : ${AppModel>mapData/SUBMISSION_TYPE_ALIAS}} - {AppModel>mapData/REQ_STATUS_ALIAS}"/>
+						<suite:ProcessFlow wheelZoomable="false" nodePress="onNodePress" scrollable="false" nodes="{path:'AppModel>nodes', templateShareable:true}"
+							lanes="{path:'AppModel>lanes', templateShareable:true}">
+							<suite:nodes>
+								<suite:ProcessFlowNode laneId="{AppModel>lane}" nodeId="{AppModel>id}" children="{AppModel>children}" state="{AppModel>state}">
+									<suite:zoomLevelOneContent>
+										<VBox height="100%" justifyContent="SpaceBetween" renderType="Bare">
+											<Text class="processFlowNodeText" text="{AppModel>COMPLETED_BY_FULL_NAME}"/>
+											<Text class="processFlowNodeDelegationText sapUITinyMarginTop" text="{AppModel>DELEGATED_TO_FULLNAME}"/>
+											<Text class="processFlowNodeText" text="{AppModel>taskActualCompletionFormatted}"/>
+											<Image height="5rem" src="{AppModel>src}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
+										</VBox>
+									</suite:zoomLevelOneContent>
+									<suite:zoomLevelTwoContent>
+										<VBox height="100%" justifyContent="SpaceBetween" renderType="Bare">
+											<Text class="processFlowNodeText" text="{AppModel>COMPLETED_BY_FULL_NAME}"/>
+											<Text class="processFlowNodeDelegationText sapUITinyMarginTop" text="{AppModel>DELEGATED_TO_FULLNAME}"/>
+											<Text class="processFlowNodeText" text="{AppModel>taskActualCompletionFormatted}"/>
+											<Image height="5rem" src="{AppModel>src}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
+										</VBox>
+									</suite:zoomLevelTwoContent>
+									<suite:zoomLevelThreeContent>
+										<VBox height="100%" justifyContent="SpaceBetween" renderType="Bare">
+											<Text class="processFlowNodeText" text="{AppModel>COMPLETED_BY_FULL_NAME}"/>
+											<Text class="processFlowNodeDelegationText sapUITinyMarginTop" text="{AppModel>DELEGATED_TO_FULLNAME}"/>
+											<Text class="processFlowNodeText" text="{AppModel>taskActualCompletionFormatted}"/>
+											<Image height="5rem" src="{AppModel>src}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
+										</VBox>
+									</suite:zoomLevelThreeContent>
+									<suite:zoomLevelFourContent>
+										<VBox height="100%" justifyContent="SpaceBetween" renderType="Bare">
+											<Text class="processFlowNodeText " text="{AppModel>COMPLETED_BY_FULL_NAME}"/>
+											<Text class="processFlowNodeDelegationText sapUITinyMarginTop" text="{AppModel>DELEGATED_TO_FULLNAME}"/>
+											<Text class="processFlowNodeText " text="{AppModel>taskActualCompletionFormatted}"/>
+											<Image height="5rem" src="{AppModel>src}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
+										</VBox>
+									</suite:zoomLevelFourContent>
+								</suite:ProcessFlowNode>
+							</suite:nodes>
+							<suite:lanes>
+								<suite:ProcessFlowLaneHeader laneId="{AppModel>id}" state="{AppModel>state}" iconSrc="{AppModel>icon}" text="{AppModel>text}"
+									position="{AppModel>position}"/>
+							</suite:lanes>
+						</suite:ProcessFlow>
+					</VBox>
+				</content>
+			</Panel>
+		</content>
+		<buttons>
+			<Button text="Ok" press="onPressCloseProcessNode"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

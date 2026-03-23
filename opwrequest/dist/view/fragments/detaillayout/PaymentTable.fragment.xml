@@ -1,0 +1,106 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form"
+	xmlns:u="sap.ui.unified" xmlns:tnt="sap.tnt" xmlns:rt="sap.ui.richtexteditor">
+	<VBox class="sapUiNoMarginTop background">
+		<f:SimpleForm editable="true" singleContainerFullSize="false" class="sapUiNoMargin" layout="ResponsiveGridLayout" labelSpanL="4"
+			maxContainerCols="3" backgroundDesign="Solid" emptySpanL="3" emptySpanM="3" emptySpanS="0" columnsL="3">
+			<f:content>
+				<core:Title text="Amount Details"/>
+				<Label text="Total Amount"/>
+				<Text text="{path:'AppModel>/cwsRequest/createCWSRequest/AMOUNT', formatter: '.formatter.decimalSeparator'}"/>
+				<Label text="Adjusted Amount"/>
+				<ObjectStatus text="{path:'AppModel>/cwsRequest/createCWSRequest/ADJUSTED_AMOUNT', formatter: '.formatter.decimalSeparator'}"/>
+				<core:Title text=" "/>
+				<Label text="Balance Amount"/>
+				<ObjectStatus text="{path:'AppModel>/cwsRequest/createCWSRequest/BALANCE_AMOUNT', formatter: '.formatter.decimalSeparator'}" state="Warning"/>
+				<Label text="Paid Amount"/>
+				<ObjectStatus text="{path:'AppModel>/cwsRequest/createCWSRequest/PAID_AMOUNT', formatter: '.formatter.decimalSeparator'}" state="Success"/>
+			</f:content>
+		</f:SimpleForm>
+		<FlexBox alignItems="Start" justifyContent="End">
+			<Button text="Refresh" icon="sap-icon://refresh" class="sapUiSmallMarginBeginEnd" press="fnPaymentAmount"/>
+		</FlexBox>
+		<l:Splitter height="400px" class="sapUiSmallMarginTop">
+			<List width="100%" visible="{=${AppModel>/cwsRequest/createCWSRequest/paymentList}.length > 0}"
+				items="{ path: 'AppModel>/paymentYearList', sorter: { path: 'YEAR' }}">
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="Year Wise Payment" level="H3" class="sapUiSmallMargin"/>
+					</OverflowToolbar>
+				</headerToolbar>
+				<items>
+					<ObjectListItem title="{AppModel>YEAR}" type="Navigation" press="onListItemPress"></ObjectListItem>
+				</items>
+				<layoutData>
+					<l:SplitterLayoutData size="200px"/>
+				</layoutData>
+			</List>
+			<Table id="oTableWbs" visible="true" width="100%" fixedLayout="Strict" items="{ path: 'AppModel>/cwsRequest/createCWSRequest/paymentList' }"
+				sticky="ColumnHeaders,HeaderToolbar">
+				<columns>
+					<Column >
+						<Text text="Month"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Text text="Amount"/>
+					</Column>
+					<Column minScreenWidth="Desktop" minWidth="30px" maxWidth="100px" demandPopin="true" hAlign="Center"
+						visible="{=${AppModel>/isDeptOHRSS} || ${AppModel>/isAppAdmin}}">
+						<Text text="Offline Adjustment"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true" hAlign="Center">
+						<Text text="Status"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true" hAlign="Center">
+						<Text text="Payment Type"/>
+					</Column>
+				</columns>
+				<items>
+					<ColumnListItem vAlign="Middle">
+						<cells>
+							<ObjectIdentifier title="{parts: [ {path:'AppModel>MONTH'}, {path:'AppModel>YEAR'} ], formatter: '.formatter.displayMonth'}"/>
+							<Text text="{path:'AppModel>AMOUNT', formatter: '.formatter.decimalSeparator'}"/>
+							<Input placeholder="Enter Amount."
+								value="{path:'AppModel>OFFLINE_ADJUSTMENT', type:'sap.ui.model.type.Float',formatOptions: { maxFractionDigits: 2 }}"
+								visible="{AppModel>/isDeptOHRSS}"
+								editable="{=(${AppModel>/isFormEditable}) &amp;&amp; (${AppModel>PAYMENT_REQ_STATUS}==='54') &amp;&amp; (${AppModel>/isDeptOHRSS}) ? true : false}"/>
+							<ObjectStatus text="{AppModel>PAYMENT_REQ_STATUS_ALIAS}" state="{AppModel>PAYMENT_REQ_STATUS_STATE}"/>
+							<Text text="{AppModel>PAYMENT_TYPE_ALIAS}"/>
+						</cells>
+					</ColumnListItem>
+				</items>
+				<layoutData>
+					<l:SplitterLayoutData size="auto"/>
+				</layoutData>
+			</Table>
+		</l:Splitter>
+		<HBox>
+			<Title text="Cost Distribution" class="sapUiSmallMargin"/>
+			<Button icon="sap-icon://sys-add" tooltip="Add WBS" press="onAddWbsElement" class="sapUiTinyMarginTop sapUiSmallMarginBegin"
+				enabled="{=${AppModel>/cwsRequest/createCWSRequest/wbsList}.length > 4 ? false: true}"
+				visible="{=${AppModel>/isFormEditable} &amp;&amp; ${AppModel>/isWbsChangeAllowed}}"/>
+			<Button icon="sap-icon://sys-minus" tooltip="Delete WBS" press="onPressDeleteWbsEntry" type="Reject"
+				visible="{=${AppModel>/isFormEditable} &amp;&amp; ${AppModel>/isWbsChangeAllowed}}" class="sapUiTinyMarginTop sapUiSmallMarginBegin"
+				enabled="{=${AppModel>/cwsRequest/createCWSRequest/wbsList}.length > 1 ? true: false}"/>
+		</HBox>
+		<Text text="{i18n>CwsRequest.WbsChange.Note}" class="wbsMessageLabel" visible="{=!${AppModel>/isWbsChangeAllowed}}"/>
+		<l:VerticalLayout width="100%"
+			content="{path:'AppModel>/cwsRequest/createCWSRequest/wbsList', sorter: { path: 'ID' }, filters: [{ path: 'IS_DELETED', operator: 'EQ', value1: 'N' }] }">
+			<l:content>
+				<HBox class="sapUiSmallMargin" width="100%">
+					<Label required="true" text="WBS:" design="Bold" class="sapUiTinyMarginTop"></Label>
+					<VBox width="20%">
+						<Input placeholder="Enter WBS.." class="sapUiTinyMarginBegin" change="onChangeWBS" value="{AppModel>WBS}"
+							valueState="{= !${AppModel>valueStateWbs} ? 'None' : ${AppModel>valueStateWbs} }"
+							valueStateText="{= !${AppModel>valueStateTextWbs} ? '' : ${AppModel>valueStateTextWbs} }"
+							editable="{=${AppModel>/isFormEditable} &amp;&amp; ${AppModel>/isWbsChangeAllowed}}"/>
+						<Text class="sapUiTinyMarginBegin" text="{AppModel>WBS_Desc}" wrapping="true"/>
+					</VBox>
+					<Label text="Percentage (%):" design="Bold" class="sapUiTinyMarginTop sapUiSmallMarginBegin"/>
+					<StepInput width="50%" placeholder="Enter Percentage.." class="sapUiTinyMarginBegin" value="{AppModel>VALUE}" displayValuePrecision="2"
+						min="1.00" max="100.00" step="1" editable="{=${AppModel>/isFormEditable} &amp;&amp; ${AppModel>/isWbsChangeAllowed}}"
+						valueState="{AppModel>/oPercentageVState}"></StepInput>
+				</HBox>
+			</l:content>
+		</l:VerticalLayout>
+	</VBox>
+</core:FragmentDefinition>

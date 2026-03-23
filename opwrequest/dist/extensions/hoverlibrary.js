@@ -1,0 +1,2 @@
+jQuery.sap.declare("sap.m.ObjectIdentifierHover");sap.m.ObjectIdentifier.extend("sap.m.ObjectIdentifierHover",{metadata:{events:{hover:{}}},onmouseover:function(e){this.fireHover()},renderer:{}});
+//# sourceMappingURL=hoverlibrary.js.map
