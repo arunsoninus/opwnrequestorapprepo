@@ -1,5 +1,5 @@
 sap.ui.define([
-	"../controller/BaseController", "../extensions/extendedvaluehelpodata", "sap/ui/core/Fragment",
+	"../controller/BaseController", "sap/ui/core/Fragment",
 	"../utils/dataformatter", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/services",
 	"../utils/appconstant",
 	"sap/ui/model/Filter",
@@ -9,7 +9,7 @@ sap.ui.define([
 	"../utils/requestlockhelper",
 	"../utils/validation",
 	"sap/ui/core/library"
-], function (BaseController, ExtendedValueHelpOData, Fragment, Formatter, MessageToast, MessageBox, Services,
+], function (BaseController, Fragment, Formatter, MessageToast, MessageBox, Services,
 	AppConstant, Filter, FilterOperator, Utility, Config, RequestLockHelper, Validation, coreLibrary) {
 	"use strict";
 	var ValueState = coreLibrary.ValueState;
