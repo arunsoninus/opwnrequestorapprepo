@@ -893,19 +893,23 @@ sap.ui.define([
 
 
 		onNavDashBoard: function () {
-			sap.ushell.Container.getServiceAsync("Navigation")
-				.then(function (oNavigation) {
-					oNavigation.navigate({
-						target: {
-							semanticObject: "cwdashboard",
-							action: "Display"
-						},
-						params: {}
+			if (sap.ushell && sap.ushell.Container) {
+				sap.ushell.Container.getServiceAsync("Navigation")
+					.then(function (oNavigation) {
+						oNavigation.navigate({
+							target: {
+								semanticObject: "cwdashboard",
+								action: "Display"
+							},
+							params: {}
+						});
+					})
+					.catch(function (err) {
+						MessageBox.error("Dashboard App Navigation failed: " + err.message);
 					});
-				})
-				.catch(function (err) {
-					console.error("Dashboard App Navigation failed", err);
-				});
+			} else {
+				MessageBox.error("Navigation service is not available.");
+			}
 		},
 
 		showDialogWithTimer: function () {
