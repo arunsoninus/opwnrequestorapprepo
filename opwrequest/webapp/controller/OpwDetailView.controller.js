@@ -2222,9 +2222,9 @@ sap.ui.define([
 			}
 		},
 		onPressApprove: function () {
-			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			var CatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			var filters = Utility._generateFilter("ID", [this.taskId]);
-			Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CwsSrvModel, this, filters, function (oData) {
+			Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CatalogSrvModel, this, filters, function (oData) {
 				var oData = oData.results;
 				if (oData.length > 0) {
 					var oMsg = this._fnshowTaskError(oData[0]);
@@ -2484,9 +2484,9 @@ sap.ui.define([
 		},
 
 		onPressReject: function () {
-			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			var CatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			var filters = Utility._generateFilter("ID", [this.taskId]);
-			Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CwsSrvModel, this, filters, function (oData) {
+			Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CatalogSrvModel, this, filters, function (oData) {
 				var oData = oData.results;
 				if (oData.length > 0) {
 					var oMsg = this._fnshowTaskError(oData[0]);
