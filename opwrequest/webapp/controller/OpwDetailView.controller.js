@@ -2224,7 +2224,7 @@ sap.ui.define([
 		onPressApprove: function () {
 			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
 			var filters = Utility._generateFilter("ID", [this.taskId]);
-			Services._readDataUsingOdataModel("/TaskDetailss", CwsSrvModel, this, filters, function (oData) {
+			Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CwsSrvModel, this, filters, function (oData) {
 				var oData = oData.results;
 				if (oData.length > 0) {
 					var oMsg = this._fnshowTaskError(oData[0]);
@@ -2486,7 +2486,7 @@ sap.ui.define([
 		onPressReject: function () {
 			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
 			var filters = Utility._generateFilter("ID", [this.taskId]);
-			Services._readDataUsingOdataModel("/TaskDetailss", CwsSrvModel, this, filters, function (oData) {
+			Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CwsSrvModel, this, filters, function (oData) {
 				var oData = oData.results;
 				if (oData.length > 0) {
 					var oMsg = this._fnshowTaskError(oData[0]);
@@ -2639,6 +2639,9 @@ sap.ui.define([
 			saveObject.SELECTED_PROGRAM_MGR = this.AppModel.getProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR");
 			saveObject.APPROVED_BY = this.AppModel.getProperty("/APPROVED_BY");
 			// End of change - CCEV3364
+			if (this.AppModel.getProperty("/oTaskDetails/0/TASK_INST_ID")) {
+				saveObject.TASK_INST_ID = this.AppModel.getProperty("/oTaskDetails/0/TASK_INST_ID");
+			}
 			saveObject.ID = this.taskId;
 			saveObject.isUpdateReqd = (saveOrSubmit.toUpperCase() === 'UPDATE') ? true : false;
 			saveObject.isReceivedPaymentUpdate = saveOrSubmit === "Update Receivables" ? true : false;
