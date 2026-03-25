@@ -141,6 +141,14 @@
       }
     },
     "resources": {
+      "js": [
+        {
+          "uri": "extensions/extendedvaluehelp.js"
+        },
+        {
+          "uri": "extensions/extendedvaluehelpodata.js"
+        }
+      ],
       "css": [
         {
           "uri": "css/style.css"

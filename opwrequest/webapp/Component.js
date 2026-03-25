@@ -3,9 +3,8 @@ sap.ui.define([
 	"sap/ui/Device",
 	"sap/ui/model/json/JSONModel",
 	"nus/edu/sg/opwrequest/model/models",
-	"nus/edu/sg/opwrequest/extensions/extendedvaluehelp",
 	"sap/f/FlexibleColumnLayoutSemanticHelper"
-], function (UIComponent, Device, JSONModel, models, ExtendedValueHelp, FlexibleColumnLayoutSemanticHelper) {
+], function (UIComponent, Device, JSONModel, models, FlexibleColumnLayoutSemanticHelper) {
 	"use strict";
 
 	return UIComponent.extend("nus.edu.sg.opwrequest.Component", {

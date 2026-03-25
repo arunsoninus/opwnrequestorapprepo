@@ -1,5 +1,5 @@
 sap.ui.define([
-	"../controller/BaseController", "../extensions/extendedvaluehelpodata", "sap/ui/core/Fragment",
+	"../controller/BaseController", "sap/ui/core/Fragment",
 	"../utils/dataformatter", "sap/m/MessageToast", "sap/m/MessageBox", "../utils/services",
 	"../utils/appconstant",
 	"sap/ui/model/Filter",
@@ -9,7 +9,7 @@ sap.ui.define([
 	"../utils/requestlockhelper",
 	"../utils/validation",
 	"sap/ui/core/library"
-], function (BaseController, ExtendedValueHelpOData, Fragment, Formatter, MessageToast, MessageBox, Services,
+], function (BaseController, Fragment, Formatter, MessageToast, MessageBox, Services,
 	AppConstant, Filter, FilterOperator, Utility, Config, RequestLockHelper, Validation, coreLibrary) {
 	"use strict";
 	var ValueState = coreLibrary.ValueState;
@@ -630,7 +630,7 @@ sap.ui.define([
 			if (this.taskId && this.viaInbox) {
 				this.AppModel.setProperty("/oTaskDetails", []);
 				var CatalogSrvModel = this.getComponentModel("CatalogSrvModel");
-				var filters = Utility._generateFilter("TASK_INST_ID", [this.taskId]);
+				var filters = Utility._generateFilter("ID", [this.taskId]);
 				Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CatalogSrvModel, this, filters, function (oData) {
 					var oData = oData.results;
 					if (oData.length > 0) {
@@ -2222,9 +2222,9 @@ sap.ui.define([
 			}
 		},
 		onPressApprove: function () {
-			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
-			var filters = Utility._generateFilter("TASK_INST_ID", [this.taskId]);
-			Services._readDataUsingOdataModel("/TaskDetailss", CwsSrvModel, this, filters, function (oData) {
+			var CatalogSrvModel = this.getComponentModel("CatalogSrvModel");
+			var filters = Utility._generateFilter("ID", [this.taskId]);
+			Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CatalogSrvModel, this, filters, function (oData) {
 				var oData = oData.results;
 				if (oData.length > 0) {
 					var oMsg = this._fnshowTaskError(oData[0]);
@@ -2248,8 +2248,6 @@ sap.ui.define([
 				"messageList": []
 			};
 
-			var validationAttachment = [];
-
 			var data = this.AppModel.getProperty("/cwsRequest/createCWSRequest");
 			var validationResponse = Validation.validateCostDistributionPerc(data.wbsList, validationElement, validateResponse.messageList,
 				this);
@@ -2257,22 +2255,12 @@ sap.ui.define([
 				this);
 			var finalObj = validationResponse.concat(validationResponse1);
 
-			var data = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList");
-			if (!data || data.results.length === 0) {
-				var messageElement = {
-					"type": "Error",
-					"sTitle": "Error",
-					"active": false,
-					"message": "No attachment found, Kindly reject and resubmit the request."
-				};
-
-				validationAttachment.push(messageElement);
-				if (finalObj.length === 0) {
-					finalObj = validationAttachment;
-				} else {
-					finalObj = finalObj.concat(validationAttachment);
-				}
-			}
+			// var attachmentData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList");
+			// var validationAttachmentList = [];
+			// Validation.validateAttachmentList(attachmentData, "CwsRequest.Attachment.ApproveMessage", validationAttachmentList, this);
+			// if (validationAttachmentList.length > 0) {
+			// 	finalObj = finalObj.concat(validationAttachmentList);
+			// }
 
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", finalObj);
 			var errorList = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages");
@@ -2484,9 +2472,9 @@ sap.ui.define([
 		},
 
 		onPressReject: function () {
-			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
-			var filters = Utility._generateFilter("TASK_INST_ID", [this.taskId]);
-			Services._readDataUsingOdataModel("/TaskDetailss", CwsSrvModel, this, filters, function (oData) {
+			var CatalogSrvModel = this.getComponentModel("CatalogSrvModel");
+			var filters = Utility._generateFilter("ID", [this.taskId]);
+			Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CatalogSrvModel, this, filters, function (oData) {
 				var oData = oData.results;
 				if (oData.length > 0) {
 					var oMsg = this._fnshowTaskError(oData[0]);
@@ -2639,7 +2627,10 @@ sap.ui.define([
 			saveObject.SELECTED_PROGRAM_MGR = this.AppModel.getProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR");
 			saveObject.APPROVED_BY = this.AppModel.getProperty("/APPROVED_BY");
 			// End of change - CCEV3364
-			saveObject.TASK_INST_ID = this.taskId;
+			if (this.AppModel.getProperty("/oTaskDetails/0/TASK_INST_ID")) {
+				saveObject.TASK_INST_ID = this.AppModel.getProperty("/oTaskDetails/0/TASK_INST_ID");
+			}
+			// saveObject.ID = this.taskId;
 			saveObject.isUpdateReqd = (saveOrSubmit.toUpperCase() === 'UPDATE') ? true : false;
 			saveObject.isReceivedPaymentUpdate = saveOrSubmit === "Update Receivables" ? true : false;
 			saveObject.isDuplicateCheck = (saveObject.SUBMISSION_TYPE === "U") ? true : false;

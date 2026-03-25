@@ -52,7 +52,7 @@ sap.ui.define([
 					this.validateBasicInfoNDuration(data, validationElement, validateResponse.messageList, component);
 					this.validateDuration(data.durationSplitList, validationElement, validateResponse.messageList, component);
 					this.validateClientWorkDetails(data, validationElement, validateResponse.messageList, component);
-					// this.validateAttachments(data.attachmentList, validationElement, validateResponse.messageList, component);
+					// this.validateAttachmentList(data.attachmentList, "CwsRequest.Attachmnent.Message", validateResponse.messageList, component);
 					this.validateCostDistribution(data.wbsList, validationElement, validateResponse.messageList, component);
 					this.validateCostDistributionPerc(data.wbsList, validationElement, validateResponse.messageList, component);
 					this.validateSelectedProgramManager(data.SELECTED_PROGRAM_MGR, data.STAFF_ID, validationElement, validateResponse.messageList,
@@ -232,6 +232,26 @@ sap.ui.define([
 					messageElement.message = component.getI18n("CwsRequest.Attachmnent.Message");
 					messageList.push(messageElement);
 				}
+			},
+
+			validateAttachmentList: function (data, messageKey, messageList, component) {
+				var messageElement = {
+					"type": "Error",
+					"sTitle": "Attachment",
+					"active": false,
+					"counter": 0
+				};
+				if (!data || data.results.length === 0) {
+					messageElement.counter = 1;
+				} else {
+					messageElement.counter = 0;
+				}
+
+				if (messageElement.counter > 0) {
+					messageElement.message = component.getI18n(messageKey);
+					messageList.push(messageElement);
+				}
+				return messageList;
 			},
 
 			validateCostPayment: function (data, validationElement, messageList, component) {

@@ -1,6 +1,5 @@
 sap.ui.define([
 	"../controller/BaseController",
-	"../extensions/extendedvaluehelpodata",
 	"sap/ui/core/Fragment",
 	"sap/ui/model/json/JSONModel",
 	"../utils/dataformatter",
@@ -18,7 +17,7 @@ sap.ui.define([
 	"../utils/configuration",
 	"../utils/massuploadhelper",
 	"../utils/processInstanceFlow"
-], function (BaseController, ExtendedValueHelpOData, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
+], function (BaseController, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
 	FilterOperator, Sorter, Services, AppConstant, Validation, exportLibrary, Spreadsheet, Utility, Config,
 	MassUploadHelper, ProcessInstanceFlow) {
 	"use strict";
