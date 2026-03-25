@@ -2255,12 +2255,12 @@ sap.ui.define([
 				this);
 			var finalObj = validationResponse.concat(validationResponse1);
 
-			var attachmentData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList");
-			var validationAttachmentList = [];
-			Validation.validateAttachmentList(attachmentData, "CwsRequest.Attachment.ApproveMessage", validationAttachmentList, this);
-			if (validationAttachmentList.length > 0) {
-				finalObj = finalObj.concat(validationAttachmentList);
-			}
+			// var attachmentData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList");
+			// var validationAttachmentList = [];
+			// Validation.validateAttachmentList(attachmentData, "CwsRequest.Attachment.ApproveMessage", validationAttachmentList, this);
+			// if (validationAttachmentList.length > 0) {
+			// 	finalObj = finalObj.concat(validationAttachmentList);
+			// }
 
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", finalObj);
 			var errorList = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages");
