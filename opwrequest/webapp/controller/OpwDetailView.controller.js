@@ -630,7 +630,7 @@ sap.ui.define([
 			if (this.taskId && this.viaInbox) {
 				this.AppModel.setProperty("/oTaskDetails", []);
 				var CatalogSrvModel = this.getComponentModel("CatalogSrvModel");
-				var filters = Utility._generateFilter("TASK_INST_ID", [this.taskId]);
+				var filters = Utility._generateFilter("ID", [this.taskId]);
 				Services._readDataUsingOdataModel(Config.dbOperations.taskDetails, CatalogSrvModel, this, filters, function (oData) {
 					var oData = oData.results;
 					if (oData.length > 0) {
@@ -2223,7 +2223,7 @@ sap.ui.define([
 		},
 		onPressApprove: function () {
 			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
-			var filters = Utility._generateFilter("TASK_INST_ID", [this.taskId]);
+			var filters = Utility._generateFilter("ID", [this.taskId]);
 			Services._readDataUsingOdataModel("/TaskDetailss", CwsSrvModel, this, filters, function (oData) {
 				var oData = oData.results;
 				if (oData.length > 0) {
@@ -2378,7 +2378,7 @@ sap.ui.define([
 				if (cwsResponse.ACTION_CODE === "UPDATE") {
 					MessageToast.show("Data has been updated successfully.");
 				} else if (statusCode === "S") {
-					if (cwsResponse.TASK_INST_ID) {
+					if (cwsResponse.ID) {
 						this.unLockstop = false;
 						Utility._fnSuccessDialog(this, cwsResponse.message, function () {
 							Utility._fnCrossAppNavigationToInbox();
@@ -2485,7 +2485,7 @@ sap.ui.define([
 
 		onPressReject: function () {
 			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
-			var filters = Utility._generateFilter("TASK_INST_ID", [this.taskId]);
+			var filters = Utility._generateFilter("ID", [this.taskId]);
 			Services._readDataUsingOdataModel("/TaskDetailss", CwsSrvModel, this, filters, function (oData) {
 				var oData = oData.results;
 				if (oData.length > 0) {
@@ -2639,7 +2639,7 @@ sap.ui.define([
 			saveObject.SELECTED_PROGRAM_MGR = this.AppModel.getProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR");
 			saveObject.APPROVED_BY = this.AppModel.getProperty("/APPROVED_BY");
 			// End of change - CCEV3364
-			saveObject.TASK_INST_ID = this.taskId;
+			saveObject.ID = this.taskId;
 			saveObject.isUpdateReqd = (saveOrSubmit.toUpperCase() === 'UPDATE') ? true : false;
 			saveObject.isReceivedPaymentUpdate = saveOrSubmit === "Update Receivables" ? true : false;
 			saveObject.isDuplicateCheck = (saveObject.SUBMISSION_TYPE === "U") ? true : false;

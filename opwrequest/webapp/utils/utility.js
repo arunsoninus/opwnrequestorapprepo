@@ -1007,7 +1007,7 @@ sap.ui.define([
 			// 	},
 			// 	params: {}
 			// })) || ""; // generate the Hash to display a Supplier
-			// // hash = hash + "&/taskdetail/" + project + "/" + objData.TASK_INST_ID + "/" + layout;
+			// // hash = hash + "&/taskdetail/" + project + "/" + objData.ID + "/" + layout;
 			// oCrossAppNavigator.toExternal({
 			// 	target: {
 			// 		shellHash: hash
