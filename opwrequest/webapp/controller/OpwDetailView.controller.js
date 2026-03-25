@@ -2248,8 +2248,6 @@ sap.ui.define([
 				"messageList": []
 			};
 
-			var validationAttachment = [];
-
 			var data = this.AppModel.getProperty("/cwsRequest/createCWSRequest");
 			var validationResponse = Validation.validateCostDistributionPerc(data.wbsList, validationElement, validateResponse.messageList,
 				this);
@@ -2257,21 +2255,11 @@ sap.ui.define([
 				this);
 			var finalObj = validationResponse.concat(validationResponse1);
 
-			var data = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList");
-			if (!data || data.results.length === 0) {
-				var messageElement = {
-					"type": "Error",
-					"sTitle": "Error",
-					"active": false,
-					"message": "No attachment found, Kindly reject and resubmit the request."
-				};
-
-				validationAttachment.push(messageElement);
-				if (finalObj.length === 0) {
-					finalObj = validationAttachment;
-				} else {
-					finalObj = finalObj.concat(validationAttachment);
-				}
+			var attachmentData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList");
+			var validationAttachmentList = [];
+			Validation.validateAttachmentList(attachmentData, "CwsRequest.Attachment.ApproveMessage", validationAttachmentList, this);
+			if (validationAttachmentList.length > 0) {
+				finalObj = finalObj.concat(validationAttachmentList);
 			}
 
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", finalObj);
