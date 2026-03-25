@@ -2366,7 +2366,7 @@ sap.ui.define([
 				if (cwsResponse.ACTION_CODE === "UPDATE") {
 					MessageToast.show("Data has been updated successfully.");
 				} else if (statusCode === "S") {
-					if (cwsResponse.ID) {
+					if (cwsResponse.TASK_INST_ID) {
 						this.unLockstop = false;
 						Utility._fnSuccessDialog(this, cwsResponse.message, function () {
 							Utility._fnCrossAppNavigationToInbox();
