@@ -224,8 +224,5 @@
   "sap.cloud": {
     "public": true,
     "service": "opwnrequestorapp"
-  },
-  "sap.platform.cf": {
-    "ui5VersionNumber": "1.120.45"
   }
 }
