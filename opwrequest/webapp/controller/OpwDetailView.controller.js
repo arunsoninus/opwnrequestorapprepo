@@ -2029,7 +2029,7 @@ sap.ui.define([
 				}
 			}
 			if (!sValid) {
-				MessageBox.error(this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Request.ChangeRequestPending", [this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID")]));
+				MessageBox.error(this.getI18nVariables("CwsRequest.Request.ChangeRequestPending", [this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID")]));
 			} else {
 				this.AppModel.setProperty("/oEditKey", key);
 				this.ocwsRequest = $.extend(true, {}, this.AppModel.getProperty("/cwsRequest/createCWSRequest"));
@@ -2378,7 +2378,7 @@ sap.ui.define([
 						if (cwsResponse.ACTION_CODE === "RESUBMIT" || cwsResponse.ACTION_CODE === "R_RESUBMIT") {
 							this.onPressCancel();
 						}
-						Utility._fnSuccessDialog(this, this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Request.SubmittedSuccess", [cwsResponse.REQUEST_ID]), function () {
+						Utility._fnSuccessDialog(this, this.getI18nVariables("CwsRequest.Request.SubmittedSuccess", [cwsResponse.REQUEST_ID]), function () {
 							this.oRouter.navTo("master", {
 								layout: "OneColumn"
 							}, true);

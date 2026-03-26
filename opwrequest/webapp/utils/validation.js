@@ -30,7 +30,7 @@ sap.ui.define([
 					if (durationDays && !message) {
 						diffDays = (diffDays == 0) ? 1 : diffDays + 1;
 						message = (diffDays < Number(durationDays)) ?
-							component.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Validation.DurationExceeds", [durationDays]) :
+							component.getI18nVariables("CwsRequest.Validation.DurationExceeds", [durationDays]) :
 							"";
 					}
 				}
@@ -948,7 +948,7 @@ sap.ui.define([
 						pattern: "d MMM yyyy"
 					});
 					var dojDate = oDateFormat.format(new Date(data.LEAVING_DATE));
-					message = component.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Validation.LastDayOfService", [dojDate]);
+					message = component.getI18nVariables("CwsRequest.Validation.LastDayOfService", [dojDate]);
 				}
 				return message;
 			},

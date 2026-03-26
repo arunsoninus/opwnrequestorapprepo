@@ -29,6 +29,12 @@ sap.ui.define([
 			var i18nTextValue = oResourceBundle.getText(sTextField);
 			return i18nTextValue ? i18nTextValue : sTextField;
 		},
+
+		getI18nVariables: function (sTextField, aVariables) {
+			var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+			var i18nTextValue = oResourceBundle.getText(sTextField, aVariables);
+			return i18nTextValue ? i18nTextValue : sTextField;
+		},
 		handleLiveChangeTa: function (oEvent) {
 			var oTextArea = oEvent.getSource(),
 				iValueLength = oTextArea.getValue().length,
@@ -905,7 +911,7 @@ sap.ui.define([
 						});
 					})
 					.catch(function (err) {
-						MessageBox.error(this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Nav.DashboardFailed", [err.message]));
+						MessageBox.error(this.getI18nVariables("CwsRequest.Nav.DashboardFailed", [err.message]));
 					});
 			} else {
 				MessageBox.error(this.getI18n("CwsRequest.Nav.ServiceUnavailable"));
@@ -921,7 +927,7 @@ sap.ui.define([
 				state: "Warning",
 				content: [
 					new sap.m.Text({
-						text: this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Nav.InterimIssue", [remainingTime])
+						text: this.getI18nVariables("CwsRequest.Nav.InterimIssue", [remainingTime])
 					})
 				],
 				beginButton: new sap.m.Button({
@@ -938,7 +944,7 @@ sap.ui.define([
 			// Update the remaining time every second
 			var timer = setInterval(function () {
 				remainingTime--;
-				oDialog.getContent()[0].setText(this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Nav.InterimIssue", [remainingTime]));
+				oDialog.getContent()[0].setText(this.getI18nVariables("CwsRequest.Nav.InterimIssue", [remainingTime]));
 				if (remainingTime <= 0) {
 					clearInterval(timer);
 					oDialog.close();
