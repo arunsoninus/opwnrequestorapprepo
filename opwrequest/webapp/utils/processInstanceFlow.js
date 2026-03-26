@@ -129,10 +129,10 @@ sap.ui.define([
 							if (photoResponse.length) {
 								objNodes.src = "data:image/png;base64," + photoResponse[0].photo;
 							} else {
-								objNodes.src = jQuery.sap.getModulePath("nus.edu.sg.opwrequest") + "/Image/Empty.png";
+								objNodes.src = sap.ui.require.toUrl("nus/edu/sg/opwrequest/Image/Empty.png");
 							}
 						} else {
-							objNodes.src = jQuery.sap.getModulePath("nus.edu.sg.opwrequest") + "/Image/Empty.png";
+							objNodes.src = sap.ui.require.toUrl("nus/edu/sg/opwrequest/Image/Empty.png");
 						}
 
 						if (taskHistoryList[t].taskUserList) {
