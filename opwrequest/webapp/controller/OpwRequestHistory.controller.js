@@ -648,7 +648,7 @@ sap.ui.define([
 			var filters = that.generateFilter("SF_STF_NUMBER", [sStaffId]);
 
 			if (!(type && startDate && endDate && durationDays && amount && fullname)) {
-				this.showMessageStrip("cwsRequestDialogMStripId", "Please provide * required fields", "E", "NewRequestTypeSelectionDialog");
+				this.showMessageStrip("cwsRequestDialogMStripId", this.getI18n("CwsRequest.Validation.RequiredFields"), "E", "NewRequestTypeSelectionDialog");
 			} else if (validateLeaving) {
 				this.showMessageStrip("cwsRequestDialogMStripId", validateLeaving, "E", "NewRequestTypeSelectionDialog");
 			} else {
@@ -745,7 +745,7 @@ sap.ui.define([
 								layout: "MidColumnFullScreen"
 							});
 						} else {
-							this.showMessageStrip("cwsRequestDialogMStripId", "User not allowed to submit CW/NED or OPWN request in the system", "E",
+							this.showMessageStrip("cwsRequestDialogMStripId", this.getI18n("CwsRequest.Error.UserNotAllowed"), "E",
 								"NewRequestTypeSelectionDialog");
 						}
 					}
@@ -1724,7 +1724,7 @@ sap.ui.define([
 			} else {
 				// msgStrip.setText("Please select file to upload.");
 				// msgStrip.setType("Error");
-				this.AppModel.setProperty("/formattedText", "Please select file to upload.");
+				this.AppModel.setProperty("/formattedText", this.getI18n("CwsRequest.MassUpload.SelectFileToUpload"));
 				msgStrip.setVisible(true);
 			}
 		},

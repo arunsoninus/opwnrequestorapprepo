@@ -2378,7 +2378,7 @@ sap.ui.define([
 						if (cwsResponse.ACTION_CODE === "RESUBMIT" || cwsResponse.ACTION_CODE === "R_RESUBMIT") {
 							this.onPressCancel();
 						}
-						Utility._fnSuccessDialog(this, "Request ID".concat(" ", cwsResponse.REQUEST_ID, " submitted successfully."), function () {
+						Utility._fnSuccessDialog(this, this.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Request.SubmittedSuccess", [cwsResponse.REQUEST_ID]), function () {
 							this.oRouter.navTo("master", {
 								layout: "OneColumn"
 							}, true);
@@ -2439,7 +2439,7 @@ sap.ui.define([
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", sValidation);
 					this.onPressErrorMessages();
 				} else {
-					var oMsg = cwsResponse.message ? cwsResponse.message : "Error Occurred while saving the request.";
+					var oMsg = cwsResponse.message ? cwsResponse.message : this.getI18n("CwsRequest.Error.SavingRequest");
 					var sValidation = [];
 					sValidation.push(this._formatErrorList("Error", "Error Detail", oMsg));
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", sValidation);

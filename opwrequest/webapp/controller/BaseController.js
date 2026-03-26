@@ -220,7 +220,7 @@ sap.ui.define([
 				"Terminate") ? "terminateMsgStrip" : (this.selectedIconTab === "Ship Change") ? "shipMsgStrip" : "recruitMsgStrip";
 			this.closeMessageStrip(srcMsgStrip);
 			if (!(Formatter.validateEnteredDate(oEvent.getParameter("id"), oEvent.getParameter("valid")))) {
-				this.showMessageStrip(srcMsgStrip, "Please select current or future date", "E", fragmentId);
+				this.showMessageStrip(srcMsgStrip, this.getI18n("CwsRequest.Date.SelectCurrentOrFuture"), "E", fragmentId);
 			}
 		},
 
@@ -1020,7 +1020,7 @@ sap.ui.define([
 					var json = JSON.parse(response.responseText);
 					oMessage = JSON.parse(json.message);
 				} catch (er) {
-					oMessage = "Error Occurred";
+					oMessage = this.getI18n("CwsRequest.Error.Occurred");
 				}
 			}
 			MessageBox.error(oMessage);
