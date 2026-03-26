@@ -492,7 +492,7 @@ sap.ui.define([
 		},
 
 		handletypemismatch: function () {
-			var msg = "Please select only xls, xlsx file.";
+			var msg = this.getI18n("CwsRequest.MassUpload.XlsOnly");
 			this.showMessageStrip("cwsRequestDialogMStripId", msg, "E", "NewRequestTypeSelectionDialog");
 		},
 
@@ -648,7 +648,7 @@ sap.ui.define([
 			var filters = that.generateFilter("SF_STF_NUMBER", [sStaffId]);
 
 			if (!(type && startDate && endDate && durationDays && amount && fullname)) {
-				this.showMessageStrip("cwsRequestDialogMStripId", "Please provide * required fields", "E", "NewRequestTypeSelectionDialog");
+				this.showMessageStrip("cwsRequestDialogMStripId", this.getI18n("CwsRequest.Validation.RequiredFields"), "E", "NewRequestTypeSelectionDialog");
 			} else if (validateLeaving) {
 				this.showMessageStrip("cwsRequestDialogMStripId", validateLeaving, "E", "NewRequestTypeSelectionDialog");
 			} else {
@@ -745,7 +745,7 @@ sap.ui.define([
 								layout: "MidColumnFullScreen"
 							});
 						} else {
-							this.showMessageStrip("cwsRequestDialogMStripId", "User not allowed to submit CW/NED or OPWN request in the system", "E",
+							this.showMessageStrip("cwsRequestDialogMStripId", this.getI18n("CwsRequest.Error.UserNotAllowed"), "E",
 								"NewRequestTypeSelectionDialog");
 						}
 					}
@@ -856,10 +856,10 @@ sap.ui.define([
 			var noOfHeaderRows = component.AppModel.getProperty("/cwsRequest/createCWSRequest/noOfHeaderRows");
 
 			if (!noOfHeaderRows) {
-				MessageBox.error("Please provide header rows count.");
+				MessageBox.error(this.getI18n("CwsRequest.MassUpload.HeaderRows"));
 				return;
 			} else if (!file) {
-				MessageBox.error("Please upload file.");
+				MessageBox.error(this.getI18n("CwsRequest.MassUpload.UploadFile"));
 				return;
 			}
 
@@ -956,7 +956,7 @@ sap.ui.define([
 							component.closeNewRequestTypeDialog();
 						}
 					} catch (oError) {
-						MessageBox.error("Failed to upload request data.");
+						MessageBox.error(this.getI18n("CwsRequest.MassUpload.FailedRequestData"));
 					} finally { }
 				}.bind(component))
 				.fail(function (response) {
@@ -1024,7 +1024,7 @@ sap.ui.define([
 			var that = this;
 			if (this.AppModel.getProperty("/oMassAttachmentID") && key === "S") {
 				MessageBox.warning(
-					"Do you want to cancel this mass request Submission? Please note that both request and attachment will also be deleted.", {
+					this.getI18n("CwsRequest.MassUpload.CancelConfirm"), {
 					title: "Warning",
 					actions: [sap.m.MessageBox.Action.YES,
 					sap.m.MessageBox.Action.NO
@@ -1059,7 +1059,7 @@ sap.ui.define([
 				}
 			}.bind(this));
 			if (isError) {
-				MessageBox.error("Please check error message in Request File and reupload.");
+				MessageBox.error(this.getI18n("CwsRequest.MassUpload.CheckErrors"));
 				var oMassDisplay = this.getUIControl("itbUpload", "fragMassUploadResponse");
 				oMassDisplay.setSelectedKey("request");
 				return;
@@ -1174,11 +1174,11 @@ sap.ui.define([
 				oSheet = new Spreadsheet(oSettings);
 				oSheet.build()
 					.then(function () {
-						MessageToast.show('Claim Data downloaded successfully.');
+						MessageToast.show(this.getI18n("CwsRequest.MassUpload.DownloadSuccess"));
 					})
 					.finally(oSheet.destroy);
 			} else {
-				MessageBox.error("No data found.");
+				MessageBox.error(this.getI18n("CwsRequest.MassUpload.NoData"));
 			}
 		},
 
@@ -1225,7 +1225,7 @@ sap.ui.define([
 			}
 
 			if (!this.AppModel.getProperty("/oMassAttachmentID")) {
-				MessageBox.error("Please upload attachment zip.");
+				MessageBox.error(this.getI18n("CwsRequest.MassUpload.UploadZip"));
 				return;
 			}
 
@@ -1248,7 +1248,7 @@ sap.ui.define([
 		},
 
 		handlefilezipTypemismatch: function (oEvent) {
-			return MessageBox.error("Only zip file extensions allowed");
+			return MessageBox.error(this.getI18n("CwsRequest.MassUpload.ZipOnly"));
 		},
 
 		fnSaveMassRequest: function () {
@@ -1281,7 +1281,7 @@ sap.ui.define([
 			if (aPayload.length) {
 				MassUploadHelper._fnPostMassSubmission(oCont, this);
 			} else {
-				MessageBox.error("There are no records to submit.");
+				MessageBox.error(this.getI18n("CwsRequest.MassUpload.NoRecords"));
 				this.hideBusyIndicator();
 				return;
 			}
@@ -1711,7 +1711,7 @@ sap.ui.define([
 							}
 						} catch (oError) {
 							this.hideBusyIndicator();
-							MessageBox.error("Failed to upload request data.");
+							MessageBox.error(this.getI18n("CwsRequest.MassUpload.FailedRequestData"));
 						} finally { }
 					}.bind(this))
 					.fail(function (response) {
@@ -1724,14 +1724,14 @@ sap.ui.define([
 			} else {
 				// msgStrip.setText("Please select file to upload.");
 				// msgStrip.setType("Error");
-				this.AppModel.setProperty("/formattedText", "Please select file to upload.");
+				this.AppModel.setProperty("/formattedText", this.getI18n("CwsRequest.MassUpload.SelectFileToUpload"));
 				msgStrip.setVisible(true);
 			}
 		},
 
 		handleDeleteMassAttachment: function (oEvent) {
 			var that = this;
-			MessageBox.confirm("Do you want to delete the attachment?", {
+			MessageBox.confirm(this.getI18n("CwsRequest.MassUpload.DeleteAttachment"), {
 				title: "Confirmation",
 				actions: [sap.m.MessageBox.Action.YES,
 				sap.m.MessageBox.Action.NO

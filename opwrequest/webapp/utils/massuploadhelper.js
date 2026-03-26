@@ -22,10 +22,10 @@ sap.ui.define([
 				var noOfHeaderRows = component.AppModel.getProperty("/cwsRequest/createCWSRequest/noOfHeaderRows");
 
 				if (!noOfHeaderRows) {
-					MessageBox.error("Please provide header rows count.");
+					MessageBox.error(component.getI18n("CwsRequest.MassUpload.HeaderRows"));
 					return;
 				} else if (!file) {
-					MessageBox.error("Please upload file.");
+					MessageBox.error(component.getI18n("CwsRequest.MassUpload.UploadFile"));
 					return;
 				}
 
@@ -110,7 +110,7 @@ sap.ui.define([
 						component.hideBusyIndicator();
 					}.bind(component));
 			} catch (oError) {
-				MessageBox.error("Data Upload Failed.");
+				MessageBox.error(component.getI18n("CwsRequest.MassUpload.DataUploadFailed"));
 			} finally {
 				component.hideBusyIndicator();
 			}
@@ -215,7 +215,7 @@ sap.ui.define([
 				if (Object.keys(response).length > 0) {
 					if (response.error) {
 						component.hideBusyIndicator();
-						msg = (response.message) ? response.message : "Failed to create the data.\n Please try again.";
+						msg = (response.message) ? response.message : component.getI18n("CwsRequest.MassUpload.FailedCreateData");
 						MessageBox.error(msg);
 					} else {
 						// var requestIDs = response.cwResponse.map(item => item.statusCode === "S" ? item.REQUEST_ID : item.message).join(', ');
@@ -237,7 +237,7 @@ sap.ui.define([
 					}
 				} else {
 					component.hideBusyIndicator();
-					msg = (response.message) ? response.message : "Failed to create the data. \n Please try again.";
+					msg = (response.message) ? response.message : component.getI18n("CwsRequest.MassUpload.FailedCreateData");
 					MessageBox.error(msg);
 				}
 				component.hideBusyIndicator();

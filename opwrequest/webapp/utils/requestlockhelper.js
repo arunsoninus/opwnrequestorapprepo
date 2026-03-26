@@ -159,9 +159,9 @@ sap.ui.define([
 			var staffId = component.AppModel.getProperty("/claimRequest/createClaimRequest/staffList/0/STAFF_FULL_NAME"); //Staff ID
 			var claimRequestType = component.AppModel.getProperty("/claimRequest/createClaimRequest/claimRequestType"); //claim Request Type
 			if (!claimType || !selectedMonth || !ulu || !fdlu) {
-				component.showMessageStrip("claimTypeMessageStripId", "Please provide * required fields", "E", "ClaimTypeDialog");
+				component.showMessageStrip("claimTypeMessageStripId", component.getI18n("CwsRequest.Validation.RequiredFields"), "E", "ClaimTypeDialog");
 			} else if (singleSubRadioSelected && (!staffId || !claimRequestType)) {
-				component.showMessageStrip("claimTypeMessageStripId", "Please provide * required fields", "E", "ClaimTypeDialog");
+				component.showMessageStrip("claimTypeMessageStripId", component.getI18n("CwsRequest.Validation.RequiredFields"), "E", "ClaimTypeDialog");
 			} else {
 				component.showBusyIndicator();
 				component.closeClaimTypeDialog();

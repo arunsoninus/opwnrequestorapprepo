@@ -29,6 +29,12 @@ sap.ui.define([
 			var i18nTextValue = oResourceBundle.getText(sTextField);
 			return i18nTextValue ? i18nTextValue : sTextField;
 		},
+
+		getI18nVariables: function (sTextField, aVariables) {
+			var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+			var i18nTextValue = oResourceBundle.getText(sTextField, aVariables);
+			return i18nTextValue ? i18nTextValue : sTextField;
+		},
 		handleLiveChangeTa: function (oEvent) {
 			var oTextArea = oEvent.getSource(),
 				iValueLength = oTextArea.getValue().length,
@@ -220,7 +226,7 @@ sap.ui.define([
 				"Terminate") ? "terminateMsgStrip" : (this.selectedIconTab === "Ship Change") ? "shipMsgStrip" : "recruitMsgStrip";
 			this.closeMessageStrip(srcMsgStrip);
 			if (!(Formatter.validateEnteredDate(oEvent.getParameter("id"), oEvent.getParameter("valid")))) {
-				this.showMessageStrip(srcMsgStrip, "Please select current or future date", "E", fragmentId);
+				this.showMessageStrip(srcMsgStrip, this.getI18n("CwsRequest.Date.SelectCurrentOrFuture"), "E", fragmentId);
 			}
 		},
 
@@ -905,10 +911,10 @@ sap.ui.define([
 						});
 					})
 					.catch(function (err) {
-						MessageBox.error("Dashboard App Navigation failed: " + err.message);
+						MessageBox.error(this.getI18nVariables("CwsRequest.Nav.DashboardFailed", [err.message]));
 					});
 			} else {
-				MessageBox.error("Navigation service is not available.");
+				MessageBox.error(this.getI18n("CwsRequest.Nav.ServiceUnavailable"));
 			}
 		},
 
@@ -921,7 +927,7 @@ sap.ui.define([
 				state: "Warning",
 				content: [
 					new sap.m.Text({
-						text: "An Interim issue has occurred, the screen will be navigated to main page in " + remainingTime + " seconds"
+						text: this.getI18nVariables("CwsRequest.Nav.InterimIssue", [remainingTime])
 					})
 				],
 				beginButton: new sap.m.Button({
@@ -938,8 +944,7 @@ sap.ui.define([
 			// Update the remaining time every second
 			var timer = setInterval(function () {
 				remainingTime--;
-				oDialog.getContent()[0].setText("An Interim issue has occurred, the screen will be navigated to main page in " + remainingTime +
-					" seconds");
+				oDialog.getContent()[0].setText(this.getI18nVariables("CwsRequest.Nav.InterimIssue", [remainingTime]));
 				if (remainingTime <= 0) {
 					clearInterval(timer);
 					oDialog.close();
@@ -1021,7 +1026,7 @@ sap.ui.define([
 					var json = JSON.parse(response.responseText);
 					oMessage = JSON.parse(json.message);
 				} catch (er) {
-					oMessage = "Error Occurred";
+					oMessage = this.getI18n("CwsRequest.Error.Occurred");
 				}
 			}
 			MessageBox.error(oMessage);
@@ -1055,7 +1060,7 @@ sap.ui.define([
 						Services.performDraftDeletion(this, aParameter, function (oResponse) {
 							if (!oResponse.isError) {
 								if (oEvent !== "D") {
-									MessageBox.success("Request has been deleted successfully.");
+									MessageBox.success(this.getI18n("CwsRequest.Delete.Success"));
 								} else {
 									Utility._fnSuccessDialog(this, oResponse.message, function () {
 										this._fnClearLocal();

@@ -449,7 +449,7 @@ sap.ui.define([
 				var file = oFiles.oFileUpload.files[0];
 				if (file.size > 5000000) {
 					this.hideBusyIndicator();
-					return MessageBox.error("Maximum size allowed for each attachment is 5 MB.");
+					return MessageBox.error(this.getI18n("CwsRequest.Upload.MaxSize"));
 				}
 				var form = new FormData();
 				form.append("files", file, file.name);
@@ -490,14 +490,14 @@ sap.ui.define([
 					}.bind(this));
 			} else {
 				this.hideBusyIndicator();
-				return MessageToast.show("Please browse & select the file to upload.");
+				return MessageToast.show(this.getI18n("CwsRequest.Upload.SelectFile"));
 			}
 		},
 		handlefileTypemismatch: function (oEvent) {
-			return MessageBox.error("Only jpg, jpeg, png, pdf, xls, xlsx file extensions allowed");
+			return MessageBox.error(this.getI18n("CwsRequest.Upload.AllowedTypes"));
 		},
 		handleFilenameLength: function (oEvent) {
-			return MessageBox.error("Filename should contain 100 characters only.");
+			return MessageBox.error(this.getI18n("CwsRequest.Upload.FileNameLength"));
 		},
 		handleUploadComplete: function () {
 			this._fnRefreshAttachment();
@@ -650,11 +650,11 @@ sap.ui.define([
 		_fnshowTaskError: function (data) {
 			var oMsg = "";
 			if (data.TASK_STATUS === "97" && data.TASK_NAME !== this.taskName) {
-				oMsg = "This task is no longer Active, the requestor has retracted this request, hence you'll be redirected to main page.";
+				oMsg = this.getI18n("CwsRequest.Task.Retracted");
 			}
 
 			if (data.TASK_STATUS === "99") {
-				oMsg = "This task is no longer active";
+				oMsg = this.getI18n("CwsRequest.Task.Inactive");
 			}
 
 			if (data.TASK_STATUS === "97" && data.TASK_NAME === this.taskName) {
@@ -1373,7 +1373,7 @@ sap.ui.define([
 			appModel.setProperty("/cwsRequest/createCWSRequest/SUB_TYPE", "");
 
 			if (this.AppModel.getProperty("/isRequestType") && selectedIndx !== "CW") {
-				return MessageBox.error("Submission only for Consultation Work (CW)");
+				return MessageBox.error(this.getI18n("CwsRequest.Request.CWOnly"));
 			} else {
 				appModel.setProperty("/cwsRequest/createCWSRequest/REQUEST_TYPE", appModel.getProperty("/requestTypes/" + selectedIndx +
 					"/CONFIG_KEY"));
@@ -1559,7 +1559,7 @@ sap.ui.define([
 				message = (diffDays < Number(srcVal)) ?
 					"Duration entered is greater than the date range.\n Please select valid range or provide correct duration" : "";
 			} else {
-				message = "Please select dates before providing the Duration";
+				message = this.getI18n("CwsRequest.Request.SelectDates");
 			}
 			if (message) {
 				this.showMessageStrip("cwsRequestDialogMStripId", message, "E", "CWSDurationDialog");
@@ -2029,8 +2029,7 @@ sap.ui.define([
 				}
 			}
 			if (!sValid) {
-				MessageBox.error("Change Request is already pending against " + this.AppModel.getProperty(
-					"/cwsRequest/createCWSRequest/REQUEST_ID"));
+				MessageBox.error(this.getI18nVariables("CwsRequest.Request.ChangeRequestPending", [this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID")]));
 			} else {
 				this.AppModel.setProperty("/oEditKey", key);
 				this.ocwsRequest = $.extend(true, {}, this.AppModel.getProperty("/cwsRequest/createCWSRequest"));
@@ -2073,7 +2072,7 @@ sap.ui.define([
 			var isValid = this.compareJSONObjects(aSaveObj, oData, skipFields);
 			if (isValid) {
 				var aValidation = [];
-				aValidation.push(Validation._formatMessageList("Error", "Error Detail", "Please make some changes to Re-Submit."));
+				aValidation.push(Validation._formatMessageList("Error", "Error Detail", this.getI18n("CwsRequest.Request.NoChanges")));
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aValidation);
 				this.onPressErrorMessages();
 			} else {
@@ -2266,7 +2265,7 @@ sap.ui.define([
 			var errorList = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages");
 
 			if (errorList.length === 0) {
-				this.confirmOnAction("Do you want to Approve?", "I", function () {
+				this.confirmOnAction(this.getI18n("CwsRequest.Approve.Confirm"), "I", function () {
 					this.showBusyIndicator();
 					var aSaveObj = this.getSaveObject('Approve');
 					this.onPostComment();
@@ -2346,11 +2345,11 @@ sap.ui.define([
 
 				if (cwsResponse.ACTION_CODE === "UPDATE RECEIVABLES") {
 					Utility._rebindAllUISections(this, cwsResponse);
-					MessageToast.show("Data has been updated successfully.");
+					MessageToast.show(this.getI18n("CwsRequest.Request.UpdateSuccess"));
 				}
 
 				if (cwsResponse.ACTION_CODE === "SAVE") {
-					MessageToast.show("Draft saved");
+					MessageToast.show(this.getI18n("CwsRequest.Request.DraftSaved"));
 					// localStorage.setItem("New_DraftID", cwsResponse.REQ_UNIQUE_ID);
 					this.AppModel.setProperty("/oCopyMode", "");
 					this.AppModel.setProperty("/showSubmitButton", true);
@@ -2364,7 +2363,7 @@ sap.ui.define([
 					}
 				}
 				if (cwsResponse.ACTION_CODE === "UPDATE") {
-					MessageToast.show("Data has been updated successfully.");
+					MessageToast.show(this.getI18n("CwsRequest.Request.UpdateSuccess"));
 				} else if (statusCode === "S") {
 					if (cwsResponse.TASK_INST_ID) {
 						this.unLockstop = false;
@@ -2379,7 +2378,7 @@ sap.ui.define([
 						if (cwsResponse.ACTION_CODE === "RESUBMIT" || cwsResponse.ACTION_CODE === "R_RESUBMIT") {
 							this.onPressCancel();
 						}
-						Utility._fnSuccessDialog(this, "Request ID".concat(" ", cwsResponse.REQUEST_ID, " submitted successfully."), function () {
+						Utility._fnSuccessDialog(this, this.getI18nVariables("CwsRequest.Request.SubmittedSuccess", [cwsResponse.REQUEST_ID]), function () {
 							this.oRouter.navTo("master", {
 								layout: "OneColumn"
 							}, true);
@@ -2440,7 +2439,7 @@ sap.ui.define([
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", sValidation);
 					this.onPressErrorMessages();
 				} else {
-					var oMsg = cwsResponse.message ? cwsResponse.message : "Error Occurred while saving the request.";
+					var oMsg = cwsResponse.message ? cwsResponse.message : this.getI18n("CwsRequest.Error.SavingRequest");
 					var sValidation = [];
 					sValidation.push(this._formatErrorList("Error", "Error Detail", oMsg));
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", sValidation);
@@ -2946,7 +2945,7 @@ sap.ui.define([
 			var that = this;
 			this._fnClearLocal();
 			this.AppModel.setProperty("/onCloseViewIsSave", '');
-			MessageBox.confirm("Do you want to save before exiting?", {
+			MessageBox.confirm(this.getI18n("CwsRequest.Request.SaveBeforeExit"), {
 				title: "Confirmation",
 				actions: [sap.m.MessageBox.Action.YES,
 				sap.m.MessageBox.Action.NO
@@ -3014,7 +3013,7 @@ sap.ui.define([
 			//this.aSaveObj = this.getSaveObject(saveOrSubmit);
 			var oReturnValidation = validation._fnSubmitValidation(this);
 			if (oReturnValidation.hasValidationError) {
-				MessageBox.error("Validation failed. Please check Error List for details");
+				MessageBox.error(this.getI18n("CwsRequest.Request.ValidationFailed"));
 				this.hideBusyIndicator();
 				return;
 			} else {
@@ -3134,7 +3133,7 @@ sap.ui.define([
 				// window.open(anchDownlaod.href, '_blank');
 				anchDownlaod.click();
 			} else {
-				return MessageBox.error("No files available for download.");
+				return MessageBox.error(this.getI18n("CwsRequest.Upload.NoFilesDownload"));
 			}
 
 		},
@@ -3198,7 +3197,7 @@ sap.ui.define([
 				window.open(blobUrl, '_blank');
 				// anchDownlaod.click();
 			} else {
-				return MessageBox.error("No files available for download.");
+				return MessageBox.error(this.getI18n("CwsRequest.Upload.NoFilesDownload"));
 			}
 		},
 
