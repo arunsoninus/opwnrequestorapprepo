@@ -718,10 +718,10 @@ sap.ui.define([
 
 		},
 		wbsElementsLookUp: function (oEvent) {
-			var token = this.AppModel.getProperty("/token");
+			// var token = this.AppModel.getProperty("/token");
 			var oHeaders = {
 				"Accept": "application/json",
-				"Authorization": "Bearer" + " " + token
+				// "Authorization": "Bearer" + " " + token
 			};
 			var url = "/eclaims/rest/fetchWBS?staffId=12564";
 			var wbsElementTypeModel = new JSONModel();

@@ -769,10 +769,10 @@ sap.ui.define([],
 				return calculatedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 			},
 			_amendHeaderToken: function (component, serviceToken) {
-				var token = (serviceToken) ? serviceToken : component.AppModel.getProperty("/token");
+				// var token = (serviceToken) ? serviceToken : component.AppModel.getProperty("/token");
 				var oHeaders = {
 					"Accept": "application/json",
-					"Authorization": "Bearer" + " " + token,
+					// "Authorization": "Bearer" + " " + token,
 					"AccessPoint": "A",
 					"Content-Type": "application/json"
 				};

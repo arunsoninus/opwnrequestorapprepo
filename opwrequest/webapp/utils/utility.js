@@ -172,10 +172,10 @@ sap.ui.define([
 		},
 
 		_headerToken: function (component) {
-			var token = component.AppModel.getProperty("/token");
+			// var token = component.AppModel.getProperty("/token");
 			var oHeaders = {
 				"Accept": "application/json",
-				"Authorization": "Bearer" + " " + token,
+				// "Authorization": "Bearer" + " " + token,
 				"AccessPoint": "A",
 				"Content-Type": "application/json"
 			};
