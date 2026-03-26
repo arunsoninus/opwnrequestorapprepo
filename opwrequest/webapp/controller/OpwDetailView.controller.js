@@ -572,7 +572,7 @@ sap.ui.define([
 
 		// generateTokenForLoggedInUser: function () {
 		// 	Services.fetchLoggedUserToken(this, function (oRetData) {
-		// 		Utility._assignTokenAndUserInfo(oRetData, this);
+		// 		Utility._assignTokenAndUserInfo(oRetData.getUserDetails, this);
 		// 		this._fetchAuthToken();
 		// 	}.bind(this));
 

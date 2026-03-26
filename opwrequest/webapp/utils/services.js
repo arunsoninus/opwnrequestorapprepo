@@ -87,10 +87,10 @@ sap.ui.define([
 			sUrl = sUrl + "?userId=" + staffId;
 			// sUrl = sUrl + "?userId=CHELUK";
 			//sUrl = sUrl + "?userId=10000027";
-			var token = sThis.AppModel.getProperty("/token");
+			// var token = sThis.AppModel.getProperty("/token");
 			var oHeaders = {
 				"Accept": "application/json",
-				"Authorization": "Bearer" + " " + token
+				// "Authorization": "Bearer" + " " + token
 			};
 			oPhotoModel.loadData(sUrl, null, null, "GET", null, null, oHeaders);
 			oPhotoModel.attachRequestCompleted(function (oResponse) {
@@ -161,10 +161,10 @@ sap.ui.define([
 
 		fetchFilterData: function (sThis, oPayload, callBackFx) {
 			var sUrl = Config.dbOperations.fetchFilterLookup;
-			var token = sThis.AppModel.getProperty("/token");
+			// var token = sThis.AppModel.getProperty("/token");
 			var oHeaders = {
 				"Content-Type": "application/json",
-				"Authorization": "Bearer" + " " + token
+				// "Authorization": "Bearer" + " " + token
 			};
 
 			var filterModel = new JSONModel();
@@ -406,10 +406,10 @@ sap.ui.define([
 				null
 			);
 
-			var token = sThis.AppModel.getProperty("/token");
+			// var token = sThis.AppModel.getProperty("/token");
 			var oHeaders = {
 				"Accept": "application/json",
-				"Authorization": "Bearer" + " " + token
+				// "Authorization": "Bearer" + " " + token
 			};
 			oValidateModel.loadData(sUrl, null, false, "GET", null, null, oHeaders);
 			return oValidateModel.getData();

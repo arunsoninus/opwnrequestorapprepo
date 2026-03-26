@@ -61,7 +61,7 @@ sap.ui.define([
 						var sDelegateToFullName = "Delegated to - " + taskHistoryList[t].DELEGATED_TO_FULLNAME;
 						objNodes.DELEGATED_TO_FULLNAME = taskHistoryList[t].DELEGATED_TO_FULLNAME ? sDelegateToFullName :
 							"";
-						if (!objNodes.TASK_ACTUAL_DOC) {
+						if (taskHistoryList[t].TASK_ACTUAL_DOC) {
 							var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
 								pattern: "d MMM, yyyy HH:mm"
 							});
