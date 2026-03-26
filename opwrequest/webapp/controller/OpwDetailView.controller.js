@@ -564,7 +564,7 @@ sap.ui.define([
 			Services.getUserInfoDetails(
 				this,
 				function (oRetData) {
-					Utility._assignTokenAndUserInfo(oRetData.getUserDetails, this);
+					Utility._assignTokenAndUserInfo(oRetData, this);
 					this._fetchAuthToken();
 				}.bind(this)
 			);
