@@ -22,10 +22,10 @@ sap.ui.define([
 				var noOfHeaderRows = component.AppModel.getProperty("/cwsRequest/createCWSRequest/noOfHeaderRows");
 
 				if (!noOfHeaderRows) {
-					MessageBox.error("Please provide header rows count.");
+					MessageBox.error(component.getI18n("CwsRequest.MassUpload.HeaderRows"));
 					return;
 				} else if (!file) {
-					MessageBox.error("Please upload file.");
+					MessageBox.error(component.getI18n("CwsRequest.MassUpload.UploadFile"));
 					return;
 				}
 
@@ -110,7 +110,7 @@ sap.ui.define([
 						component.hideBusyIndicator();
 					}.bind(component));
 			} catch (oError) {
-				MessageBox.error("Data Upload Failed.");
+				MessageBox.error(component.getI18n("CwsRequest.MassUpload.DataUploadFailed"));
 			} finally {
 				component.hideBusyIndicator();
 			}

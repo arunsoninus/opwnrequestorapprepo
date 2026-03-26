@@ -381,7 +381,7 @@ sap.ui.define([
 				headers: oHeaders,
 				success: function () { },
 				error: function (oError) {
-					sap.m.MessageToast.show("Error occurred while updating the status flag.");
+					sap.m.MessageToast.show(component.getI18n("CwsRequest.Service.StatusUpdateError"));
 				}
 			});
 		},

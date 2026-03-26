@@ -25,13 +25,12 @@ sap.ui.define([
 				if (startDate && endDate) {
 					diffDays = Formatter.getDaysDiff(startDate, endDate);
 
-					message = (diffDays < 0) ? "Start date must be before the end date." : "";
+					message = (diffDays < 0) ? component.getI18n("CwsRequest.Validation.StartBeforeEnd") : "";
 
 					if (durationDays && !message) {
 						diffDays = (diffDays == 0) ? 1 : diffDays + 1;
 						message = (diffDays < Number(durationDays)) ?
-							"Duration entered (" + durationDays +
-							") is greater than the date range.\n Please select valid range or provide correct duration" :
+							component.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Validation.DurationExceeds", [durationDays]) :
 							"";
 					}
 				}
@@ -949,7 +948,7 @@ sap.ui.define([
 						pattern: "d MMM yyyy"
 					});
 					var dojDate = oDateFormat.format(new Date(data.LEAVING_DATE));
-					message = "Staff’s last day of service is " + dojDate + ". Hence, above End Date cannot be after this date.";
+					message = component.getOwnerComponent().getModel("i18n").getResourceBundle().getText("CwsRequest.Validation.LastDayOfService", [dojDate]);
 				}
 				return message;
 			},
