@@ -128,14 +128,11 @@ sap.ui.define([
 							var photoResponse = Services.fetchUserImageAsync(component, taskHistoryList[t].TASK_USER_STAFF_ID);
 							if (photoResponse.length) {
 								objNodes.src = "data:image/png;base64," + photoResponse[0].photo;
-								objNodes.hasPhoto = true;
 							} else {
-								objNodes.src = "";
-								objNodes.hasPhoto = false;
+								objNodes.src = jQuery.sap.getModulePath("nus.edu.sg.opwrequest") + "/Image/Empty.png";
 							}
 						} else {
-							objNodes.src = "";
-							objNodes.hasPhoto = false;
+							objNodes.src = jQuery.sap.getModulePath("nus.edu.sg.opwrequest") + "/Image/Empty.png";
 						}
 
 						if (taskHistoryList[t].taskUserList) {
