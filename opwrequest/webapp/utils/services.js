@@ -180,12 +180,16 @@ sap.ui.define([
 		},
 		
 		fetchUserImageAsync: function (component, staffId) {
-			var oPhotoModel = new JSONModel();
-			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
-			var sUrl = UtilitySrvModel.sServiceUrl + Config.dbOperations.photoApi;
-			sUrl = sUrl + "?userId=" + staffId;
-			oPhotoModel.loadData(sUrl, null, false, "GET", null, null, HeaderHelper._headerToken());
-			return !oPhotoModel.getData().d ? [] : oPhotoModel.getData().d.results;
+			try {
+				var oPhotoModel = new JSONModel();
+				var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+				var sUrl = UtilitySrvModel.sServiceUrl + Config.dbOperations.photoApi;
+				sUrl = sUrl + "?userId=" + staffId;
+				oPhotoModel.loadData(sUrl, null, false, "GET", null, null, HeaderHelper._headerToken());
+				return !oPhotoModel.getData().d ? [] : oPhotoModel.getData().d.results;
+			} catch (e) {
+				return [];
+			}
 		},
 
 		fetchUserPhoto: function (component, callBackFx) {
