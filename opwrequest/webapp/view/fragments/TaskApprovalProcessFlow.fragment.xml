@@ -17,7 +17,7 @@
 											<Text class="processFlowNodeText" text="{AppModel>COMPLETED_BY_FULL_NAME}"/>
 											<Text class="processFlowNodeDelegationText sapUITinyMarginTop" text="{AppModel>DELEGATED_TO_FULLNAME}"/>
 											<Text class="processFlowNodeText" text="{AppModel>taskActualCompletionFormatted}"/>
-											<Image height="5rem" src="{AppModel>src}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
+											<Image height="5rem" src="{AppModel>src}" visible="{AppModel>hasPhoto}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
 										</VBox>
 									</suite:zoomLevelOneContent>
 									<suite:zoomLevelTwoContent>
@@ -25,7 +25,7 @@
 											<Text class="processFlowNodeText" text="{AppModel>COMPLETED_BY_FULL_NAME}"/>
 											<Text class="processFlowNodeDelegationText sapUITinyMarginTop" text="{AppModel>DELEGATED_TO_FULLNAME}"/>
 											<Text class="processFlowNodeText" text="{AppModel>taskActualCompletionFormatted}"/>
-											<Image height="5rem" src="{AppModel>src}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
+											<Image height="5rem" src="{AppModel>src}" visible="{AppModel>hasPhoto}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
 										</VBox>
 									</suite:zoomLevelTwoContent>
 									<suite:zoomLevelThreeContent>
@@ -33,7 +33,7 @@
 											<Text class="processFlowNodeText" text="{AppModel>COMPLETED_BY_FULL_NAME}"/>
 											<Text class="processFlowNodeDelegationText sapUITinyMarginTop" text="{AppModel>DELEGATED_TO_FULLNAME}"/>
 											<Text class="processFlowNodeText" text="{AppModel>taskActualCompletionFormatted}"/>
-											<Image height="5rem" src="{AppModel>src}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
+											<Image height="5rem" src="{AppModel>src}" visible="{AppModel>hasPhoto}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
 										</VBox>
 									</suite:zoomLevelThreeContent>
 									<suite:zoomLevelFourContent>
@@ -41,7 +41,7 @@
 											<Text class="processFlowNodeText " text="{AppModel>COMPLETED_BY_FULL_NAME}"/>
 											<Text class="processFlowNodeDelegationText sapUITinyMarginTop" text="{AppModel>DELEGATED_TO_FULLNAME}"/>
 											<Text class="processFlowNodeText " text="{AppModel>taskActualCompletionFormatted}"/>
-											<Image height="5rem" src="{AppModel>src}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
+											<Image height="5rem" src="{AppModel>src}" visible="{AppModel>hasPhoto}" alt="{AppModel>COMPLETED_BY_FULL_NAME}" densityAware="false"/>
 										</VBox>
 									</suite:zoomLevelFourContent>
 								</suite:ProcessFlowNode>
