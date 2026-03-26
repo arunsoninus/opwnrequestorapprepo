@@ -1,2 +1,0 @@
-sap.ui.define([],function(){"use strict";return{_headerToken:function(){var n={Accept:"application/json",AccessPoint:"A","Content-Type":"application/json"};var i=window.location.href;var o="applicationstudio";if(i.includes(o)){n["X-User-Id"]="alvinfoo"}return n}}});
-//# sourceMappingURL=headerHelper.js.map
