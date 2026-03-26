@@ -1052,12 +1052,12 @@ sap.ui.define([
 						aParameter.inputList.push({
 							"DRAFT_ID": reqUniqueId
 						});
-						Services.performDraftDeletion(this, aParameter, function (utilisationData) {
-							if (!oData.getSource().getData().error) {
+						Services.performDraftDeletion(this, aParameter, function (oResponse) {
+							if (!oResponse.isError) {
 								if (oEvent !== "D") {
 									MessageBox.success("Request has been deleted successfully.");
 								} else {
-									Utility._fnSuccessDialog(this, oData.getSource().getData().message, function () {
+									Utility._fnSuccessDialog(this, oResponse.message, function () {
 										this._fnClearLocal();
 										this.oRouter.navTo("master", {
 											layout: "OneColumn"
@@ -1067,7 +1067,7 @@ sap.ui.define([
 								this.getOpwnRequests();
 								// this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("CwsSrvModel"));
 							} else {
-								MessageBox.error(oData.getSource().getData().message);
+								MessageBox.error(oResponse.message);
 							}
 						}.bind(this)
 						);
