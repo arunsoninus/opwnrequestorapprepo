@@ -997,23 +997,6 @@ sap.ui.define([
 			}.bind(this));
 		},
 		_fnCrossAppNavigationToInbox: function () {
-			// var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
-			// var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-			// 	target: {
-			// 		semanticObject: "inbox",
-			// 		action: "Display"
-			// 		// semanticObject: "myinboxdev",
-			// 		// action: "display"
-			// 	},
-			// 	params: {}
-			// })) || ""; // generate the Hash to display a Supplier
-			// // hash = hash + "&/taskdetail/" + project + "/" + objData.ID + "/" + layout;
-			// oCrossAppNavigator.toExternal({
-			// 	target: {
-			// 		shellHash: hash
-			// 	}
-			// }); // navigate to Supplier application
-
 			if (sap.ushell && sap.ushell.Container) {
 
 				sap.ushell.Container.getServiceAsync("Navigation")
@@ -1035,20 +1018,6 @@ sap.ui.define([
 		},
 
 		_fnCrossAppNavigationToReport: function () {
-			// var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
-			// var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-			// 	target: {
-			// 		semanticObject: "cwnedreport",
-			// 		action: "Display"
-			// 	},
-			// 	params: {}
-			// })) || "";
-			// oCrossAppNavigator.toExternal({
-			// 	target: {
-			// 		shellHash: hash
-			// 	}
-			// });
-
 			if (sap.ushell && sap.ushell.Container) {
 				// var that = this;
 				sap.ushell.Container.getServiceAsync("Navigation")
@@ -1069,20 +1038,6 @@ sap.ui.define([
 		},
 
 		_fnCrossAppNavigationToofn: function () {
-			// var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation"); // get a handle on the global XAppNav service
-			// var hash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-			// 	target: {
-			// 		semanticObject: "ofnreportview",
-			// 		action: "Display"
-			// 	},
-			// 	params: {}
-			// })) || "";
-			// oCrossAppNavigator.toExternal({
-			// 	target: {
-			// 		shellHash: hash
-			// 	}
-			// });
-
 			if (sap.ushell && sap.ushell.Container) {
 				// var that = this;
 				sap.ushell.Container.getServiceAsync("Navigation")
