@@ -981,10 +981,10 @@ sap.ui.define([
 			this.AppModel.setProperty("/oWrVisible", false);
 			var oData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/massUploadResponseDisplay");
 			oData.find(function (element) {
-				if (element.error_STATE === true) {
+				if (element.ERROR_STATE === true) {
 					this.AppModel.setProperty("/oErVisible", true);
 				}
-				if (element.error_STATE === false && element.statusCode === "S") {
+				if (element.ERROR_STATE === false && element.statusCode === "S") {
 					this.AppModel.setProperty("/oSuVisible", true);
 				}
 				if (element.statusCode === "W") {
@@ -1006,7 +1006,7 @@ sap.ui.define([
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadFilter", filteredArray);
 				this.AppModel.setProperty("/oMassSelectedKey", key);
 			} else {
-				var excludedCondition = (oData) => oData.error_STATE === false;
+				var excludedCondition = (oData) => oData.ERROR_STATE === false;
 				var filteredArray = oData.filter((element) => !excludedCondition(element));
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadFilter", filteredArray);
 				this.AppModel.setProperty("/oMassSelectedKey", key);
@@ -1058,7 +1058,7 @@ sap.ui.define([
 			var isError = false,
 				oData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/massUploadResponseDisplay");
 			oData.find(function (element) {
-				if (element.error_STATE === true) {
+				if (element.ERROR_STATE === true) {
 					isError = true;
 				}
 			}.bind(this));
@@ -1655,9 +1655,9 @@ sap.ui.define([
 					}
 				}*/
 
-				var excludedSuccCondition = (oDataResponse) => oDataResponse.error_STATE === true;
+				var excludedSuccCondition = (oDataResponse) => oDataResponse.ERROR_STATE === true;
 				var SucccessPayload = oDataResponse.filter((element) => !excludedSuccCondition(element));
-				var excludedErrCondition = (oDataResponse) => oDataResponse.error_STATE === false;
+				var excludedErrCondition = (oDataResponse) => oDataResponse.ERROR_STATE === false;
 				var ErrorPayload = oDataResponse.filter((element) => !excludedErrCondition(element));
 
 				var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
