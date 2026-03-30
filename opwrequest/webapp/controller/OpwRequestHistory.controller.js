@@ -16,10 +16,11 @@ sap.ui.define([
 	"../utils/utility",
 	"../utils/configuration",
 	"../utils/massuploadhelper",
+	"../utils/headerHelper",
 	"../utils/processInstanceFlow"
 ], function (BaseController, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
 	FilterOperator, Sorter, Services, AppConstant, Validation, exportLibrary, Spreadsheet, Utility, Config,
-	MassUploadHelper, ProcessInstanceFlow) {
+	MassUploadHelper,HeaderHelper, ProcessInstanceFlow) {
 	"use strict";
 	return BaseController.extend("nus.edu.sg.opwrequest.controller.OpwRequestHistory", {
 		formatter: Formatter,
@@ -603,7 +604,8 @@ sap.ui.define([
 			this.AppModel.setProperty("/cwsRequest/Request_key", this.AppModel.getProperty("/RequestType/0/CONFIG_KEY"));
 			this.AppModel.setProperty("/cwsRequest/Request_key_Desc", this.AppModel.getProperty("/RequestType/0/CONFIG_VALUE"));
 			var oKey = oEvent.getSource().getSelectedButton().getText();
-			var oCwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			// var oCwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			// if (oKey === "Mass Upload") {
 			// 	MessageBox.information(this.getI18n("CwsRequest.MassUploadInfo"));
 			// }
@@ -612,8 +614,8 @@ sap.ui.define([
 				var andFilter = [];
 				andFilter.push(new sap.ui.model.Filter("ACCESS_ROLE", FilterOperator.EQ, 'CW_PROGRAM_ADMIN'));
 				andFilter.push(new Filter("REFERENCE_KEY", FilterOperator.EQ, 'USEFULLINKS'));
-				var oURL = "/DashboardConfigurations";
-				oCwsSrvModel.read(oURL, {
+				// var oURL = "/DashboardConfigurations";
+				oCatalogSrvModel.read(Config.dbOperations.dashboardData, {
 					filters: [andFilter],
 					success: function (oData) {
 						if (oData.results.length > 0) {
@@ -874,10 +876,11 @@ sap.ui.define([
 			form.append("requestType", "OPWN");
 			// form.append("period", period);
 			form.append("noOfHeaderRows", noOfHeaderRows - 1);
-			var oHeaders = Utility._headerToken(component);
+			var oHeaders = HeaderHelper._headerToken();
+			var sUrl = component.getComponentModel("CwsSrvModel").sServiceUrl;
 			delete oHeaders['Content-Type'];
 			var settings = {
-				"url": "/rest/excelUpload/cwsRequestUpload",
+				"url": sUrl + "/cwsRequestUpload",
 				"method": "POST",
 				"timeout": 0,
 				"headers": oHeaders,
@@ -890,6 +893,7 @@ sap.ui.define([
 				.done(function (response) {
 					try {
 						var parseResponse = JSON.parse(response);
+						parseResponse = (parseResponse.d && parseResponse.d.cwsRequestUpload)? parseResponse.d.cwsRequestUpload : {};
 						component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadResponse", parseResponse);
 						component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadResponseDisplay", parseResponse.displayPayload);
 						component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadRequestPayload", parseResponse.requestPayload);

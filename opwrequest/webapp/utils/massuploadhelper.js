@@ -32,6 +32,7 @@ sap.ui.define([
 				if (isNaN(parseInt(noOfHeaderRows))) {
 					noOfHeaderRows = 0;
 				}
+				var sUrl = component.getComponentModel("CwsSrvModel").sServiceUrl;
 				var form = new FormData();
 				form.append("excelFile", file, file.name);
 				form.append("processCode", "203");
@@ -42,7 +43,7 @@ sap.ui.define([
 				var oHeaders = Utility._headerToken(component);
 				delete oHeaders['Content-Type'];
 				var settings = {
-					"url": "/rest/excelUpload/cwsRequestUpload",
+					"url": sUrl + "/cwned/cwsRequestUpload",
 					"method": "POST",
 					"timeout": 0,
 					"headers": oHeaders,
