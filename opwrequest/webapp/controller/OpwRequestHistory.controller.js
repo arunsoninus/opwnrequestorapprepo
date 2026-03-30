@@ -20,7 +20,7 @@ sap.ui.define([
 	"../utils/processInstanceFlow"
 ], function (BaseController, Fragment, JSONModel, Formatter, MessageToast, MessageBox, Filter,
 	FilterOperator, Sorter, Services, AppConstant, Validation, exportLibrary, Spreadsheet, Utility, Config,
-	MassUploadHelper,HeaderHelper, ProcessInstanceFlow) {
+	MassUploadHelper, HeaderHelper, ProcessInstanceFlow) {
 	"use strict";
 	return BaseController.extend("nus.edu.sg.opwrequest.controller.OpwRequestHistory", {
 		formatter: Formatter,
@@ -893,7 +893,7 @@ sap.ui.define([
 				.done(function (response) {
 					try {
 						var parseResponse = JSON.parse(response);
-						parseResponse = (parseResponse.d && parseResponse.d.cwsRequestUpload)? parseResponse.d.cwsRequestUpload : {};
+						parseResponse = (parseResponse.d && parseResponse.d.cwsRequestUpload) ? parseResponse.d.cwsRequestUpload : {};
 						component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadResponse", parseResponse);
 						component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadResponseDisplay", parseResponse.displayPayload);
 						component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadRequestPayload", parseResponse.requestPayload);
@@ -1190,7 +1190,7 @@ sap.ui.define([
 			var oView = this;
 			var spreadsheetData = dataArray.flatMap(data => {
 				const baseData = {
-					"serialNo": data.serialNo,
+					"SERIAL_NO": data.SERIAL_NO,
 					"STAFF_ID": data.STAFF_ID,
 					"START_DATE": data.START_DATE,
 					"END_DATE": data.END_DATE,
@@ -1667,13 +1667,13 @@ sap.ui.define([
 
 				var form = new FormData();
 				form.append("massZipUploadFile", file, oFileName + "_" + oDate + ".zip");
-				form.append("processCode", "203");
-				form.append("role", "CW_PROGRAM_ADMIN");
+				form.append("processCode", this.getI18n("CwsRequest.ProcessCode.203"));
+				form.append("role", this.getI18n("CwsRequest.PrgAdmin"));
 				form.append("staffLists", SucccessPayload.map(function (value) {
-					return value.serialNo + "_" + value.STAFF_ID;
+					return value.SERIAL_NO + "_" + value.STAFF_ID;
 				}).join(","));
 				form.append("errStaffLists", ErrorPayload.map(function (value) {
-					return value.serialNo + "_" + value.STAFF_ID;
+					return value.SERIAL_NO + "_" + value.STAFF_ID;
 				}).join(","));
 				var oHeaders = Utility._headerToken(this);
 				delete oHeaders['Content-Type'];

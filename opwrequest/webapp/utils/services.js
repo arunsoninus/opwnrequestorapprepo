@@ -411,12 +411,12 @@ sap.ui.define([
 			);
 
 			// var token = sThis.AppModel.getProperty("/token");
-			var oHeaders = {
-				"Accept": "application/json",
-				// "Authorization": "Bearer" + " " + token
-			};
-			oValidateModel.loadData(sUrl, null, false, "GET", null, null, oHeaders);
-			return oValidateModel.getData();
+			// var oHeaders = {
+			// 	"Accept": "application/json",
+			// 	// "Authorization": "Bearer" + " " + token
+			// };
+			// oValidateModel.loadData(sUrl, null, false, "GET", null, null, oHeaders);
+			// return oValidateModel.getData();
 		},
 		getTotalUtilization: async function (component, oPayload, callBackFx) {
 			var CwsSrvModel = component.getComponentModel("CwsSrvModel");

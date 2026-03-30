@@ -77,12 +77,12 @@
 														visible="{= ${AppModel>validationResults/}.length > 0 }" type="Reject" press="onMessagePopoverPress($event,'E')"/>
 													<Button class="removeBorderButton sapUiNoContentPadding" icon="sap-icon://alert" text="{= ${AppModel>warningValidationResults/}.length }"
 														visible="{= ${AppModel>warningValidationResults/}.length > 0 }" type="Emphasized" press="onMessagePopoverPress($event,'W')"/>
-													<Text text="{AppModel>serialNo}"/>
+													<Text text="{AppModel>SERIAL_NO}"/>
 													<Text text="{AppModel>FULL_NAME} ({AppModel>STAFF_ID})"/>
 													<Text text="{AppModel>SUB_TYPE_DESC}"/>
 													<Text text="{ path: 'AppModel>START_DATE', formatter: '.formatter.dateFormatUTCone'}"/>
 													<Text text="{ path: 'AppModel>END_DATE', formatter: '.formatter.dateFormatUTCone'}"/>
-													<Text text="{AppModel>program_NAME}"/>
+													<Text text="{AppModel>PROGRAM_NAME}"/>
 													<Text text="{path:'AppModel>amount',formatter:'.formatter.formatRequestAmount'}"/>
 												</cells>
 											</ColumnListItem>

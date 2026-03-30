@@ -2395,7 +2395,7 @@ sap.ui.define([
 					} else if (cwsResponse.ACTION_CODE === "RETRACT") {
 						Utility._fnSuccessDialog(this, cwsResponse.message, function () {
 							// localStorage.setItem("New_DraftID", cwsResponse.REQ_UNIQUE_ID);
-							this._project = "cwsRequestViews('" + cwsResponse.REQ_UNIQUE_ID + "')";
+							this._project = "cwsRequestViews('" + cwsResponse.ID + "')";
 							this._fnGetOpwnRequestData();
 						}.bind(this));
 					} else if (cwsResponse.ACTION_CODE === "CLOSE") {
