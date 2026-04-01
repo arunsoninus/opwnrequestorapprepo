@@ -1039,8 +1039,8 @@ sap.ui.define([
 			if (oEvent === "D") {
 				var reqUniqueId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID");
 			} else {
-				var sPath = oEvent.getSource().getBindingContext("CwsSrvModel").getPath();
-				reqUniqueId = oEvent.getSource().getModel("CwsSrvModel").getProperty(sPath + "/REQ_UNIQUE_ID");
+				var sPath = oEvent.getSource().getBindingContext("OpwnSrvModel").getPath();
+				reqUniqueId = oEvent.getSource().getModel("OpwnSrvModel").getProperty(sPath + "/REQ_UNIQUE_ID");
 			}
 			MessageBox.confirm(
 				"Please confirm to delete ?", {
@@ -1070,7 +1070,7 @@ sap.ui.define([
 									}.bind(this));
 								}
 								this.getOpwnRequests();
-								// this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("CwsSrvModel"));
+								// this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("OpwnSrvModel"));
 							} else {
 								MessageBox.error(oResponse.message);
 							}
@@ -1088,7 +1088,7 @@ sap.ui.define([
 						// 				}, true);
 						// 			}.bind(this));
 						// 		}
-						// 		this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("CwsSrvModel"));
+						// 		this._fnReadAfterMetadataLoaded(this.getOwnerComponent().getModel("OpwnSrvModel"));
 						// 	} else {
 						// 		MessageBox.error(oData.getSource().getData().message);
 						// 	}

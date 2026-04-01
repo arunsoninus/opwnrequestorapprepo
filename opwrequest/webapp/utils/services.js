@@ -258,11 +258,11 @@ sap.ui.define([
 			};
 			oCont.cwRequest.push(oPayload);
 
-			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.massUpload;
 			await this._createDataUsingOdataModelWithRespObject(
 				serviceUrl,
-				CwsSrvModel,
+				OpwnSrvModel,
 				component,
 				function (response) {
 					let oResponse = (response && response.data && response.data.massCwRequestsCreation) ? response.data.massCwRequestsCreation : {};
@@ -285,7 +285,7 @@ sap.ui.define([
 		},
 
 		readLookups: function (serviceUrl, oDataModel, component, aFilter, callBackFx) {
-			oDataModel = oDataModel ? oDataModel : component.getComponentModel("CwsSrvModel");
+			oDataModel = oDataModel ? oDataModel : component.getComponentModel("OpwnSrvModel");
 			oDataModel.read(serviceUrl, {
 				filters: aFilter,
 				success: function (oData) {
@@ -355,6 +355,27 @@ sap.ui.define([
 			});
 		},
 
+		performAttachmentDownload: async function (component, callBackFx) {
+			// var oValidateModel = new JSONModel();
+			var AttachmentSrvModel = this.getComponentModel("AttachmentSrvModel");
+			var oHeaders = HeaderHelper._headerToken();
+
+			// let oParameter = {
+			// 	referenceId: selectedReq.REQUEST_ID,
+			// 	processCode: selectedReq.PROCESS_CODE
+			// };
+			this._readDataUsingOdataModel(
+				Config.dbOperations.weekendValidateUrl,
+				OpwnSrvModel,
+				component,
+				[],
+				function (response) {
+					callBackFx(response.validateWorkingHours);
+				}.bind(component),
+				oHeaders,
+				null
+			);
+		},
 		_loadDataAttachment: function (serviceUrl, oPayload, httpMethod, headers, callBackFx) {
 			var oModel = new JSONModel();
 			var sPayload = null;
@@ -372,15 +393,17 @@ sap.ui.define([
 		},
 		performAttrUpdate: function (component) {
 			var attachmentId = component.AppModel.getProperty("/oMassAttachmentID");
-			var cwSrvModel = component.getOwnerComponent().getModel("CwsSrvModel");
+			// var cwSrvModel = component.getOwnerComponent().getModel("OpwnSrvModel");
+			var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 			var oData = {
 				"IS_ZIP_PROCESSED": "N"
 			};
 			var oHeaders = {
 				"If-Match": "*"
 			};
+			var sUrl = Config.dbOperations.attachmentsView + "('" + attachmentId + "')"
 			// Perform the PATCH request
-			cwSrvModel.update("/AttachmentsDatas('" + attachmentId + "')", oData, {
+			oCatalogSrvModel.update(sUrl, oData, {
 				method: "PATCH",
 				headers: oHeaders,
 				success: function () { },
@@ -389,9 +412,23 @@ sap.ui.define([
 				}
 			});
 		},
+		performRemarksDeletion: function (component,remarksId, callBackFx) {
+			var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+			var sUrl = Config.dbOperations.deleteRemarks + "('" + remarksId + "')";
+			// Perform the DELETE request
+			oCatalogSrvModel.update(sUrl, null, {
+				method: "DELETE",
+				success: function (remarksResponse) {
+					callBackFx(remarksResponse);
+				 },
+				error: function (oError) {
+					sap.m.MessageToast.show(component.getI18n("CwsRequest.Service.StatusUpdateError"));
+				}
+			});
+		},
 		validateForWeekend: async function (component, callBackFx) {
 			// var oValidateModel = new JSONModel();
-			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
 			var oHeaders = HeaderHelper._headerToken();
 
 			// let oParameter = {
@@ -400,7 +437,7 @@ sap.ui.define([
 			// };
 			this._readDataUsingOdataModel(
 				Config.dbOperations.weekendValidateUrl,
-				CwsSrvModel,
+				OpwnSrvModel,
 				component,
 				[],
 				function (response) {
@@ -409,21 +446,13 @@ sap.ui.define([
 				oHeaders,
 				null
 			);
-
-			// var token = sThis.AppModel.getProperty("/token");
-			// var oHeaders = {
-			// 	"Accept": "application/json",
-			// 	// "Authorization": "Bearer" + " " + token
-			// };
-			// oValidateModel.loadData(sUrl, null, false, "GET", null, null, oHeaders);
-			// return oValidateModel.getData();
 		},
 		getTotalUtilization: async function (component, oPayload, callBackFx) {
-			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.utilizationDays;
 			await this._createDataUsingOdataModelWithRespObject(
 				serviceUrl,
-				CwsSrvModel,
+				OpwnSrvModel,
 				component,
 				function (response) {
 					let oResponse = (response && response.data && response.data.totalUtilization) ? response.data.totalUtilization : {};
@@ -461,11 +490,11 @@ sap.ui.define([
 			);
 		},
 		getPaymentList: async function (component, oPayload, callBackFx) {
-			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.oPaymentList;
 			await this._createDataUsingOdataModelWithRespObject(
 				serviceUrl,
-				CwsSrvModel,
+				OpwnSrvModel,
 				component,
 				function (response) {
 					let oResponse = (response && response.data && response.data.populatePaymentList) ? response.data.populatePaymentList : {};
@@ -482,11 +511,11 @@ sap.ui.define([
 			);
 		},
 		getPayrollArea: async function (component, oPayload, callBackFx) {
-			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.payrollArea;
 			await this._createDataUsingOdataModelWithRespObject(
 				serviceUrl,
-				CwsSrvModel,
+				OpwnSrvModel,
 				component,
 				function (response) {
 					let oResponse = (response && response.data && response.data.payrollAreaDetails) ? response.data.payrollAreaDetails : {};
@@ -546,7 +575,7 @@ sap.ui.define([
 			);
 		},
 		getRequestStatusDetails: function (component, reqUniqueId, requestId, callBackFx) {
-			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
 			var sUrl = Config.dbOperations.requestDetails;
 
 			var oHeaders = HeaderHelper._headerToken();
@@ -557,7 +586,7 @@ sap.ui.define([
 			};
 			this._readDataUsingOdataModel(
 				sUrl,
-				CwsSrvModel,
+				OpwnSrvModel,
 				component,
 				[],
 				function (response) {
@@ -568,10 +597,10 @@ sap.ui.define([
 			);
 		},
 		performDraftDeletion: async function (component, oPayload, callBackFx) {
-			var CwsSrvModel = component.getComponentModel("CwsSrvModel");
+			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
 			await this._createDataUsingOdataModelWithRespObject(
 				Config.dbOperations.deleteReqUrl,
-				CwsSrvModel,
+				OpwnSrvModel,
 				component,
 				function (response) {
 					let oResponse = (response && response.data && response.data.purgeCWRequest) ? response.data.purgeCWRequest : {};

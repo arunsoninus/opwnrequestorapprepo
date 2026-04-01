@@ -6,8 +6,8 @@ sap.ui.define([
 
 		_onPressProcessInstance: async function (oEvent, component) {
 			// component.showBusyIndicator();
-			var sPath = oEvent.getSource().getBindingContext("CwsSrvModel").getPath();
-			var selectedReq = component.getComponentModel("CwsSrvModel").getProperty(sPath);
+			var sPath = oEvent.getSource().getBindingContext("OpwnSrvModel").getPath();
+			var selectedReq = component.getComponentModel("OpwnSrvModel").getProperty(sPath);
 			if (!component._oProcessInstanceNode) {
 				component._oProcessInstanceNode = sap.ui.xmlfragment(component.createId("fragProcessInstanceNodeTest"),
 					"nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow", component);

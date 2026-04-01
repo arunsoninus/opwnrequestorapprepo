@@ -26,6 +26,12 @@ server:
         - path: /odata/v2/eclaims
           url: https://national-university-of-singapore-nus-cf-btp-uat-r2fbv1y681c57cd.cfapps.ap11.hana.ondemand.com
           destination: nusbtpeclaim
+        - path: /v2/attachment
+          url: https://national-university-of-singapore-nus-ariba-dev-px55m7l576956a4c.cfapps.eu10-004.hana.ondemand.com
+          destination: nusbtputil
+        - path: /attachment
+          url: https://national-university-of-singapore-nus-ariba-dev-px55m7l576956a4c.cfapps.eu10-004.hana.ondemand.com
+          destination: nusbtputil
         ui5:
           path:
             - /resources

@@ -130,7 +130,7 @@ sap.ui.define([
 			var selectedKey = this.AppModel.getProperty("/iconTabBarSelectedKey");
 			this.getView().byId("itb1").setSelectedKey(selectedKey);
 			var aFilter = [];
-			let oDataModel = this.getComponentModel("CwsSrvModel");
+			let oDataModel = this.getComponentModel("OpwnSrvModel");
 			// var userRole = this.AppModel.getProperty("/userRole");
 			// if (userRole === "CW_ESS") {
 			aFilter = Utility._fnEssDraft(this);
@@ -170,7 +170,7 @@ sap.ui.define([
 
 		loadTableItemsBasedOnStatusKey: function (selectedKeyOfIconTabBar) {
 			this.getView().byId("itb1").setSelectedKey(selectedKeyOfIconTabBar);
-			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
+			var sPath = "OpwnSrvModel>" + Config.dbOperations.openRequestView;
 			this.GlobalFilterForTable = Utility._handleIconTabBarSelect(this, selectedKeyOfIconTabBar);
 			// Begin of change - CW0084
 			var oViewModel = this.getView().getModel("ViewModel");
@@ -206,7 +206,7 @@ sap.ui.define([
 
 		setRejStatusCount: function () {
 			var aFilter = Utility._rejStatusCount(this);
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
+			var oDataModel = this.getOwnerComponent().getModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.requestViewCount;
 			Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
 				this.getUIControl("itfReject").setCount(oResponse);
@@ -215,7 +215,7 @@ sap.ui.define([
 
 		setInProcessStatusCount: function () {
 			var aFilter = Utility._setInProcessCount(this);
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
+			var oDataModel = this.getOwnerComponent().getModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.requestViewCount;
 			Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
 				this.getUIControl("itfProcess").setCount(oResponse);
@@ -223,7 +223,7 @@ sap.ui.define([
 		},
 		setPostedStatusCount: function () {
 			var aFilter = Utility._setPostedStatusCount(this);
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
+			var oDataModel = this.getOwnerComponent().getModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.requestViewCount;
 			Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
 				this.getUIControl("itfPost").setCount(oResponse);
@@ -232,7 +232,7 @@ sap.ui.define([
 
 		setWithdrawnCount: function () {
 			var aFilter = Utility._setWithdrawnCount(this);
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
+			var oDataModel = this.getOwnerComponent().getModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.requestViewCount;
 			Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
 				this.getUIControl("itfWithdrawn").setCount(oResponse);
@@ -240,7 +240,7 @@ sap.ui.define([
 		},
 		setWithcloseCount: function () {
 			var aFilter = Utility._setWithcloseCount(this);
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
+			var oDataModel = this.getOwnerComponent().getModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.requestViewCount;
 			Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
 				this.getUIControl("itfClosedReq").setCount(oResponse);
@@ -249,7 +249,7 @@ sap.ui.define([
 
 		setDeleteCount: function () {
 			var aFilter = Utility._setDeleteCount(this);
-			var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
+			var oDataModel = this.getOwnerComponent().getModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.requestViewCount;
 			Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
 				this.getUIControl("itfDeleted").setCount(oResponse);
@@ -268,14 +268,14 @@ sap.ui.define([
 		},
 		// setPendReqStatusCount: function () {
 		// 	var aFilter = Utility._setPendReqStatusCount(this);
-		// 	var oDataModel = this.getOwnerComponent().getModel("CwsSrvModel");
+		// 	var oDataModel = this.getOwnerComponent().getModel("OpwnSrvModel");
 		// 	var serviceUrl = Config.dbOperations.requestViewCount;
 		// 	Services.getRequestViewCount(serviceUrl, oDataModel, this, aFilter, function (oResponse) {
 		// 		this.getUIControl("itfPendReq").setCount(oResponse);
 		// 	}.bind(this));
 		// },
 		getDraftRequests: function () {
-			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
+			var sPath = "OpwnSrvModel>" + Config.dbOperations.openRequestView;
 			this.GlobalFilterForTable = Utility._fnEssDraft(this);
 			var oSorter = new sap.ui.model.Sorter({
 				path: "REQ_UNIQUE_ID",
@@ -286,11 +286,11 @@ sap.ui.define([
 
 		onRefreshClaim: function (oEvent) {
 			this.getOpwnRequests();
-			// this._fnReadAfterMetadataLoaded(this.oOwnerComponent.getModel("CwsSrvModel"));
+			// this._fnReadAfterMetadataLoaded(this.oOwnerComponent.getModel("OpwnSrvModel"));
 		},
 		onSelectIconFilter: function (oEvent) {
 			this.getUIControl("idOpwnRequestTable").setVisible(true);
-			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
+			var sPath = "OpwnSrvModel>" + Config.dbOperations.openRequestView;
 			// var sKey = oEvent.getParameter("selectedKey");
 			var sKey = oEvent === "Draft" ? "Draft" : oEvent.getParameter("selectedKey");
 			// Begin of change - CCEV3364
@@ -456,7 +456,7 @@ sap.ui.define([
 			this.AppModel.setProperty("/prevSelectedKeyOfIconTabBar", prevSelectedKeyOfIconTabBar);
 			this.AppModel.setProperty("/cwsRequest/validationRequest", {});
 
-			var localModel = oEvent.getSource().getBindingContext("CwsSrvModel");
+			var localModel = oEvent.getSource().getBindingContext("OpwnSrvModel");
 			var ruleSet = localModel.getPath().split("/").slice(-1).pop();
 			this.handleRouting("detail", {
 				project: ruleSet,
@@ -472,7 +472,7 @@ sap.ui.define([
 			this.AppModel.setProperty("/prevSelectedKeyOfIconTabBar", prevSelectedKeyOfIconTabBar);
 			this.AppModel.setProperty("/cwsRequest/validationRequest", {});
 
-			var localModel = oEvent.getSource().getBindingContext("CwsSrvModel");
+			var localModel = oEvent.getSource().getBindingContext("OpwnSrvModel");
 			var ruleSet = localModel.getPath().split("/").slice(-1).pop();
 			this.AppModel.setProperty("/oCopyMode", "Copied");
 			this.handleRouting("detail", {
@@ -604,7 +604,7 @@ sap.ui.define([
 			this.AppModel.setProperty("/cwsRequest/Request_key", this.AppModel.getProperty("/RequestType/0/CONFIG_KEY"));
 			this.AppModel.setProperty("/cwsRequest/Request_key_Desc", this.AppModel.getProperty("/RequestType/0/CONFIG_VALUE"));
 			var oKey = oEvent.getSource().getSelectedButton().getText();
-			// var oCwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			// var oCwsSrvModel = this.oOwnerComponent.getModel("OpwnSrvModel");
 			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			// if (oKey === "Mass Upload") {
 			// 	MessageBox.information(this.getI18n("CwsRequest.MassUploadInfo"));
@@ -730,7 +730,7 @@ sap.ui.define([
 		},
 
 		_fncreateLoad: function () {
-			// var oCwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			// var oCwsSrvModel = this.oOwnerComponent.getModel("OpwnSrvModel");
 			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			var staffNusNetId = this.AppModel.getProperty("/primaryAssigment/NUSNET_ID");
 			var filters = this.generateFilter("NUSNET_ID", [staffNusNetId]);
@@ -877,7 +877,7 @@ sap.ui.define([
 			// form.append("period", period);
 			form.append("noOfHeaderRows", noOfHeaderRows - 1);
 			var oHeaders = HeaderHelper._headerToken();
-			var sUrl = component.getComponentModel("CwsSrvModel").sServiceUrl;
+			var sUrl = component.getComponentModel("OpwnSrvModel").sServiceUrl;
 			delete oHeaders['Content-Type'];
 			var settings = {
 				"url": sUrl + "/cwsRequestUpload",
@@ -1072,7 +1072,7 @@ sap.ui.define([
 
 		_fnFetchUserDetailFromChrsJobInfo: function () {
 			var that = this;
-			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			var OpwnSrvModel = this.oOwnerComponent.getModel("OpwnSrvModel");
 			var staffId = "";
 			staffId = this.AppModel.getProperty("/loggedInUserId");
 			if (!staffId) {
@@ -1080,7 +1080,7 @@ sap.ui.define([
 			}
 			var filters = Utility._generateFilter("NUSNET_ID", [staffId]);
 			var serviceUrl = Config.dbOperations.chrsJobInfo;
-			Services._readDataUsingOdataModel(serviceUrl, CwsSrvModel, this, filters, function (oData) {
+			Services._readDataUsingOdataModel(serviceUrl, OpwnSrvModel, this, filters, function (oData) {
 				this.AppModel.setProperty("/cwsRequest/UluFdluList", oData.results);
 				if (oData.results.length === 1) {
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/uluSelected", oData.results[0].ULU_T);
@@ -1091,7 +1091,7 @@ sap.ui.define([
 
 		onPressSearchCWSRequest: function (oEvent) {
 			var sValue = this.getView().byId("srchFldCWSRequest").getValue();
-			var sPath = "CwsSrvModel>" + Config.dbOperations.openRequestView;
+			var sPath = "OpwnSrvModel>" + Config.dbOperations.openRequestView;
 			var oViewModel = this.getView().getModel("ViewModel");
 			var oSorter = new Sorter({
 				path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "REQ_UNIQUE_ID",
@@ -1431,8 +1431,8 @@ sap.ui.define([
 		},
 		initiateProcessInstanceRendering: async function (oEvent) {
 			this.showBusyIndicator();
-			var sPath = oEvent.getSource().getBindingContext("CwsSrvModel").getPath();
-			var selectedReq = this.getComponentModel("CwsSrvModel").getProperty(sPath);
+			var sPath = oEvent.getSource().getBindingContext("OpwnSrvModel").getPath();
+			var selectedReq = this.getComponentModel("OpwnSrvModel").getProperty(sPath);
 			if (!this._oProcessInstanceNode) {
 				// this._oProcessInstanceNode = sap.ui.xmlfragment(this.createId("fragProcessInstanceNodeTest"),
 				// 	"nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow", component);
@@ -1496,9 +1496,9 @@ sap.ui.define([
 		 */
 		onPressExport: function () {
 			this.getView().setBusy(true);
-			var CwsSrvModel = this.getComponentModel("CwsSrvModel");
+			var OpwnSrvModel = this.getComponentModel("OpwnSrvModel");
 			this.GlobalFilterForTable = Utility._fnEssAllStatus(this);
-			Services._readDataUsingOdataModel(Config.dbOperations.openRequestView, CwsSrvModel, this, this.GlobalFilterForTable, function (oData) {
+			Services._readDataUsingOdataModel(Config.dbOperations.openRequestView, OpwnSrvModel, this, this.GlobalFilterForTable, function (oData) {
 				if (oData.results.length > 0) {
 					this._fnExportClaims(oData.results);
 				}
@@ -1544,8 +1544,8 @@ sap.ui.define([
 
 		onPressAuditLog: function (oEvent) {
 			//making rest call to get Audit Log data
-			var sPath = oEvent.getSource().getBindingContext("CwsSrvModel").getPath();
-			var selectedReq = this.getComponentModel("CwsSrvModel").getProperty(sPath);
+			var sPath = oEvent.getSource().getBindingContext("OpwnSrvModel").getPath();
+			var selectedReq = this.getComponentModel("OpwnSrvModel").getProperty(sPath);
 
 			this.AppModel.setProperty("/claimRequest/draftId", selectedReq.REQ_UNIQUE_ID);
 

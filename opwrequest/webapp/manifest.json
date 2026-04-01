@@ -34,7 +34,7 @@
           "odataVersion": "2.0"
         }
       },
-      "cwsNedService": {
+      "opwnService": {
         "uri": "/odata/v2/cwned/",
         "type": "OData",
         "settings": {
@@ -46,6 +46,14 @@
       "local_data_alias": {
         "uri": "enums/localdata.json",
         "type": "JSON"
+      },
+      "attachmentService": {
+        "uri": "/v2/attachment/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "2.0"
+        }
       }
     },
     "crossNavigation": {
@@ -119,8 +127,19 @@
           "earlyRequests": true
         }
       },
-      "CwsSrvModel": {
-        "dataSource": "cwsNedService",
+      "AttachmentSrvModel": {
+        "dataSource": "attachmentService",
+        "preload": true,
+        "settings": {
+          "useBatch": false,
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "synchronizationMode": "None",
+          "earlyRequests": true
+        }
+      },
+      "OpwnSrvModel": {
+        "dataSource": "opwnService",
         "preload": true,
         "settings": {
           "useBatch": false,

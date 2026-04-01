@@ -32,7 +32,7 @@ sap.ui.define([
 				if (isNaN(parseInt(noOfHeaderRows))) {
 					noOfHeaderRows = 0;
 				}
-				var sUrl = component.getComponentModel("CwsSrvModel").sServiceUrl;
+				var sUrl = component.getComponentModel("OpwnSrvModel").sServiceUrl;
 				var form = new FormData();
 				form.append("excelFile", file, file.name);
 				form.append("processCode", "203");
@@ -234,7 +234,8 @@ sap.ui.define([
 
 						component.onPressmasscancel();
 						component._fnHandleSubmission();
-						component._fnReadAfterMetadataLoaded(component.getComponentModel("CwsSrvModel"));
+						component.getOpwnRequests();
+						// component._fnReadAfterMetadataLoaded(component.getComponentModel("OpwnSrvModel"));
 					}
 				} else {
 					component.hideBusyIndicator();

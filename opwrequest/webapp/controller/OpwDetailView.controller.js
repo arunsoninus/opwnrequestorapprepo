@@ -102,7 +102,7 @@ sap.ui.define([
 
 		_fnRefreshAssistance: function (assistanceData) {
 			// var oView = this.getView();
-			// var CwsSrvModel = this.getComponentModel("CwsSrvModel");
+			// var OpwnSrvModel = this.getComponentModel("OpwnSrvModel");
 			var CatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			// var reqUniqueId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID");
 
@@ -191,8 +191,8 @@ sap.ui.define([
 			var oStaffUserGroupFilter = new Filter("STAFF_USER_GRP", FilterOperator.EQ, 'CW_PROGRAM_MANAGER'),
 				oProcessCode = new Filter("CLAIM_TYPE", FilterOperator.EQ, '203'),
 				// oItemTemplate = new sap.ui.core.ListItem({
-				// 	text: "{CwsSrvModel>FULL_NM}",
-				// 	key: "{CwsSrvModel>STAFF_ID}"
+				// 	text: "{OpwnSrvModel>FULL_NM}",
+				// 	key: "{OpwnSrvModel>STAFF_ID}"
 				// }),
 				dToday = new Date(),
 				iMonth = parseInt(dToday.getMonth()) + 1,
@@ -433,9 +433,12 @@ sap.ui.define([
 
 		onUploadChange: function () {
 			this.showBusyIndicator();
-			var serviceUrl = Config.dbOperations.uploadAttachment;
-			var oView = this.getView(),
-				oFiles = sap.ui.core.Fragment.byId(oView.getId(), "fileUploader");
+			// var serviceUrl = Config.dbOperations.uploadAttachment;
+			var AttachmentSrvModel = this.getComponentModel("AttachmentSrvModel");
+			var serviceUrl = AttachmentSrvModel.sServiceUrl.replace(/\/$/, '') + Config.dbOperations.uploadAttachment;
+			// var oView = this.getView(),
+			// 	oFiles = sap.ui.core.Fragment.byId(oView.getId(), "fileUploader");
+			var oFiles = this.getUIControl("fileUploader");
 			var draftId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID");
 			var oProcessCode = this.AppModel.getProperty("/cwsRequest/createCWSRequest/PROCESS_CODE");
 			var attachmentTypeDesc = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentTypeDesc");
@@ -585,7 +588,7 @@ sap.ui.define([
 			if (oSectionToSelect) {
 				oObjectPageLayout.setSelectedSection(oSectionToSelect);
 			}
-			// let oDataModel = this.getComponentModel("CwsSrvModel");
+			// let oDataModel = this.getComponentModel("OpwnSrvModel");
 			this.AppModel.setProperty("/oWBSDeletion", []);
 			if (this.viaInbox) {
 				this._fnTaskidStatus();
@@ -606,7 +609,7 @@ sap.ui.define([
 			// });
 			// oDataModel.setUseBatch(false);
 			// oDataModel.metadataLoaded().then(function () {
-			// 	this.getOwnerComponent().setModel(oDataModel, "CwsSrvModel");
+			// 	this.getOwnerComponent().setModel(oDataModel, "OpwnSrvModel");
 			// 	/*if (localStorage) {
 			// 		var myValue = localStorage.getItem("New_DraftID");
 			// 		if (myValue) {
@@ -711,11 +714,10 @@ sap.ui.define([
 		 */
 		_fnGetOpwnRequestData: function () {
 			this.showBusyIndicator();
-			var cwsSrvModel = this.getComponentModel("CwsSrvModel");
-			// var requestData = cwsSrvModel.getProperty("/" + this._project);
-			cwsSrvModel.read("/" + this._project, {
+			var opwnSrvModel = this.getComponentModel("OpwnSrvModel");
+			opwnSrvModel.read("/" + this._project, {
 				urlParameters: {
-					"$expand": "CwsAssistanceDetails,CwsPaymentsDetails,CwsYearSplitDetails,RemarksDataDetails,CwsWbsDataDetails"
+					"$expand": this.getI18n("CwsRequest.expandRequestView")
 				},
 				success: function (oData) {
 					this.setOpwnRequestData(oData);
@@ -778,7 +780,7 @@ sap.ui.define([
 				var sfilters = new Filter({
 					filters: [new Filter("SF_STF_NUMBER", FilterOperator.EQ, requestData.LOCKED_BY_USER_NID)]
 				});
-				// var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+				// var OpwnSrvModel = this.oOwnerComponent.getModel("OpwnSrvModel");
 				var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 				oCatalogSrvModel.read(Config.dbOperations.userLookup, {
 					filters: [sfilters],
@@ -916,7 +918,7 @@ sap.ui.define([
 
 				var aFilters = [],
 					sUrlParameters = "$select=FULL_NM",
-					oCwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel"),
+					oOpwnSrvModel = this.getComponentModel("OpwnSrvModel"),
 					sPath = "/UserLookups",
 					sIndexTask = oData.results.length - 1,
 					sTaskCompletedBy = oData.results[sIndexTask].TASK_COMPLETED_BY,
@@ -933,7 +935,7 @@ sap.ui.define([
 				aFilters.push(new Filter({
 					filters: [new Filter("SF_STF_NUMBER", FilterOperator.EQ, sTaskCompletedBy)]
 				}));
-				this.readODataCallWithParameters(oCwsSrvModel, sPath, aFilters, sUrlParameters, function (oData) {
+				this.readODataCallWithParameters(oOpwnSrvModel, sPath, aFilters, sUrlParameters, function (oData) {
 					if (oData.results.length) {
 						this.AppModel.setProperty("/APPROVED_BY_FULLNM", "(" + oData.results[0].FULL_NM + ")");
 						this.AppModel.setProperty("/APPROVED_BY", sTaskCompletedBy);
@@ -1244,7 +1246,7 @@ sap.ui.define([
 
 		_fnFetchLoginUserDetail: function (nusNetId) {
 			var that = this;
-			// var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			// var OpwnSrvModel = this.oOwnerComponent.getModel("OpwnSrvModel");
 			var filters = that.generateFilter("STF_NUMBER", [nusNetId]);
 			var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 			oCatalogSrvModel.read(Config.dbOperations.userLookup, {
@@ -3074,17 +3076,35 @@ sap.ui.define([
 					processCode: oProcessCode
 				};
 
-				var oHeaders = Formatter._amendHeaderToken(this);
-				var serviceUrl = Config.dbOperations.deleteAttachment;
-				Services._loadDataAttachment(serviceUrl, oParameter, "GET", oHeaders, function (oData) {
-					if (oData.getSource().getData().status === "S") {
-						this._fnRefreshAttachment();
-						this.hideBusyIndicator();
-					} else {
-						MessageBox.error(his.getI18n("AttachmentFailedToDelete"));
-					}
+				var AttachmentSrvModel = this.getComponentModel("AttachmentSrvModel");
 
-				}.bind(this));
+				// var oHeaders = Formatter._amendHeaderToken(this);
+				Services._readDataUsingOdataModel(
+					Config.dbOperations.deleteAttachment,
+					AttachmentSrvModel,
+					this,
+					[],
+					function (response) {
+						if (response && response.deleteAttachment && response.deleteAttachment.status === "S") {
+							this._fnRefreshAttachment();
+						} else {
+							MessageBox.error(this.getI18n("AttachmentFailedToDelete"));
+						}
+						this.hideBusyIndicator();
+					}.bind(this),
+					null,
+					oParameter
+				);
+
+				// Services._loadDataAttachment(serviceUrl, oParameter, "GET", oHeaders, function (oData) {
+				// 	if (oData.getSource().getData().status === "S") {
+				// 		this._fnRefreshAttachment();
+				// 		this.hideBusyIndicator();
+				// 	} else {
+				// 		MessageBox.error(his.getI18n("AttachmentFailedToDelete"));
+				// 	}
+
+				// }.bind(this));
 			} catch (oError) {
 				this.hideBusyIndicator();
 			}
@@ -3093,10 +3113,9 @@ sap.ui.define([
 		handleDownloadPress: function (oEvent) {
 			this.lastSuccessRun = new Date();
 			try {
-				// this.showBusyIndicator();
+				this.showBusyIndicator();
 				var sPath = oEvent.getSource().getBindingContext("AppModel").getPath();
 				var oAttachment = this.AppModel.getProperty(sPath);
-				//fetch rate Type and rate Amount 
 				var draftId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID");
 				var oProcessCode = this.AppModel.getProperty("/cwsRequest/createCWSRequest/PROCESS_CODE");
 				var role = this.AppModel.getProperty("/userRole");
@@ -3107,18 +3126,33 @@ sap.ui.define([
 					role: role,
 					processCode: oProcessCode
 				};
+				var AttachmentSrvModel = this.getComponentModel("AttachmentSrvModel");
 
-				var oHeaders = Formatter._amendHeaderToken(this);
-				var serviceUrl = Config.dbOperations.fetchAttachment;
-				Services._loadDataAttachment(serviceUrl, oParameter, "GET", oHeaders, function (oData) {
-					if (oData.getSource().getData().status === "S") {
-						this._fnDownloadFile(oData.getSource().getData().attachmentFiles);
+				Services._readDataUsingOdataModel(
+					Config.dbOperations.fetchAttachment,
+					AttachmentSrvModel,
+					this,
+					[],
+					function (response) {
+						if (response && response.fetchAttachment && response.fetchAttachment.status === "S") {
+							this._fnDownloadFile(response.fetchAttachment.attachmentFiles);
+						} else {
+							MessageBox.error(this.getI18n("AttachmentFailedToDownload"));
+						}
 						this.hideBusyIndicator();
-					} else {
-						MessageBox.error(this.getI18n("AttachmentFailedToDownload"));
-					}
+					}.bind(this),
+					null,
+					oParameter
+				);
+				// Services._loadDataAttachment(serviceUrl, oParameter, "GET", oHeaders, function (oData) {
+				// 	if (oData.getSource().getData().status === "S") {
+				// 		this._fnDownloadFile(oData.getSource().getData().attachmentFiles);
+				// 		this.hideBusyIndicator();
+				// 	} else {
+				// 		MessageBox.error(this.getI18n("AttachmentFailedToDownload"));
+				// 	}
 
-				}.bind(this));
+				// }.bind(this));
 			} catch (oError) {
 				this.hideBusyIndicator();
 			}
@@ -3155,17 +3189,35 @@ sap.ui.define([
 					processCode: oProcessCode
 				};
 
-				var oHeaders = Formatter._amendHeaderToken(this);
-				var serviceUrl = Config.dbOperations.fetchAttachment;
-				Services._loadDataAttachment(serviceUrl, oParameter, "GET", oHeaders, function (oData) {
-					if (oData.getSource().getData().status === "S") {
-						this._fnOpenFile(oData.getSource().getData().attachmentFiles);
-						this.hideBusyIndicator();
-					} else {
-						MessageBox.error(his.getI18n("AttachmentFailedToDownload"));
-					}
+				// var oHeaders = Formatter._amendHeaderToken(this);
+				var AttachmentSrvModel = this.getComponentModel("AttachmentSrvModel");
 
-				}.bind(this));
+				Services._readDataUsingOdataModel(
+					Config.dbOperations.fetchAttachment,
+					AttachmentSrvModel,
+					this,
+					[],
+					function (oData) {
+						var result = oData.fetchAttachment || oData;
+						if (result.status === "S") {
+							this._fnOpenFile(result.attachmentFiles);
+							this.hideBusyIndicator();
+						} else {
+							MessageBox.error(this.getI18n("AttachmentFailedToDownload"));
+						}
+					}.bind(this),
+					null,
+					oParameter
+				);
+				// Services._loadDataAttachment(serviceUrl, oParameter, "GET", oHeaders, function (oData) {
+				// 	if (oData.getSource().getData().status === "S") {
+				// 		this._fnOpenFile(oData.getSource().getData().attachmentFiles);
+				// 		this.hideBusyIndicator();
+				// 	} else {
+				// 		MessageBox.error(his.getI18n("AttachmentFailedToDownload"));
+				// 	}
+
+				// }.bind(this));
 			} catch (oError) {
 				this.hideBusyIndicator();
 			}
@@ -3506,15 +3558,20 @@ sap.ui.define([
 
 		onPressDeleteRemark: function (oEvent) {
 			this.lastSuccessRun = new Date();
-			var CwsSrvModel = this.oOwnerComponent.getModel("CwsSrvModel");
+			// var CwsSrvModel = this.oOwnerComponent.getModel("OpwnSrvModel");
+			// var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			var oPath = oEvent.getSource().getBindingContext("AppModel").getPath();
 			var idx = Number(oPath.replace(/^\D+/g, ""));
 			var remarksId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REMARKS")[idx].ID;
+
 			if (remarksId) {
-				Services._loadDataUsingJsonModel(this, Config.dbOperations.deleteRemarks + "('" + remarksId + "')", null, "DELETE", function (
-					oData) {
+				Services.performRemarksDeletion(this, remarksId, function () {
 					this._fnRemoveRemarks(idx);
 				}.bind(this));
+				// Services._loadDataUsingJsonModel(this, Config.dbOperations.deleteRemarks + "('" + remarksId + "')", null, "DELETE", function (
+				// 	oData) {
+				// 	this._fnRemoveRemarks(idx);
+				// }.bind(this));
 			} else {
 				this._fnRemoveRemarks(idx);
 			}
