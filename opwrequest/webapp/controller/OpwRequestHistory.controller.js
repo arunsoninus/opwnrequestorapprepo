@@ -1641,7 +1641,9 @@ sap.ui.define([
 				this.AppModel.setProperty("/oMassAttachmentID", "");
 
 				this.showBusyIndicator();
-				var sURL = Config.dbOperations.massUploadAttach;
+				var AttachmentSrvModel = this.getComponentModel("AttachmentSrvModel");
+				var serviceUrl = AttachmentSrvModel.sServiceUrl.replace(/\/$/, '') + Config.dbOperations.massUploadAttach;
+				// var sURL = Config.dbOperations.massUploadAttach;
 				var oFileName = file.name;
 				oFileName = oFileName.replace(/\.[^/.]+$/, '');
 				var oDataResponse = this.AppModel.getProperty("/cwsRequest/createCWSRequest/massUploadResponseDisplay");
@@ -1678,7 +1680,7 @@ sap.ui.define([
 				var oHeaders = Utility._headerToken(this);
 				delete oHeaders['Content-Type'];
 				var settings = {
-					"url": sURL,
+					"url": serviceUrl,
 					"method": "POST",
 					"timeout": 0,
 					"headers": oHeaders,
