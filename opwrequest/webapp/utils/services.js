@@ -178,7 +178,7 @@ sap.ui.define([
 				}
 			}.bind(sThis));
 		},
-		
+
 		fetchUserImageAsync: function (component, staffId) {
 			try {
 				var oPhotoModel = new JSONModel();
@@ -412,7 +412,7 @@ sap.ui.define([
 				}
 			});
 		},
-		performRemarksDeletion: function (component,remarksId, callBackFx) {
+		performRemarksDeletion: function (component, remarksId, callBackFx) {
 			var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 			var sUrl = Config.dbOperations.deleteRemarks + "('" + remarksId + "')";
 			// Perform the DELETE request
@@ -420,7 +420,7 @@ sap.ui.define([
 				method: "DELETE",
 				success: function (remarksResponse) {
 					callBackFx(remarksResponse);
-				 },
+				},
 				error: function (oError) {
 					sap.m.MessageToast.show(component.getI18n("CwsRequest.Service.StatusUpdateError"));
 				}
@@ -457,9 +457,9 @@ sap.ui.define([
 				function (response) {
 					let oResponse = (response && response.data && response.data.totalUtilization) ? response.data.totalUtilization : {};
 					// if (!oResponse.error) {
-						callBackFx(oResponse);
+					callBackFx(oResponse);
 					// } else {
-						// sap.m.MessageBox.error(oResponse.message);
+					// sap.m.MessageBox.error(oResponse.message);
 					// }
 
 				}.bind(this),
@@ -519,12 +519,7 @@ sap.ui.define([
 				component,
 				function (response) {
 					let oResponse = (response && response.data && response.data.payrollAreaDetails) ? response.data.payrollAreaDetails : {};
-					if (!oResponse.isError) {
-						callBackFx(oResponse);
-					} else {
-						sap.m.MessageBox.error(oResponse.message);
-					}
-
+					callBackFx(oResponse);
 				}.bind(this),
 				HeaderHelper._headerToken(),
 				oPayload,
