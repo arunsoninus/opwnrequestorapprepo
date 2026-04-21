@@ -250,13 +250,20 @@ sap.ui.define([
 			);
 		},
 
-		persistOpwnRequest: async function (component, oPayload, callBackFx) {
+		persistOpwnRequest: async function (component, isMassUpload, oPayload, callBackFx) {
 			// var sUrl = Config.dbOperations.saveCwRequest;
-			delete oPayload.JOIN_DATE;
-			var oCont = {
-				"cwRequest": []
+			// delete oPayload.JOIN_DATE;
+			// var oCont = {
+			// 	"cwRequest": []
+			// };
+			// oCont.cwRequest.push(oPayload);
+
+			if (!isMassUpload)
+				delete oPayload.JOIN_DATE;
+
+			var persistReq = {
+				"cwRequest": isMassUpload ? oPayload : [oPayload]
 			};
-			oCont.cwRequest.push(oPayload);
 
 			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
 			var serviceUrl = Config.dbOperations.massUpload;
@@ -274,7 +281,7 @@ sap.ui.define([
 
 				}.bind(this),
 				HeaderHelper._headerToken(),
-				oCont,
+				persistReq,
 				true
 			);
 			// var persistModel = new JSONModel();
@@ -376,20 +383,36 @@ sap.ui.define([
 				null
 			);
 		},
-		_loadDataAttachment: function (serviceUrl, oPayload, httpMethod, headers, callBackFx) {
-			var oModel = new JSONModel();
-			var sPayload = null;
-			if (oPayload) {
-				if (httpMethod === "GET") {
-					sPayload = oPayload;
-				} else {
-					sPayload = JSON.stringify(oPayload);
-				}
-			}
-			oModel.loadData(serviceUrl, sPayload, null, httpMethod, null, null, headers);
-			oModel.attachRequestCompleted(function (oResponse) {
-				callBackFx(oResponse);
-			});
+		deleteZipAttachmentOnCancel: async function (component, oParameter, callBackFx) {
+			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			var oHeaders = HeaderHelper._headerToken();
+
+			this._readDataUsingOdataModel(
+				Config.dbOperations.deleteMassAttachment,
+				UtilitySrvModel,
+				component,
+				[],
+				function (response) {
+					callBackFx(response.deleteAttachmentById);
+				}.bind(component),
+				oHeaders,
+				oParameter
+			);
+		},
+		_loadDataAttachment: function (component, oParameter, callBackFx) {
+			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			var oHeaders = HeaderHelper._headerToken();
+			this._readDataUsingOdataModel(
+				Config.dbOperations.syncAttachment,
+				UtilitySrvModel,
+				component,
+				[],
+				function (response) {
+					callBackFx(response.syncAttachmentsForRequest);
+				}.bind(component),
+				oHeaders,
+				oParameter
+			);
 		},
 		performAttrUpdate: function (component) {
 			var attachmentId = component.AppModel.getProperty("/oMassAttachmentID");

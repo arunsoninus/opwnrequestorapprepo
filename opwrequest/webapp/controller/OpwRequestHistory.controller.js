@@ -1279,17 +1279,52 @@ sap.ui.define([
 					continue;
 				}
 			}
-			var oCont = {
-				"cwRequest": aPayload
-			};
+			// var oCont = {
+			// 	"cwRequest": aPayload
+			// };
 			if (aPayload.length) {
-				MassUploadHelper._fnPostMassSubmission(oCont, this);
+				// MassUploadHelper._fnPostMassSubmission(oCont, this);
+				Services.persistOpwnRequest(this, true, aPayload, function (massUploadResponse) {
+					this.handleMassSubmissionAfterPosting(massUploadResponse);
+				}.bind(this));
 			} else {
 				MessageBox.error(this.getI18n("CwsRequest.MassUpload.NoRecords"));
 				this.hideBusyIndicator();
 				return;
 			}
 
+		},
+
+		handleMassSubmissionAfterPosting: function (massUploadResponse) {
+			// var cwsResponse = (massUploadResponse && massUploadResponse.cwResponse instanceof Array) ? massUploadResponse.cwResponse : postResponse;
+			if (Object.keys(massUploadResponse).length > 0) {
+				if (massUploadResponse.error) {
+					this.hideBusyIndicator();
+					msg = (massUploadResponse.message) ? massUploadResponse.message : this.getI18n("CwsRequest.MassUpload.FailedCreateData");
+					MessageBox.error(msg);
+				} else {
+					// var requestIDs = response.cwResponse.map(item => item.statusCode === "S" ? item.REQUEST_ID : item.message).join(', ');
+					// MessageBox.success("Request/s (" + requestIDs + ") submitted successfully.");
+					// var oValue = massUploadResponse.cwResponse.filter((item) => item.statusCode === "S");
+					// if (oValue.length > 0) {
+					// 	component.onPressmasscancel();
+					// }
+					this.AppModel.setProperty("/oSuccessData", massUploadResponse.cwResponse);
+
+					//Update a Flag for Mass Submission in Attachment Data - Added on 3rd Oct 2024
+					Services.performAttrUpdate(this);
+					//Flag for Mass Submission in Attachment Data - Added on 3rd Oct 2024
+
+					this.onPressmasscancel();
+					this._fnHandleSubmission();
+					this.getOpwnRequests();
+				}
+			} else {
+				this.hideBusyIndicator();
+				msg = (massUploadResponse.message) ? massUploadResponse.message : this.getI18n("CwsRequest.MassUpload.FailedCreateData");
+				MessageBox.error(msg);
+			}
+			this.hideBusyIndicator();
 		},
 
 		_fnHandleSubmission: function () {
@@ -1756,21 +1791,19 @@ sap.ui.define([
 			var oListItem = this.getUIControl("oMassList", "fragMassUploadResponse");
 			var oParameter = {
 				attachmentId: this.AppModel.getProperty("/oMassAttachmentID"),
-				processCode: "203"
+				processCode: this.getI18n("CwsRequest.ProcessCode.203")
 			};
-			var oHeaders = Formatter._amendHeaderToken(this);
-			var serviceUrl = Config.dbOperations.deleteMassAttachment;
-			Services._loadDataAttachment(serviceUrl, oParameter, "GET", oHeaders, function (oData) {
-				if (oData.getSource().getData().status === "S") {
+			Services.deleteZipAttachmentOnCancel(this, oParameter, function (deleteResponse) {
+				if (deleteResponse.status === "S") {
 					this.hideBusyIndicator();
 					if (key === "S") {
-						MessageBox.success(oData.getSource().getData().message);
+						MessageBox.success(deleteResponse.message);
 						this.AppModel.setProperty("/massUploader", true);
 						oListItem.setVisible(false);
 					}
 				} else {
 					this.hideBusyIndicator();
-					MessageBox.error(oData.getSource().getData().message);
+					MessageBox.error(deleteResponse.message);
 				}
 			}.bind(this));
 		},

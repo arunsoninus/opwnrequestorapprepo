@@ -314,19 +314,16 @@ sap.ui.define([
 				var oParameter = {
 					draftId: draftId,
 					processCode: oProcessCode,
-					massAttachmentId: "NA"
+					massAttachmentId: this.getI18n("CwsRequest.NA")
 				};
 
-				var oHeaders = Formatter._amendHeaderToken(this);
-				var serviceUrl = Config.dbOperations.syncAttachment;
-				Services._loadDataAttachment(serviceUrl, oParameter, "GET", oHeaders, function (oData) {
-					oData = oData.getSource().getData();
-					if (oData.attachmentFiles && oData.attachmentFiles[0].status === "S") {
+				Services._loadDataAttachment(this, oParameter, function (syncResp) {
+					if (syncResp.attachmentFiles && syncResp.attachmentFiles[0].status === "S") {
 						this._fnRefreshAttachment();
 						this.hideBusyIndicator();
 					} else {
 						this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", []);
-						var msg = oData.message;
+						var msg = syncResp.message;
 						MessageBox.error(msg);
 						this.hideBusyIndicator();
 					}
@@ -2308,7 +2305,7 @@ sap.ui.define([
 			cwsRequest = Formatter.parseObjectData(cwsRequest);
 			delete (cwsRequest.Photo);
 			//Handle for Save and Submission
-			Services.persistOpwnRequest(this, cwsRequest, function (response) {
+			Services.persistOpwnRequest(this,false, cwsRequest, function (response) {
 				this.handleAfterPosting(response);
 			}.bind(this));
 		},
