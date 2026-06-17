@@ -399,6 +399,38 @@ sap.ui.define([
 				oParameter
 			);
 		},
+
+		scanFileForMalware: function (component, file, callBackFx) {
+			var AttachmentSrvModel = component.getComponentModel("AttachmentSrvModel");
+			var serviceUrl = AttachmentSrvModel.sServiceUrl.replace(/\/$/, '') + Config.dbOperations.scanFile;
+
+			var form = new FormData();
+			form.append("fileToScan", file, file.name);
+
+			var oHeaders = HeaderHelper._headerToken();
+			delete oHeaders["Content-Type"];
+
+			var settings = {
+				"url": serviceUrl,
+				"method": "POST",
+				"timeout": 0,
+				"headers": oHeaders,
+				"processData": false,
+				"mimeType": "multipart/form-data",
+				"contentType": false,
+				"data": form
+			};
+
+			$.ajax(settings)
+				.done(function (response) {
+					var oResponse = typeof response === "string" ? JSON.parse(response) : response;
+					callBackFx(oResponse, null);
+				})
+				.fail(function (oError) {
+					callBackFx(null, oError);
+				});
+		},
+
 		_loadDataAttachment: function (component, oParameter, callBackFx) {
 			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
 			var oHeaders = HeaderHelper._headerToken();

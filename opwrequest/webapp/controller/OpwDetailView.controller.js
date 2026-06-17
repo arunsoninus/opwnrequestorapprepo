@@ -389,24 +389,37 @@ sap.ui.define([
 		onChangeFileUpload: function (oEvent) {
 			var oFiles = oEvent.getSource();
 			var file = oFiles.oFileUpload.files[0];
+			this.AppModel.setProperty("/fileName", "");
+			this.AppModel.setProperty("/visfileName", false);
 
-			// Begin of change - CCEV3364 - added validation of special character in file name
-			var bValidateFileError = false;
-			bValidateFileError = this._checkFileNameSpecialChar(file);
-			if (bValidateFileError) {
-				//Update message model with file name validation
-				var aValidation = [];
-				aValidation.push(Validation._formatMessageList("Error", "File Upload Error",
-					this.getI18n("CwsRequest.Attachments.FileNameValidation1")));
-				this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aValidation);
-				this.onPressErrorMessages();
+			if (this._checkFileNameSpecialChar(file)) {
+				this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Attachments.FileNameValidation1"));
+				oFiles.clear();
 				//Hide busy indicator and display message box validation
 				this.hideBusyIndicator();
 				return;
 			}
-			// End of change - CCEV3364
-			this.AppModel.setProperty("/fileName", file.name);
-			this.AppModel.setProperty("/visfileName", true);
+
+			this.showBusyIndicator();
+			Services.scanFileForMalware(this, file, function (oResponse, oError) {
+				this.hideBusyIndicator();
+
+				if (oError || oResponse.status !== "S" || oResponse.malwareDetected) {
+					oFiles.clear();
+					this._setFileUploadErrorMessage(oError ? this.getI18n("CwsRequest.Upload.ScanFailed") : oResponse.message);
+					return;
+				}
+
+				this.AppModel.setProperty("/fileName", file.name);
+				this.AppModel.setProperty("/visfileName", true);
+			}.bind(this));
+		},
+
+		//Update message model with the given file upload error and display it
+		_setFileUploadErrorMessage: function (sMessage) {
+			var aValidation = [Validation._formatMessageList("Error", "File Upload Error", sMessage)];
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aValidation);
+			this.onPressErrorMessages();
 		},
 
 		/**
@@ -2305,7 +2318,7 @@ sap.ui.define([
 			cwsRequest = Formatter.parseObjectData(cwsRequest);
 			delete (cwsRequest.Photo);
 			//Handle for Save and Submission
-			Services.persistOpwnRequest(this,false, cwsRequest, function (response) {
+			Services.persistOpwnRequest(this, false, cwsRequest, function (response) {
 				this.handleAfterPosting(response);
 			}.bind(this));
 		},

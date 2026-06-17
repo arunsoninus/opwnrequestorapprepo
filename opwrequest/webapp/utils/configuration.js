@@ -47,7 +47,8 @@ sap.ui.define([],
 				fetchTaskAgent: "/workFlowUserDetails",
 				weekendValidateUrl: "/validateWorkingHours",
 				auditLogApi : "/getAuditLogData",
-				dashboardData : "/dashboard_data"
+				dashboardData : "/dashboard_data",
+				scanFile: "/scanFile"
 			}
 
 		};
