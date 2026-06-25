@@ -7,10 +7,11 @@ sap.ui.define([
 	"./services",
 	"./appconstant",
 	"./configuration",
+	"./dataformatter",
 	"sap/m/Dialog",
 	"sap/m/Text",
 	"sap/m/FlexBox"
-], function (Filter, FilterOperator, FilterType, Fragment, Sorter, Services, AppConstant, Config, Dialog, Text, FlexBox) {
+], function (Filter, FilterOperator, FilterType, Fragment, Sorter, Services, AppConstant, Config, Formatter, Dialog, Text, FlexBox) {
 	"use strict";
 	var utility = ("nus.edu.sg.opwrequest.utils.utility", {
 		_fnAppModelGetProperty: function (component, sPath) {
