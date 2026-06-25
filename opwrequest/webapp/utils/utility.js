@@ -4,14 +4,13 @@ sap.ui.define([
 	"sap/ui/model/FilterType",
 	"sap/ui/core/Fragment",
 	"sap/ui/model/Sorter",
-	"sap/ui/model/json/JSONModel",
 	"./services",
 	"./appconstant",
 	"./configuration",
 	"sap/m/Dialog",
 	"sap/m/Text",
 	"sap/m/FlexBox"
-], function (Filter, FilterOperator, FilterType, Fragment, Sorter, JSONModel, Services, AppConstant, Config, Dialog, Text, FlexBox) {
+], function (Filter, FilterOperator, FilterType, Fragment, Sorter, Services, AppConstant, Config, Dialog, Text, FlexBox) {
 	"use strict";
 	var utility = ("nus.edu.sg.opwrequest.utils.utility", {
 		_fnAppModelGetProperty: function (component, sPath) {
@@ -278,7 +277,9 @@ sap.ui.define([
 							component.AppModel.setProperty("/cwsRequest/createCWSRequest/REQUEST_TYPE_DESC", oData.results[0].CONFIG_VALUE);
 						}
 						that.initializeDependentLookups(component);
-						callBack();
+						if (callBack) {
+							callBack();
+						}
 					}
 				}.bind(this));
 		},
@@ -365,6 +366,18 @@ sap.ui.define([
 					component.AppModel.setProperty("/paymentTypes", oData.results);
 				}.bind(this));
 		},
+		
+		retrieveEffectiveDate: function (component) {
+			var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+			var effectiveDateFilter = this._fnLookupFilter("CONFIG_KEY", "ADMIN_FEE_EFFDATE");
+			effectiveDateFilter.push(this._fnLookupFilter("PROCESS_CODE", component.getI18n("CwsRequest.ProcessCode.203"))[0]);
+			Services.readLookups(Config.dbOperations.cwsAppConfigs, oCatalogSrvModel, component, effectiveDateFilter,
+				function (oData) {
+					var configEffDateVal = oData.results && oData.results[0] ? oData.results[0].CONFIG_VALUE : "";
+					configEffDateVal = (configEffDateVal) ? Formatter.formatDateAsString(configEffDateVal, "dd MMM yyyy") : "";
+					component.AppModel.setProperty("/adminEffDateDisplay", configEffDateVal);
+				}.bind(this));
+		},
 
 		retrieveLevyDetails: function (component, isRetrieve) {
 			var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
@@ -384,7 +397,7 @@ sap.ui.define([
 		},
 		_fnLookupFilter: function (property, value) {
 			var aFilter = [];
-			aFilter.push(new sap.ui.model.Filter(property, FilterOperator.EQ, value));
+			aFilter.push(new Filter(property, FilterOperator.EQ, value));
 			return aFilter;
 		},
 		_fnEssDraft: function (component) {
@@ -395,10 +408,10 @@ sap.ui.define([
 			var andFilter = [];
 			var aFilter = [];
 			var orFilter = [];
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '31'));
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '46'));
-			// orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '49'));
-			andFilter.push(new sap.ui.model.Filter(orFilter, false));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '31'));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '46'));
+			// orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '49'));
+			andFilter.push(new Filter(orFilter, false));
 			if (oRole === component.getI18n("CwsRequest.PrgAdmin")) {
 				var submittedByFilter = new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId);
 				var staffIdFilter = new Filter("STAFF_ID", FilterOperator.EQ, staffId);
@@ -406,16 +419,16 @@ sap.ui.define([
 				var ULUFilter = new Filter("ULU", FilterOperator.EQ, ULU);
 				var cFilter = new Filter([FDLUFilter, ULUFilter], true);
 				var StaffBy = new Filter([submittedByFilter, staffIdFilter], false);
-				andFilter.push(new sap.ui.model.Filter([cFilter, StaffBy], false));
+				andFilter.push(new Filter([cFilter, StaffBy], false));
 			} else {
-				var sFilter = new sap.ui.model.Filter([
-					new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-					new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId)
+				var sFilter = new Filter([
+					new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+					new Filter("STAFF_ID", FilterOperator.EQ, staffId)
 				], false);
-				andFilter.push(new sap.ui.model.Filter(sFilter, false));
+				andFilter.push(new Filter(sFilter, false));
 			}
-			andFilter.push(new sap.ui.model.Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
-			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			andFilter.push(new Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
+			aFilter.push(new Filter(andFilter, true));
 			return aFilter;
 		},
 		_fnEssRejReq: function (component) {
@@ -426,11 +439,11 @@ sap.ui.define([
 			var andFilter = [];
 			var aFilter = [];
 			var orFilter = [];
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '41'));
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '44')); // retract
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '45')); // Dept amdin
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '46'));
-			andFilter.push(new sap.ui.model.Filter(orFilter, false));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '41'));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '44')); // retract
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '45')); // Dept amdin
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '46'));
+			andFilter.push(new Filter(orFilter, false));
 			if (oRole === component.getI18n("CwsRequest.PrgAdmin")) {
 				var submittedByFilter = new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId);
 				var staffIdFilter = new Filter("STAFF_ID", FilterOperator.EQ, staffId);
@@ -438,16 +451,16 @@ sap.ui.define([
 				var ULUFilter = new Filter("ULU", FilterOperator.EQ, ULU);
 				var cFilter = new Filter([FDLUFilter, ULUFilter], true);
 				var StaffBy = new Filter([submittedByFilter, staffIdFilter], false);
-				andFilter.push(new sap.ui.model.Filter([cFilter, StaffBy], false));
+				andFilter.push(new Filter([cFilter, StaffBy], false));
 			} else {
-				var sFilter = new sap.ui.model.Filter([
-					new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-					new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId)
+				var sFilter = new Filter([
+					new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+					new Filter("STAFF_ID", FilterOperator.EQ, staffId)
 				], false);
-				andFilter.push(new sap.ui.model.Filter(sFilter, false));
+				andFilter.push(new Filter(sFilter, false));
 			}
-			andFilter.push(new sap.ui.model.Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
-			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			andFilter.push(new Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
+			aFilter.push(new Filter(andFilter, true));
 			return aFilter;
 		},
 		_fnEssPost: function (component) {
@@ -459,9 +472,9 @@ sap.ui.define([
 			var andFilter = [];
 			var aFilter = [];
 			var orFilter = [];
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '38')); // completed
-			andFilter.push(new sap.ui.model.Filter("TO_DISPLAY", FilterOperator.EQ, 'Y'));
-			andFilter.push(new sap.ui.model.Filter(orFilter, false));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '38')); // completed
+			andFilter.push(new Filter("TO_DISPLAY", FilterOperator.EQ, 'Y'));
+			andFilter.push(new Filter(orFilter, false));
 
 			var modifiedBy = new Filter("MODIFIED_BY", FilterOperator.EQ, staffId);
 			var oMigratedC = new Filter("MIGRATED", FilterOperator.EQ, 'MC');
@@ -476,19 +489,19 @@ sap.ui.define([
 				var ULUFilter = new Filter("ULU", FilterOperator.EQ, ULU);
 				var cFilter = new Filter([FDLUFilter, ULUFilter], true);
 				var StaffBy = new Filter([submittedByFilter, staffIdFilter], false);
-				andFilter.push(new sap.ui.model.Filter([cFilter, StaffBy, oMigrateFilter], false));
+				andFilter.push(new Filter([cFilter, StaffBy, oMigrateFilter], false));
 			} else if (isDeptOhrss) {
 				// 
 			} else {
-				var sFilter = new sap.ui.model.Filter([
-					new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-					new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId)
+				var sFilter = new Filter([
+					new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+					new Filter("STAFF_ID", FilterOperator.EQ, staffId)
 				], false);
-				andFilter.push(new sap.ui.model.Filter(sFilter, false));
+				andFilter.push(new Filter(sFilter, false));
 			}
 
-			andFilter.push(new sap.ui.model.Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
-			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			andFilter.push(new Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
+			aFilter.push(new Filter(andFilter, true));
 			return aFilter;
 		},
 		_fnEssProcess: function (component) {
@@ -500,10 +513,10 @@ sap.ui.define([
 			var aFilter = [];
 			var orFilter = [];
 			//02,03,04,05,06,08
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '40'));
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '42'));
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '43'));
-			andFilter.push(new sap.ui.model.Filter(orFilter, false));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '40'));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '42'));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '43'));
+			andFilter.push(new Filter(orFilter, false));
 			if (oRole === component.getI18n("CwsRequest.PrgAdmin")) {
 				var submittedByFilter = new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId);
 				var staffIdFilter = new Filter("STAFF_ID", FilterOperator.EQ, staffId);
@@ -511,16 +524,16 @@ sap.ui.define([
 				var ULUFilter = new Filter("ULU", FilterOperator.EQ, ULU);
 				var cFilter = new Filter([FDLUFilter, ULUFilter], true);
 				var StaffBy = new Filter([submittedByFilter, staffIdFilter], false);
-				andFilter.push(new sap.ui.model.Filter([cFilter, StaffBy], false));
+				andFilter.push(new Filter([cFilter, StaffBy], false));
 			} else {
-				var sFilter = new sap.ui.model.Filter([
-					new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-					new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId)
+				var sFilter = new Filter([
+					new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+					new Filter("STAFF_ID", FilterOperator.EQ, staffId)
 				], false);
-				andFilter.push(new sap.ui.model.Filter(sFilter, false));
+				andFilter.push(new Filter(sFilter, false));
 			}
-			andFilter.push(new sap.ui.model.Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
-			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			andFilter.push(new Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
+			aFilter.push(new Filter(andFilter, true));
 			return aFilter;
 		},
 
@@ -533,8 +546,8 @@ sap.ui.define([
 			var andFilter = [];
 			var aFilter = [];
 			var orFilter = [];
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '39')); // withdraw
-			andFilter.push(new sap.ui.model.Filter(orFilter, false));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '39')); // withdraw
+			andFilter.push(new Filter(orFilter, false));
 			if (oRole === component.getI18n("CwsRequest.PrgAdmin") && !isDeptOhrss) {
 				var submittedByFilter = new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId);
 				var staffIdFilter = new Filter("STAFF_ID", FilterOperator.EQ, staffId);
@@ -543,25 +556,25 @@ sap.ui.define([
 				var ULUFilter = new Filter("ULU", FilterOperator.EQ, ULU);
 				var cFilter = new Filter([FDLUFilter, ULUFilter], true);
 				var StaffBy = new Filter([submittedByFilter, staffIdFilter], false);
-				andFilter.push(new sap.ui.model.Filter([cFilter, StaffBy], false));
+				andFilter.push(new Filter([cFilter, StaffBy], false));
 			} else {
-				var sFilter = new sap.ui.model.Filter([
-					new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-					new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId)
+				var sFilter = new Filter([
+					new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+					new Filter("STAFF_ID", FilterOperator.EQ, staffId)
 				], false);
 
 				if (isDeptOhrss) { //If OHRSS withdraws the Request
-					sFilter = new sap.ui.model.Filter([
-						new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-						new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId),
-						new sap.ui.model.Filter("MODIFIED_BY", FilterOperator.EQ, staffId)
+					sFilter = new Filter([
+						new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+						new Filter("STAFF_ID", FilterOperator.EQ, staffId),
+						new Filter("MODIFIED_BY", FilterOperator.EQ, staffId)
 					], false);
 				}
 
-				andFilter.push(new sap.ui.model.Filter(sFilter, false));
+				andFilter.push(new Filter(sFilter, false));
 			}
-			andFilter.push(new sap.ui.model.Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
-			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			andFilter.push(new Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
+			aFilter.push(new Filter(andFilter, true));
 			return aFilter;
 		},
 
@@ -573,8 +586,8 @@ sap.ui.define([
 			var andFilter = [];
 			var aFilter = [];
 			var orFilter = [];
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '48')); // closed
-			andFilter.push(new sap.ui.model.Filter(orFilter, false));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '48')); // closed
+			andFilter.push(new Filter(orFilter, false));
 			if (oRole === component.getI18n("CwsRequest.PrgAdmin")) {
 				var submittedByFilter = new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId);
 				var staffIdFilter = new Filter("STAFF_ID", FilterOperator.EQ, staffId);
@@ -582,16 +595,16 @@ sap.ui.define([
 				var ULUFilter = new Filter("ULU", FilterOperator.EQ, ULU);
 				var cFilter = new Filter([FDLUFilter, ULUFilter], true);
 				var StaffBy = new Filter([submittedByFilter, staffIdFilter], false);
-				andFilter.push(new sap.ui.model.Filter([cFilter, StaffBy], false));
+				andFilter.push(new Filter([cFilter, StaffBy], false));
 			} else {
-				var sFilter = new sap.ui.model.Filter([
-					new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-					new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId)
+				var sFilter = new Filter([
+					new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+					new Filter("STAFF_ID", FilterOperator.EQ, staffId)
 				], false);
-				andFilter.push(new sap.ui.model.Filter(sFilter, false));
+				andFilter.push(new Filter(sFilter, false));
 			}
-			andFilter.push(new sap.ui.model.Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
-			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			andFilter.push(new Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
+			aFilter.push(new Filter(andFilter, true));
 			return aFilter;
 		},
 
@@ -603,9 +616,9 @@ sap.ui.define([
 			var andFilter = [];
 			var aFilter = [];
 			var orFilter = [];
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '49')); // Mark for Deletion
-			// andFilter.push(new sap.ui.model.Filter("TYPE", FilterOperator.EQ, 'EXT'));
-			andFilter.push(new sap.ui.model.Filter(orFilter, false));
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '49')); // Mark for Deletion
+			// andFilter.push(new Filter("TYPE", FilterOperator.EQ, 'EXT'));
+			andFilter.push(new Filter(orFilter, false));
 			if (oRole === component.getI18n("CwsRequest.PrgAdmin")) {
 				var submittedByFilter = new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId);
 				var staffIdFilter = new Filter("STAFF_ID", FilterOperator.EQ, staffId);
@@ -616,15 +629,15 @@ sap.ui.define([
 					staffIdFilter,
 					new Filter([FDLUFilter, ULUFilter], true)
 				], false);
-				andFilter.push(new sap.ui.model.Filter(combinedFilter, false));
+				andFilter.push(new Filter(combinedFilter, false));
 			} else {
-				var sFilter = new sap.ui.model.Filter([
-					new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-					new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId)
+				var sFilter = new Filter([
+					new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+					new Filter("STAFF_ID", FilterOperator.EQ, staffId)
 				], false);
-				andFilter.push(new sap.ui.model.Filter(sFilter, false));
+				andFilter.push(new Filter(sFilter, false));
 			}
-			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			aFilter.push(new Filter(andFilter, true));
 			return aFilter;
 		},
 
@@ -632,10 +645,10 @@ sap.ui.define([
 			var appMatrixAuth = component.AppModel.getProperty("/appMatrixAuth");
 			var aFilter = [];
 			var orFilter = [];
-			orFilter.push(new sap.ui.model.Filter("REQUEST_STATUS", FilterOperator.EQ, '31'));
-			var oUserBasedFilter = new sap.ui.model.Filter(orFilter, false);
+			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '31'));
+			var oUserBasedFilter = new Filter(orFilter, false);
 			var oUluFdluMultipleList = this._fnFilterForDeptAdminOnUluFdlu(component, appMatrixAuth);
-			aFilter.push(new sap.ui.model.Filter({
+			aFilter.push(new Filter({
 				filters: [oUserBasedFilter, oUluFdluMultipleList],
 				and: true
 			}));
@@ -655,16 +668,16 @@ sap.ui.define([
 				var ULUFilter = new Filter("ULU", FilterOperator.EQ, ULU);
 				var cFilter = new Filter([FDLUFilter, ULUFilter], true);
 				var StaffBy = new Filter([submittedByFilter, staffIdFilter], false);
-				andFilter.push(new sap.ui.model.Filter([cFilter, StaffBy], false));
+				andFilter.push(new Filter([cFilter, StaffBy], false));
 			} else {
-				var sFilter = new sap.ui.model.Filter([
-					new sap.ui.model.Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
-					new sap.ui.model.Filter("STAFF_ID", FilterOperator.EQ, staffId)
+				var sFilter = new Filter([
+					new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId),
+					new Filter("STAFF_ID", FilterOperator.EQ, staffId)
 				], false);
-				andFilter.push(new sap.ui.model.Filter(sFilter, false));
+				andFilter.push(new Filter(sFilter, false));
 			}
-			andFilter.push(new sap.ui.model.Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
-			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			andFilter.push(new Filter("REQUEST_TYPE", FilterOperator.EQ, 'OPWN'));
+			aFilter.push(new Filter(andFilter, true));
 			return aFilter;
 		},
 
@@ -674,9 +687,9 @@ sap.ui.define([
 			jQuery.sap.each(claimAuthorizations, function (i, authElement) {
 				aUluFdluFilter = [];
 				if (authElement.STAFF_USER_GRP === component.getI18n("CwsRequest.User.DeptAdminAlias")) {
-					aUluFdluFilter.push(new sap.ui.model.Filter("ULU", FilterOperator.EQ, authElement.ULU_C)); //testing ULU
-					aUluFdluFilter.push(new sap.ui.model.Filter("FDLU", FilterOperator.EQ, authElement.FDLU_C)); //testing FDLU
-					aFinalUluFdluFilter.push(new sap.ui.model.Filter(aUluFdluFilter, true));
+					aUluFdluFilter.push(new Filter("ULU", FilterOperator.EQ, authElement.ULU_C)); //testing ULU
+					aUluFdluFilter.push(new Filter("FDLU", FilterOperator.EQ, authElement.FDLU_C)); //testing FDLU
+					aFinalUluFdluFilter.push(new Filter(aUluFdluFilter, true));
 				}
 			});
 
@@ -687,9 +700,9 @@ sap.ui.define([
 			return oUluFdluMultipleList;
 		},
 		_generateFilter: function (sValueToFilter, aFilterValues, sOperator) {
-			sOperator = sOperator || sap.ui.model.FilterOperator.EQ;
+			sOperator = sOperator || FilterOperator.EQ;
 			var aFilterArray = aFilterValues.map(function (sFilterValue) {
-				return new sap.ui.model.Filter(sValueToFilter, sOperator, sFilterValue);
+				return new Filter(sValueToFilter, sOperator, sFilterValue);
 			});
 			return aFilterArray;
 		},
@@ -748,52 +761,52 @@ sap.ui.define([
 			return str.replace(/\b\w/g, (match) => match.toUpperCase());
 		},
 		_onPressSearchCWRequest: function (sValue, component) {
-			var filterNusNetId = new sap.ui.model.Filter([
-				new sap.ui.model.Filter("STAFF_NUSNET_ID", sap.ui.model.FilterOperator.Contains, sValue.toUpperCase()),
-				new sap.ui.model.Filter("STAFF_NUSNET_ID", sap.ui.model.FilterOperator.Contains, sValue.toLowerCase()),
-				new sap.ui.model.Filter("STAFF_NUSNET_ID", sap.ui.model.FilterOperator.Contains, this.capitalizeWords(sValue))
+			var filterNusNetId = new Filter([
+				new Filter("STAFF_NUSNET_ID", FilterOperator.Contains, sValue.toUpperCase()),
+				new Filter("STAFF_NUSNET_ID", FilterOperator.Contains, sValue.toLowerCase()),
+				new Filter("STAFF_NUSNET_ID", FilterOperator.Contains, this.capitalizeWords(sValue))
 			], false);
 
-			var filterProcess = new sap.ui.model.Filter([
-				new sap.ui.model.Filter("PROCESS_TITLE", sap.ui.model.FilterOperator.Contains, sValue.toUpperCase()),
-				new sap.ui.model.Filter("PROCESS_TITLE", sap.ui.model.FilterOperator.Contains, sValue.toLowerCase()),
-				new sap.ui.model.Filter("PROCESS_TITLE", sap.ui.model.FilterOperator.Contains, this.capitalizeWords(sValue))
+			var filterProcess = new Filter([
+				new Filter("PROCESS_TITLE", FilterOperator.Contains, sValue.toUpperCase()),
+				new Filter("PROCESS_TITLE", FilterOperator.Contains, sValue.toLowerCase()),
+				new Filter("PROCESS_TITLE", FilterOperator.Contains, this.capitalizeWords(sValue))
 			], false);
 
-			var filterSubtype = new sap.ui.model.Filter([
-				new sap.ui.model.Filter("SUB_TYPE_T", sap.ui.model.FilterOperator.Contains, sValue.toUpperCase()),
-				new sap.ui.model.Filter("SUB_TYPE_T", sap.ui.model.FilterOperator.Contains, sValue.toLowerCase()),
-				new sap.ui.model.Filter("SUB_TYPE_T", sap.ui.model.FilterOperator.Contains, this.capitalizeWords(sValue))
+			var filterSubtype = new Filter([
+				new Filter("SUB_TYPE_T", FilterOperator.Contains, sValue.toUpperCase()),
+				new Filter("SUB_TYPE_T", FilterOperator.Contains, sValue.toLowerCase()),
+				new Filter("SUB_TYPE_T", FilterOperator.Contains, this.capitalizeWords(sValue))
 			], false);
 
-			var filterFullName = new sap.ui.model.Filter([
-				new sap.ui.model.Filter("FULL_NM", sap.ui.model.FilterOperator.Contains, sValue.toUpperCase()),
-				new sap.ui.model.Filter("FULL_NM", sap.ui.model.FilterOperator.Contains, sValue.toLowerCase()),
-				new sap.ui.model.Filter("FULL_NM", sap.ui.model.FilterOperator.Contains, this.capitalizeWords(sValue))
+			var filterFullName = new Filter([
+				new Filter("FULL_NM", FilterOperator.Contains, sValue.toUpperCase()),
+				new Filter("FULL_NM", FilterOperator.Contains, sValue.toLowerCase()),
+				new Filter("FULL_NM", FilterOperator.Contains, this.capitalizeWords(sValue))
 			], false);
 
-			var filterSfStfNumber = new sap.ui.model.Filter("SF_STF_NUMBER", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterStfNumber = new sap.ui.model.Filter("STAFF_ID", sap.ui.model.FilterOperator.Contains, sValue);
-			// var filterReqType = new sap.ui.model.Filter("REQUEST_TYPE", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterSubmittedByNid = new sap.ui.model.Filter([
-				new sap.ui.model.Filter("SUBMITTED_BY_FULLNAME", sap.ui.model.FilterOperator.Contains, sValue.toUpperCase()),
-				new sap.ui.model.Filter("SUBMITTED_BY_FULLNAME", sap.ui.model.FilterOperator.Contains, sValue.toLowerCase()),
-				new sap.ui.model.Filter("SUBMITTED_BY_FULLNAME", sap.ui.model.FilterOperator.Contains, this.capitalizeWords(sValue))
+			var filterSfStfNumber = new Filter("SF_STF_NUMBER", FilterOperator.Contains, sValue);
+			var filterStfNumber = new Filter("STAFF_ID", FilterOperator.Contains, sValue);
+			// var filterReqType = new Filter("REQUEST_TYPE", FilterOperator.Contains, sValue);
+			var filterSubmittedByNid = new Filter([
+				new Filter("SUBMITTED_BY_FULLNAME", FilterOperator.Contains, sValue.toUpperCase()),
+				new Filter("SUBMITTED_BY_FULLNAME", FilterOperator.Contains, sValue.toLowerCase()),
+				new Filter("SUBMITTED_BY_FULLNAME", FilterOperator.Contains, this.capitalizeWords(sValue))
 			], false);
 			// Begin of change - CCEV3364
-			// var filterRequestId = new sap.ui.model.Filter("REQUEST_ID", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterRequestId = new sap.ui.model.Filter("REQUEST_ID", sap.ui.model.FilterOperator.Contains, sValue.trim());
+			// var filterRequestId = new Filter("REQUEST_ID", FilterOperator.Contains, sValue);
+			var filterRequestId = new Filter("REQUEST_ID", FilterOperator.Contains, sValue.trim());
 			// End of change - CCEV3364
-			var filterAmount = new sap.ui.model.Filter("AMOUNT", sap.ui.model.FilterOperator.EQ, sValue);
-			var filterStatusAlias = new sap.ui.model.Filter([
-				new sap.ui.model.Filter("STATUS_ALIAS", sap.ui.model.FilterOperator.Contains, sValue.toUpperCase()),
-				new sap.ui.model.Filter("STATUS_ALIAS", sap.ui.model.FilterOperator.Contains, sValue.toLowerCase()),
-				new sap.ui.model.Filter("STATUS_ALIAS", sap.ui.model.FilterOperator.Contains, this.capitalizeWords(sValue))
+			var filterAmount = new Filter("AMOUNT", FilterOperator.EQ, sValue);
+			var filterStatusAlias = new Filter([
+				new Filter("STATUS_ALIAS", FilterOperator.Contains, sValue.toUpperCase()),
+				new Filter("STATUS_ALIAS", FilterOperator.Contains, sValue.toLowerCase()),
+				new Filter("STATUS_ALIAS", FilterOperator.Contains, this.capitalizeWords(sValue))
 			], false);
-			var filterPrgmName = new sap.ui.model.Filter([
-				new sap.ui.model.Filter("PROGRAM_NAME", sap.ui.model.FilterOperator.Contains, sValue.toUpperCase()),
-				new sap.ui.model.Filter("PROGRAM_NAME", sap.ui.model.FilterOperator.Contains, sValue.toLowerCase()),
-				new sap.ui.model.Filter("PROGRAM_NAME", sap.ui.model.FilterOperator.Contains, this.capitalizeWords(sValue))
+			var filterPrgmName = new Filter([
+				new Filter("PROGRAM_NAME", FilterOperator.Contains, sValue.toUpperCase()),
+				new Filter("PROGRAM_NAME", FilterOperator.Contains, sValue.toLowerCase()),
+				new Filter("PROGRAM_NAME", FilterOperator.Contains, this.capitalizeWords(sValue))
 			], false);
 
 			var filtersGrp = new Filter({
@@ -816,15 +829,15 @@ sap.ui.define([
 			return [finalFilterGrp];
 		},
 		_filterSortingRequestTable: function (component, oTable, sValue, oSelectedSort, sortingMethod, oSelectedGroup, groupMethod) {
-			var filterNusNetId = new sap.ui.model.Filter("STAFF_NUSNET_ID", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterFullName = new sap.ui.model.Filter("FULL_NM", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterSfStfNumber = new sap.ui.model.Filter("SF_STF_NUMBER", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterStfNumber = new sap.ui.model.Filter("STAFF_ID", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterRequestType = new sap.ui.model.Filter("REQUEST_TYPE", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterSubmittedByNid = new sap.ui.model.Filter("SUBMITTED_BY", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterRequestId = new sap.ui.model.Filter("REQUEST_ID", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterStatusAlias = new sap.ui.model.Filter("STATUS_ALIAS", sap.ui.model.FilterOperator.Contains, sValue);
-			var filterPrgmName = new sap.ui.model.Filter("PROGRAM_NAME", sap.ui.model.FilterOperator.Contains, sValue);
+			var filterNusNetId = new Filter("STAFF_NUSNET_ID", FilterOperator.Contains, sValue);
+			var filterFullName = new Filter("FULL_NM", FilterOperator.Contains, sValue);
+			var filterSfStfNumber = new Filter("SF_STF_NUMBER", FilterOperator.Contains, sValue);
+			var filterStfNumber = new Filter("STAFF_ID", FilterOperator.Contains, sValue);
+			var filterRequestType = new Filter("REQUEST_TYPE", FilterOperator.Contains, sValue);
+			var filterSubmittedByNid = new Filter("SUBMITTED_BY", FilterOperator.Contains, sValue);
+			var filterRequestId = new Filter("REQUEST_ID", FilterOperator.Contains, sValue);
+			var filterStatusAlias = new Filter("STATUS_ALIAS", FilterOperator.Contains, sValue);
+			var filterPrgmName = new Filter("PROGRAM_NAME", FilterOperator.Contains, sValue);
 
 			var filtersGrp = new Filter({
 				filters: [filterNusNetId, filterFullName,

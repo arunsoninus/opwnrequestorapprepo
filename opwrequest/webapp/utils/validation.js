@@ -953,6 +953,20 @@ sap.ui.define([
 				return message;
 			},
 
+			_checkFileNameSpecialChar: function (oFile) {
+				let sSplChar = /[!@#$%^&*()+\=\[\]{};':"\\|,.<>\/?]+/,
+					bContainsSplChar = false,
+					aFileName = oFile.name.split("."); //Split the filename with name and extension separate.
+				if (aFileName.length > 2) { //validation for "." character
+					bContainsSplChar = true;
+				} else {
+					if (sSplChar.test(aFileName[0])) { //Validation for special characters.
+						bContainsSplChar = true;
+					}
+				}
+				return bContainsSplChar;
+			},
+
 			_formatMessageList: function (type, sColumnName, message, claimDate) {
 				var messageObj = {};
 				messageObj.type = type;

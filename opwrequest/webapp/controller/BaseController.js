@@ -24,9 +24,9 @@ sap.ui.define([
 			this.getOwnerComponent().getInitialDataForUser();
 			// window.location.reload(true);
 		},
-		getI18n: function (sTextField) {
+		getI18n: function (sTextField, aArgs) {
 			var oResourceBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-			var i18nTextValue = oResourceBundle.getText(sTextField);
+			var i18nTextValue = oResourceBundle.getText(sTextField, aArgs);
 			return i18nTextValue ? i18nTextValue : sTextField;
 		},
 
@@ -296,7 +296,7 @@ sap.ui.define([
 				this.AppModel.setProperty("/PaidStartDate", true);
 				if (data.statusCode === "E") {
 					if (key === "N") {
-						this.showMessageStrip("cwsRequestDialogMStripId", data.message, "E", "NewRequestTypeSelectionDialog");
+						this.showMessageStrip("opwnRequestDialogMStripId", data.message, "E", "NewRequestTypeSelectionDialog");
 					} else {
 						var aValidation = [];
 						aValidation.push(Validation._formatMessageList("Error", "Payment Error", data.message));

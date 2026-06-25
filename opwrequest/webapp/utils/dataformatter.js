@@ -222,11 +222,16 @@ sap.ui.define([],
 			 * Format Date as String
 			 */
 			formatDateAsString: function (dateValue, format, isYearFormat) {
+				
 				var response = "";
 				if (dateValue !== "NA" && dateValue !== "/Date(0)/") {
 					if (dateValue) {
 						if (typeof (dateValue) === "string" && dateValue.indexOf("/Date") > -1) {
 							dateValue = parseFloat(dateValue.substr(dateValue.lastIndexOf("(") + 1, dateValue.lastIndexOf(")") - 1));
+						}
+						// Convert yyyyMMdd to yyyy-MM-dd
+						if (typeof (dateValue) === "string" && /^\d{8}$/.test(dateValue)) {
+							dateValue = dateValue.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
 						}
 						dateValue = new Date(dateValue);
 					} else {
@@ -314,6 +319,12 @@ sap.ui.define([],
 						secs = dateValue.getSeconds() + "";
 						secs = (secs.length > 1) ? secs : "0" + secs;
 						response += hh + ":" + mins + ":" + secs + " " + ampm;
+						break;
+					case "dd MMM yyyy":
+						var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+							"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+						];
+						response = dd + " " + monthNames[dateValue.getMonth()] + " " + yyyy;
 						break;
 					default:
 						response = dateValue;

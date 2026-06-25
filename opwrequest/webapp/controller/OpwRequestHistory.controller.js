@@ -164,6 +164,9 @@ sap.ui.define([
 					this.getDraftRequests();
 				}
 				// Utility._fnFilterCreation(this);
+
+				//Added for Admin OPWN Fee Handling (to display the message)
+				Utility.retrieveEffectiveDate(this);
 			}.bind(this));
 			// this.handleFilter();
 		},
@@ -494,11 +497,44 @@ sap.ui.define([
 
 		handletypemismatch: function () {
 			var msg = this.getI18n("CwsRequest.MassUpload.XlsOnly");
-			this.showMessageStrip("cwsRequestDialogMStripId", msg, "E", "NewRequestTypeSelectionDialog");
+			this.showMessageStrip("opwnRequestDialogMStripId", msg, "E", "NewRequestTypeSelectionDialog");
+		},
+
+		onChangeMassUploadFile: function (oEvent) {
+			var oFiles = oEvent.getSource();
+			var file = oFiles.oFileUpload.files[0];
+			this.closeMessageStrip("opwnRequestDialogMStripId", "NewRequestTypeSelectionDialog");
+			this.AppModel.setProperty("/requestFileName", "");
+			this.AppModel.setProperty("/visRequestFileName", false);
+
+			if (!file) {
+				return;
+			}
+
+			if (Validation._checkFileNameSpecialChar(file)) {
+				oFiles.clear();
+				this.showMessageStrip("opwnRequestDialogMStripId", this.getI18n("CwsRequest.Attachments.FileNameValidation1"), "E", "NewRequestTypeSelectionDialog");
+				return;
+			}
+
+			this.showBusyIndicator();
+			Services.scanFileForMalware(this, file, function (oResponse, oError) {
+				this.hideBusyIndicator();
+
+				if (oError || oResponse.status !== "S" || oResponse.malwareDetected) {
+					oFiles.clear();
+					this.showMessageStrip("opwnRequestDialogMStripId", oError ? this.getI18n("CwsRequest.Upload.ScanFailed") : oResponse.message, "E",
+						"NewRequestTypeSelectionDialog");
+					return;
+				}
+
+				this.AppModel.setProperty("/requestFileName", file.name);
+				this.AppModel.setProperty("/visRequestFileName", true);
+			}.bind(this));
 		},
 
 		onChangeNewRequestParams: function (oEvent, key) {
-			this.closeMessageStrip("cwsRequestDialogMStripId", "NewRequestTypeSelectionDialog");
+			this.closeMessageStrip("opwnRequestDialogMStripId", "NewRequestTypeSelectionDialog");
 			var oNumber = oEvent.getSource().getValue();
 			if (key === "DR") {
 				if (oNumber) {
@@ -517,10 +553,10 @@ sap.ui.define([
 			var validateLeaving = Validation.validateLeavingDate(data, this);
 			if (validationMsg) {
 				oEvent.getSource().setValue("");
-				this.showMessageStrip("cwsRequestDialogMStripId", validationMsg, "E", "NewRequestTypeSelectionDialog");
+				this.showMessageStrip("opwnRequestDialogMStripId", validationMsg, "E", "NewRequestTypeSelectionDialog");
 			}
 			if (validateLeaving) {
-				this.showMessageStrip("cwsRequestDialogMStripId", validateLeaving, "E", "NewRequestTypeSelectionDialog");
+				this.showMessageStrip("opwnRequestDialogMStripId", validateLeaving, "E", "NewRequestTypeSelectionDialog");
 			}
 		},
 		/**
@@ -543,7 +579,7 @@ sap.ui.define([
 			this.newRequestTypeDialog.setEscapeHandler(function () {
 				return;
 			});
-			this.initializeNewCwsRequest();
+			this.initializeNewOpwnRequest();
 			this._fnRequestType();
 			Utility.retrieveAttachmentTypes(this);
 			this.newRequestTypeDialog.open();
@@ -570,10 +606,12 @@ sap.ui.define([
 		/**
 		 * Initialize New CWS Request
 		 */
-		initializeNewCwsRequest: function () {
+		initializeNewOpwnRequest: function () {
 			var oCont = [],
 				oStaffID = this.AppModel.getProperty("/staffInfo/STAFF_ID");
 			this.AppModel.setProperty("/cwsRequest/SingleSubRadioSelected", true);
+			this.AppModel.setProperty("/requestFileName", "");
+			this.AppModel.setProperty("/visRequestFileName", false);
 			this.AppModel.setProperty("/isEditableType", true);
 			this.AppModel.setProperty("/isRequestType", false);
 			$.each(this.AppModel.getProperty("/staffInfo/approverMatrix"), function (idx, obj) {
@@ -590,7 +628,7 @@ sap.ui.define([
 				"CwsRequest.ProcessCode.201")) {
 				this.AppModel.setProperty("/isRequestType", true);
 			}
-			this.closeMessageStrip("cwsRequestDialogMStripId", "NewRequestTypeSelectionDialog");
+			this.closeMessageStrip("opwnRequestDialogMStripId", "NewRequestTypeSelectionDialog");
 			this.AppModel.setProperty("/cwsRequest/validationRequest", {});
 			this.AppModel.refresh(true);
 			Utility.retrieveTypes(this);
@@ -603,6 +641,11 @@ sap.ui.define([
 		onSelectRequestType: function (oEvent) {
 			this.AppModel.setProperty("/cwsRequest/Request_key", this.AppModel.getProperty("/RequestType/0/CONFIG_KEY"));
 			this.AppModel.setProperty("/cwsRequest/Request_key_Desc", this.AppModel.getProperty("/RequestType/0/CONFIG_VALUE"));
+
+			this.AppModel.setProperty("/requestFileName", "");
+			this.AppModel.setProperty("/visRequestFileName", false);
+			this.getUIControl("massRequestsOpwnFileUploaderId", "NewRequestTypeSelectionDialog").clear();
+
 			var oKey = oEvent.getSource().getSelectedButton().getText();
 			// var oCwsSrvModel = this.oOwnerComponent.getModel("OpwnSrvModel");
 			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
@@ -642,7 +685,7 @@ sap.ui.define([
 			var that = this;
 			var data = this.AppModel.getProperty("/cwsRequest/createCWSRequest");
 			var validateLeaving = Validation.validateLeavingDate(data, this);
-			this.closeMessageStrip("cwsRequestDialogMStripId", "NewRequestTypeSelectionDialog");
+			this.closeMessageStrip("opwnRequestDialogMStripId", "NewRequestTypeSelectionDialog");
 
 			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			var sStaffId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID");
@@ -650,9 +693,9 @@ sap.ui.define([
 			var filters = that.generateFilter("SF_STF_NUMBER", [sStaffId]);
 
 			if (!(type && startDate && endDate && durationDays && amount && fullname)) {
-				this.showMessageStrip("cwsRequestDialogMStripId", this.getI18n("CwsRequest.Validation.RequiredFields"), "E", "NewRequestTypeSelectionDialog");
+				this.showMessageStrip("opwnRequestDialogMStripId", this.getI18n("CwsRequest.Validation.RequiredFields"), "E", "NewRequestTypeSelectionDialog");
 			} else if (validateLeaving) {
-				this.showMessageStrip("cwsRequestDialogMStripId", validateLeaving, "E", "NewRequestTypeSelectionDialog");
+				this.showMessageStrip("opwnRequestDialogMStripId", validateLeaving, "E", "NewRequestTypeSelectionDialog");
 			} else {
 
 				oCatalogSrvModel.read(Config.dbOperations.userLookup, {
@@ -684,7 +727,7 @@ sap.ui.define([
 									));
 								this._payrollCheck(utcStartDate, utcEndDate);
 							} else {
-								this.showMessageStrip("cwsRequestDialogMStripId",
+								this.showMessageStrip("opwnRequestDialogMStripId",
 									"User is a Non-Employee, hence is not allowed to submit OPWN request in the system.", "E",
 									"NewRequestTypeSelectionDialog");
 							}
@@ -709,7 +752,7 @@ sap.ui.define([
 				if (oCode === "S") {
 					this.fnPaymentAmount('N');
 				} else {
-					this.showMessageStrip("cwsRequestDialogMStripId", payrollData.message, "E",
+					this.showMessageStrip("opwnRequestDialogMStripId", payrollData.message, "E",
 						"NewRequestTypeSelectionDialog");
 				}
 			}.bind(this)
@@ -723,7 +766,7 @@ sap.ui.define([
 			// 	if (oCode === "S") {
 			// 		this.fnPaymentAmount('N');
 			// 	} else {
-			// 		this.showMessageStrip("cwsRequestDialogMStripId", oResponse.getSource().getProperty("/message"), "E",
+			// 		this.showMessageStrip("opwnRequestDialogMStripId", oResponse.getSource().getProperty("/message"), "E",
 			// 			"NewRequestTypeSelectionDialog");
 			// 	}
 			// }.bind(this));
@@ -747,7 +790,7 @@ sap.ui.define([
 								layout: "MidColumnFullScreen"
 							});
 						} else {
-							this.showMessageStrip("cwsRequestDialogMStripId", this.getI18n("CwsRequest.Error.UserNotAllowed"), "E",
+							this.showMessageStrip("opwnRequestDialogMStripId", this.getI18n("CwsRequest.Error.UserNotAllowed"), "E",
 								"NewRequestTypeSelectionDialog");
 						}
 					}
@@ -764,7 +807,7 @@ sap.ui.define([
 			// 					layout: "MidColumnFullScreen"
 			// 				});
 			// 			} else {
-			// 				this.showMessageStrip("cwsRequestDialogMStripId", "User not allowed to submit CW/NED or OPWN request in the system", "E",
+			// 				this.showMessageStrip("opwnRequestDialogMStripId", "User not allowed to submit CW/NED or OPWN request in the system", "E",
 			// 					"NewRequestTypeSelectionDialog");
 			// 			}
 			// 		}
@@ -851,9 +894,8 @@ sap.ui.define([
 			component.AppModel.setProperty("/oMassUploadSVisible", false);
 			component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadResponseDisplay", []);
 			component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadRequestPayload", []);
-			var fileUploader = component.getUIControl("massClaimsUploadId", "NewRequestTypeSelectionDialog");
+			var fileUploader = component.getUIControl("massRequestsOpwnFileUploaderId", "NewRequestTypeSelectionDialog");
 			var file = fileUploader.oFileUpload.files[0];
-			var requestType = component.AppModel.getProperty("/cwsRequest/Request_key");
 			var claimType = component.AppModel.getProperty("/cwsRequest/createCWSRequest/TYPE");
 			var noOfHeaderRows = component.AppModel.getProperty("/cwsRequest/createCWSRequest/noOfHeaderRows");
 
@@ -924,6 +966,12 @@ sap.ui.define([
 						}.bind(component));
 
 						component.onSelectIconStatus();
+						
+						//Frame the Admin Effective Date message to display
+						if (this.AppModel.getProperty("/adminEffDateDisplay")) {
+							var adminEffDateDisplay = this.AppModel.getProperty("/adminEffDateDisplay");
+							this.AppModel.setProperty("/AdminFeeMessage", this.getI18n("CwsRequest.MassUpload.OPWNAdminFeeMsg", [adminEffDateDisplay]))
+						}
 
 						if (parseResponse.error) { //successfully upload
 							//aggregate error messages for a particular claim request row				
@@ -1054,7 +1102,14 @@ sap.ui.define([
 			}
 		},
 
-		onSelectUpload: function () {
+		onSelectUpload: function (oEvent) {
+			var sSelectedKey = oEvent.getParameter("key");
+
+			//Tab was re-selected without actually switching - leave the current file selection untouched
+			if (sSelectedKey === this._sUploadTabSelectedKey) {
+				return;
+			}
+			this._sUploadTabSelectedKey = sSelectedKey;
 			var isError = false,
 				oData = this.AppModel.getProperty("/cwsRequest/createCWSRequest/massUploadResponseDisplay");
 			oData.find(function (element) {
@@ -1068,10 +1123,14 @@ sap.ui.define([
 				oMassDisplay.setSelectedKey("request");
 				return;
 			}
+
+			//Clear the File Uploader at this point to avoid the same file being uploaded again
+			this.getUIControl("zipFileUploaderOpwnId", "fragMassUploadResponse").clear();
+			this.AppModel.setProperty("/zipFileName", "");
+			this.AppModel.setProperty("/visZipFileName", false);
 		},
 
 		_fnFetchUserDetailFromChrsJobInfo: function () {
-			var that = this;
 			var OpwnSrvModel = this.oOwnerComponent.getModel("OpwnSrvModel");
 			var staffId = "";
 			staffId = this.AppModel.getProperty("/loggedInUserId");
@@ -1089,7 +1148,7 @@ sap.ui.define([
 			}.bind(this));
 		},
 
-		onPressSearchCWSRequest: function (oEvent) {
+		onPressSearchCWSRequest: function () {
 			var sValue = this.getView().byId("srchFldCWSRequest").getValue();
 			var sPath = "OpwnSrvModel>" + Config.dbOperations.openRequestView;
 			var oViewModel = this.getView().getModel("ViewModel");
@@ -1253,6 +1312,36 @@ sap.ui.define([
 
 		handlefilezipTypemismatch: function (oEvent) {
 			return MessageBox.error(this.getI18n("CwsRequest.MassUpload.ZipOnly"));
+		},
+
+		onChangeFileUploadZip: function (oEvent) {
+			var oFiles = oEvent.getSource();
+			var file = oFiles.oFileUpload.files[0];
+			this.AppModel.setProperty("/zipFileName", "");
+			this.AppModel.setProperty("/visZipFileName", false);
+			this.AppModel.setProperty("/oMassAttachmentID", "");
+			this.AppModel.setProperty("/formattedText", "");
+			this.getUIControl("uploadMsg", "fragMassUploadResponse").setVisible(false);
+
+			if (Validation._checkFileNameSpecialChar(file)) {
+				oFiles.clear();
+				MessageBox.error(this.getI18n("CwsRequest.Attachments.FileNameValidation1"));
+				return;
+			}
+
+			this.showBusyIndicator();
+			Services.scanFileForMalware(this, file, function (oResponse, oError) {
+				this.hideBusyIndicator();
+
+				if (oError || oResponse.status !== "S" || oResponse.malwareDetected) {
+					oFiles.clear();
+					MessageBox.error(oError ? this.getI18n("CwsRequest.Upload.ScanFailed") : oResponse.message);
+					return;
+				}
+
+				this.AppModel.setProperty("/zipFileName", file.name);
+				this.AppModel.setProperty("/visZipFileName", true);
+			}.bind(this));
 		},
 
 		fnSaveMassRequest: function () {
@@ -1663,7 +1752,7 @@ sap.ui.define([
 		},
 
 		onUploadZip: function () {
-			var fileUploader = this.getUIControl("massClaimsUploadZip", "fragMassUploadResponse");
+			var fileUploader = this.getUIControl("zipFileUploaderOpwnId", "fragMassUploadResponse");
 			var msgStrip = this.getUIControl("uploadMsg", "fragMassUploadResponse");
 			var oListItem = this.getUIControl("oMassList", "fragMassUploadResponse");
 			// msgStrip.setText("");
@@ -1748,6 +1837,7 @@ sap.ui.define([
 								this.AppModel.setProperty("/oMassAttachmentID", oKeyid);
 								this.AppModel.setProperty("/oMassuploadResponse", parseResponse);
 								this.AppModel.setProperty("/massUploader", false);
+								this.getUIControl("zipFileUploaderOpwnId", "fragMassUploadResponse").clear();
 								oListItem.setVisible(true);
 							}
 						} catch (oError) {
@@ -1799,6 +1889,8 @@ sap.ui.define([
 					if (key === "S") {
 						MessageBox.success(deleteResponse.message);
 						this.AppModel.setProperty("/massUploader", true);
+						this.AppModel.setProperty("/zipFileName", "");
+						this.AppModel.setProperty("/visZipFileName", false);
 						oListItem.setVisible(false);
 					}
 				} else {

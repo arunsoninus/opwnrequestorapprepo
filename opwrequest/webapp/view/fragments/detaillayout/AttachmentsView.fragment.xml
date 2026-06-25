@@ -24,10 +24,10 @@
 					<u:FileUploader class="sapUiSmallMarginBegin" change="onChangeFileUpload" id="fileUploader" name="myFileUpload" tooltip="Upload Attachments"
 						uploadComplete="handleUploadComplete" buttonOnly="true" fileSizeExceed="handleFileSizeExceed" maximumFileSize="10"
 						maximumFilenameLength="100" filenameLengthExceed="handleFilenameLength" sameFilenameAllowed="false"
-						fileType="jpg,jpeg,png,pdf,xls,xlsx,doc,docx" typeMissmatch="handlefileTypemismatch"
+						fileType="{i18n>CwsRequest.Attachments.AllowedExtensions}" typeMissmatch="handlefileTypemismatch"
 						visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}"
 						enabled="{AppModel>/isFormEditable}"/>
-					<Button class="sapUiSmallMarginBegin" text="Upload File" icon="sap-icon://upload" press="onUploadFile" enabled="{AppModel>/isFormEditable}"
+					<Button class="sapUiSmallMarginBegin" text="Upload File" icon="sap-icon://upload" press="onUploadFile" enabled="{AppModel>/visfileName}"
 						visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}"></Button>
 				</HBox>
 				<ObjectStatus visible="{AppModel>/visfileName}" class="sapUiSmallMarginTop" title="Selected File" text="{AppModel>/fileName}"

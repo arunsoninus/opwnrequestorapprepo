@@ -333,10 +333,6 @@ sap.ui.define([
 			}
 
 		},
-
-		handleFileSizeExceed: function () {
-			return MessageBox.error(this.getI18n("CwsRequest.Attachments.Note2"));
-		},
 		/**
 		 * Frame Data For Attachment Upload
 		 */
@@ -507,10 +503,16 @@ sap.ui.define([
 			}
 		},
 		handlefileTypemismatch: function (oEvent) {
-			return MessageBox.error(this.getI18n("CwsRequest.Upload.AllowedTypes"));
+			// return MessageBox.error(this.getI18n("CwsRequest.Upload.AllowedTypes"));
+			this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Upload.AllowedTypes"));
 		},
 		handleFilenameLength: function (oEvent) {
-			return MessageBox.error(this.getI18n("CwsRequest.Upload.FileNameLength"));
+			// return MessageBox.error(this.getI18n("CwsRequest.Upload.FileNameLength"));
+			this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Upload.FileNameLength"));
+		},
+		handleFileSizeExceed: function () {
+			this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Attachments.Note2"));
+			// return MessageBox.error(this.getI18n("CwsRequest.Attachments.Note2"));
 		},
 		handleUploadComplete: function () {
 			this._fnRefreshAttachment();
@@ -536,12 +538,11 @@ sap.ui.define([
 			}
 		},
 
-		_flpBackBtn: function (oEvent) {
+		_flpBackBtn: function () {
 			var isFlpBackButtonPressed = this.AppModel.getProperty("/isFlpBackButtonPressed");
-			var presisttabkey = this.AppModel.getProperty("/prevSelectedKeyOfIconTabBar");
 			var Status = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS");
 			if (isFlpBackButtonPressed != 'Y') {
-				if (Status === "31" || Status === "44" || Status === "45" || Status === "46") {
+				if (Status === "31" /*|| Status === "44" || Status === "45" || Status === "46"*/) {
 					var saveSource = 'onCloseSaveCall';
 					this.onPressSaveDraftRequest(saveSource, null, false);
 				}
@@ -1487,7 +1488,7 @@ sap.ui.define([
 
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/DURATION_DAYS", oNumber);
 			}
-			// this.closeMessageStrip("cwsRequestDialogMStripId", "NewRequestTypeSelectionDialog");
+			// this.closeMessageStrip("opwnRequestDialogMStripId", "NewRequestTypeSelectionDialog");
 			var validationMsg = Validation.validateDatesNDuration(this);
 			// this.AppModel.setProperty("/cwsRequest/createCWSRequest/durationSplitList", []);
 			var oBasicAmnt = this.AppModel.getProperty("/cwsRequest/createCWSRequest/AMOUNT");
@@ -1546,13 +1547,13 @@ sap.ui.define([
 			this.lastSuccessRun = new Date();
 			var startDate = this.AppModel.getProperty("/cwsRequest/createCWSRequest/START_DATE");
 			var endDate = this.AppModel.getProperty("/cwsRequest/createCWSRequest/END_DATE");
-			// this.closeMessageStrip("cwsRequestDialogMStripId", "CWSDurationDialog");
+			// this.closeMessageStrip("opwnRequestDialogMStripId", "CWSDurationDialog");
 			if (startDate && endDate) {
 				if (Formatter.compareDatesNValidate(startDate, endDate)) {
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/startDateDisplay", Formatter.formatDateAsString(startDate, "dd/MM/yyyy"));
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/endDateDisplay", Formatter.formatDateAsString(endDate, "dd/MM/yyyy"));
 				} else {
-					// this.showMessageStrip("cwsRequestDialogMStripId", "Please provide proper date range", "E", "CWSDurationDialog");
+					// this.showMessageStrip("opwnRequestDialogMStripId", "Please provide proper date range", "E", "CWSDurationDialog");
 					if (oEvent)
 						oEvent.getSource().setValue("");
 				}
@@ -1564,7 +1565,7 @@ sap.ui.define([
 			// var requestModel = this.modelAssignment("CWSRequest");
 			var startDate = this.AppModel.getProperty("/cwsRequest/createCWSRequest/START_DATE");
 			var endDate = this.AppModel.getProperty("/cwsRequest/createCWSRequest/END_DATE");
-			// this.closeMessageStrip("cwsRequestDialogMStripId", "CWSDurationDialog");
+			// this.closeMessageStrip("opwnRequestDialogMStripId", "CWSDurationDialog");
 			var message = "";
 			if (startDate && endDate && srcVal) {
 				var diffDays = Formatter.getDaysDiff(startDate, endDate);
@@ -1574,7 +1575,7 @@ sap.ui.define([
 				message = this.getI18n("CwsRequest.Request.SelectDates");
 			}
 			if (message) {
-				this.showMessageStrip("cwsRequestDialogMStripId", message, "E", "CWSDurationDialog");
+				this.showMessageStrip("opwnRequestDialogMStripId", message, "E", "CWSDurationDialog");
 				oEvent.getSource().setValue("");
 				this.AppModel.setProperty("/duration", "");
 			} else {

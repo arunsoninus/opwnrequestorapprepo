@@ -71,20 +71,23 @@
 						</HBox>
 						<Label visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}"/>
 						<HBox visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}">
-							<u:FileUploader id="massClaimsUploadId" placeholder="Upload Mass Requests..." uploadUrl="" fileType="xls,xlsx"
-								typeMissmatch="handletypemismatch" value="{ClaimRequest>/massUploadFile}"
+							<u:FileUploader id="massRequestsOpwnFileUploaderId" placeholder="Upload Mass Requests..." uploadUrl="" fileType="xls,xlsx"
+								typeMissmatch="handletypemismatch" change="onChangeMassUploadFile"
 								visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? true: false}"/>
 						</HBox>
+						<Label/>
+						<ObjectStatus visible="{AppModel>/visRequestFileName}" class="sapUiTinyMarginTop" title="Selected File"
+							text="{AppModel>/requestFileName}" state="Success"/>
 					</f:content>
 				</f:SimpleForm>
-				<MessageStrip id="cwsRequestDialogMStripId" class="sapUiTinyMargin"></MessageStrip>
+				<MessageStrip id="opwnRequestDialogMStripId" class="sapUiTinyMargin"></MessageStrip>
 			</layout:content>
 		</layout:VerticalLayout>
 		<buttons>
 			<Button text="Proceed" icon="sap-icon://process" press="onPressProceedToCreate"
 				visible="{= ${AppModel>/cwsRequest/massUploadRadioSelected} === true ? false: true}"/>
 			<Button text="Upload" icon="sap-icon://upload" press="onPressMassUploadTemplate"
-				visible="{= ${AppModel>/cwsRequest/SingleSubRadioSelected} === true ? false: true}"/>
+				visible="{= ${AppModel>/cwsRequest/SingleSubRadioSelected} === true ? false: true}" enabled="{AppModel>/visRequestFileName}"/>
 			<Button icon="sap-icon://decline" press="closeNewRequestTypeDialog" tooltip="Cancel"/>
 		</buttons>
 	</Dialog>
