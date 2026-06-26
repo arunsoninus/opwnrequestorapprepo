@@ -331,20 +331,20 @@ sap.ui.define([
 			);
 		},
 
-		_readDataUsingOdataModel: function (serviceUrl, oDataModel, component, aFilter, callBackFx) {
-			oDataModel.read(serviceUrl, {
-				filters: aFilter,
-				success: function (oData) {
-					if (oData) {
-						callBackFx(oData);
+		// _readDataUsingOdataModel: function (serviceUrl, oDataModel, component, aFilter, callBackFx) {
+		// 	oDataModel.read(serviceUrl, {
+		// 		filters: aFilter,
+		// 		success: function (oData) {
+		// 			if (oData) {
+		// 				callBackFx(oData);
 
-					}
-				}.bind(component),
-				error: function (oError) {
-					callBackFx(oError);
-				}
-			});
-		},
+		// 			}
+		// 		}.bind(component),
+		// 		error: function (oError) {
+		// 			callBackFx(oError);
+		// 		}
+		// 	});
+		// },
 		_loadDataUsingJsonModel: function (component, serviceUrl, oPayload, httpMethod, callBackFx) {
 			var oModel = new JSONModel();
 			var headers = Formatter._amendHeaderToken(component);

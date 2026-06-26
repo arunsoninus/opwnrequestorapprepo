@@ -41,16 +41,41 @@ sap.ui.define([
 					this.oRouter.getRoute("displayofn").attachPatternMatched(this._onClaimReportofn, this);
 				}
 			}
+
+			this._boundFlpBackBtn = this._flpBackBtn.bind(this);
+			this._registerShellBackNavigation();
+
+			// isTrusted === true  → real browser Back button press
+			// isTrusted === false → synthetic popstate from SAPUI5 hasher on navTo()
+			this._boundPopState = function (oEvent) {
+				if (oEvent.isTrusted) {
+					this._flpBackBtn(oEvent);
+				}
+			}.bind(this);
+			window.addEventListener("popstate", this._boundPopState);
+		},
+
+		_registerShellBackNavigation: function () {
+			var that = this;
+			if (sap.ushell && sap.ushell.Container) {
+				sap.ushell.Container.getServiceAsync("ShellUIService").then(function (oShellService) {
+					// SAP Build Work Zone (BTP Cloud Foundry)
+					oShellService.setBackNavigation(that._boundFlpBackBtn);
+				}).catch(function () {
+					// Fallback: Classic Fiori Launchpad (on-premise / Neo)
+					var oBackBtn = sap.ui.getCore().byId("backBtn");
+					if (oBackBtn) {
+						oBackBtn.detachBrowserEvent("click", that._boundFlpBackBtn);
+						oBackBtn.attachBrowserEvent("click", that._boundFlpBackBtn);
+					}
+				});
+			}
 		},
 
 		/**
 		 * Invoke at every point of Project Navigation
 		 */
 		_onProjectMatched: function (oEvent) {
-			//attach the press event to the fiori launchpad back button
-			if (sap.ui.getCore().byId("backBtn")) {
-				sap.ui.getCore().byId("backBtn").attachBrowserEvent("click", this._flpBackBtn, this);
-			}
 
 			if (sap.ushell) {
 				sap.ushell.Container.attachLogoutEvent(function (oLogOff) {
@@ -80,10 +105,6 @@ sap.ui.define([
 		},
 
 		_onClaimReportMatched: function (oEvent) {
-			//attach the press event to the fiori launchpad back button
-			if (sap.ui.getCore().byId("backBtn")) {
-				sap.ui.getCore().byId("backBtn").attachBrowserEvent("click", this._flpBackBtn, this);
-			}
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
 			this.viaClaimReport = true;
 			this._fnInitializeAppModel();
@@ -91,9 +112,6 @@ sap.ui.define([
 		},
 
 		_onClaimReportofn: function (oEvent) {
-			if (sap.ui.getCore().byId("backBtn")) {
-				sap.ui.getCore().byId("backBtn").attachBrowserEvent("click", this._flpBackBtn, this);
-			}
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
 			this.viaClaimofn = true;
 			this._fnInitializeAppModel();
@@ -538,7 +556,10 @@ sap.ui.define([
 			}
 		},
 
-		_flpBackBtn: function () {
+		_flpBackBtn: function (oEvent) {
+			if (!this.AppModel) {
+				return;
+			}
 			var isFlpBackButtonPressed = this.AppModel.getProperty("/isFlpBackButtonPressed");
 			var Status = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS");
 			if (isFlpBackButtonPressed != 'Y') {
@@ -554,16 +575,15 @@ sap.ui.define([
 			}
 			this.runAutoSave = false; //stop auto save
 			this._fnClearLocal();
+			Utility._fnAppModelSetProperty(this, "/cwsRequest/createCWSRequest", {}); // Clear cwrequest model
 		},
 
 		_taskInboxLoad: function (oEvent) {
-			//attach the press event to the fiori launchpad back button
-			if (sap.ui.getCore().byId("backBtn")) {
-				sap.ui.getCore().byId("backBtn").attachBrowserEvent("click", this._flpBackBtn, this);
+			if (sap.ushell && sap.ushell.Container) {
+				sap.ushell.Container.attachLogoutEvent(function (oLogOff) {
+					this._fnRequestLockHandling();
+				}.bind(this), false);
 			}
-			sap.ushell.Container.attachLogoutEvent(function (oLogOff) {
-				this._fnRequestLockHandling();
-			}.bind(this), false);
 			//get draft Id
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
 			this.taskId = oEvent.getParameter("arguments").taskId;
@@ -3004,7 +3024,18 @@ sap.ui.define([
 		},
 
 		onExit: function () {
-			this.runAutoSave = false; //stop auto save
+			this.runAutoSave = false;
+
+			if (this._boundPopState) {
+				window.removeEventListener("popstate", this._boundPopState);
+			}
+
+			if (sap.ushell && sap.ushell.Container) {
+				sap.ushell.Container.getServiceAsync("ShellUIService").then(function (oShellService) {
+					oShellService.setBackNavigation(null);
+				});
+			}
+
 			if ((this.viaRequestorForm || this.viaInbox) && !this.firstTimeUnlockRequest && this.unLockstop) {
 				this._fnRequestLockHandling();
 			}
