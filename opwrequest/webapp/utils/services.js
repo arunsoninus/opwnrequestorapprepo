@@ -592,7 +592,7 @@ sap.ui.define([
 				component,
 				function (response) {
 					if (response.success) {
-						let oResponse = (response && response.data && response.data.raw) ? response.data.raw : {};
+						let oResponse = (response && response.data && response.data.ecpWbsValidate) ? response.data.ecpWbsValidate : {};
 						callBackFx(oResponse);
 					} else {
 						sap.m.MessageBox.error(component.getI18n("CwsRequest.WbsError"));
