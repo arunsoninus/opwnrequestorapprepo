@@ -178,7 +178,7 @@ sap.ui.define([
 			// Begin of change - CW0084
 			var oViewModel = this.getView().getModel("ViewModel");
 			var oSorter = new Sorter({
-				path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "REQ_UNIQUE_ID",
+				path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "SUBMITTED_ON_TS",
 				descending: oViewModel.getProperty("/SortCwTable/sortDescending") !== "" ? oViewModel.getProperty("/SortCwTable/sortDescending") : true,
 			}),
 				oGroup,
@@ -200,7 +200,7 @@ sap.ui.define([
 				filters: aFilters
 			});
 			// var oSorter = new sap.ui.model.Sorter({
-			// 	path: "REQ_UNIQUE_ID",
+			// 	path: "SUBMITTED_ON_TS",
 			// 	descending: true
 			// });
 			// Utility._bindItems(this, "idOpwnRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
@@ -281,7 +281,7 @@ sap.ui.define([
 			var sPath = "OpwnSrvModel>" + Config.dbOperations.openRequestView;
 			this.GlobalFilterForTable = Utility._fnEssDraft(this);
 			var oSorter = new sap.ui.model.Sorter({
-				path: "REQ_UNIQUE_ID",
+				path: "SUBMITTED_ON_TS",
 				descending: true
 			});
 			Utility._bindItems(this, "idOpwnRequestTable", sPath, oSorter, this.oTemplate, this.GlobalFilterForTable);
@@ -316,7 +316,7 @@ sap.ui.define([
 				var oViewModel = this.getView().getModel("ViewModel"),
 					oSorter;
 				// var oSorter = new sap.ui.model.Sorter({
-				// 	path: "REQ_UNIQUE_ID",
+				// 	path: "SUBMITTED_ON_TS",
 				// 	descending: true
 				// });
 				if (oViewModel.getProperty("/GroupCwTable/groupKey") !== "") {
@@ -324,7 +324,7 @@ sap.ui.define([
 						true);
 				} else {
 					oSorter = new Sorter({
-						path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "REQ_UNIQUE_ID",
+						path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "SUBMITTED_ON_TS",
 						descending: oViewModel.getProperty("/SortCwTable/sortDescending") !== "" ? oViewModel.getProperty(
 							"/SortCwTable/sortDescending") : true,
 					});
@@ -398,7 +398,7 @@ sap.ui.define([
 				};
 			} else {
 				oSort = {
-					sortKey: "REQ_UNIQUE_ID",
+					sortKey: "SUBMITTED_ON_TS",
 					sortDescending: true
 				};
 			}
@@ -1153,7 +1153,7 @@ sap.ui.define([
 			var sPath = "OpwnSrvModel>" + Config.dbOperations.openRequestView;
 			var oViewModel = this.getView().getModel("ViewModel");
 			var oSorter = new Sorter({
-				path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "REQ_UNIQUE_ID",
+				path: oViewModel.getProperty("/SortCwTable/sortKey") !== "" ? oViewModel.getProperty("/SortCwTable/sortKey") : "SUBMITTED_ON_TS",
 				descending: oViewModel.getProperty("/SortCwTable/sortDescending") !== "" ? oViewModel.getProperty("/SortCwTable/sortDescending") : true,
 			});
 			oViewModel.setProperty("/SearchProperty", sValue);
