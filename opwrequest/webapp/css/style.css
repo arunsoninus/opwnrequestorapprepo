@@ -155,6 +155,17 @@
 .requestid .sapMObjStatusText {
     color: black !important;
     font-weight: bold !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.requestid .sapMObjStatusText.requestIdSelectable {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 

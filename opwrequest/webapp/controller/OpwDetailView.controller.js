@@ -34,11 +34,11 @@ sap.ui.define([
 					this.oRouter.getRoute("taskdetail").attachPatternMatched(this._taskInboxLoad, this);
 				}
 				if (this.oRouter.getRoute("displaydetail")) {
-					this.oRouter.getRoute("displaydetail").attachPatternMatched(this._onClaimReportMatched, this);
+					this.oRouter.getRoute("displaydetail").attachPatternMatched(this._onRunReportMatched, this);
 				}
 
 				if (this.oRouter.getRoute("displayofn")) {
-					this.oRouter.getRoute("displayofn").attachPatternMatched(this._onClaimReportofn, this);
+					this.oRouter.getRoute("displayofn").attachPatternMatched(this._onOfnReportMatched, this);
 				}
 			}
 
@@ -53,6 +53,36 @@ sap.ui.define([
 				}
 			}.bind(this);
 			window.addEventListener("popstate", this._boundPopState);
+
+			var oRequestIdStatus = this.getUIControl("opwnRequestIdStatus");
+			if (oRequestIdStatus) {
+				oRequestIdStatus.attachBrowserEvent("dblclick", this.onRequestIdDblClick, this);
+			}
+		},
+		/**
+		 * Request ID text is not selectable by default (to avoid accidental partial selection);
+		 * a double-click selects just the Request ID (not the trailing "(Submission Type)") so it
+		 * can be copied easily.
+		 */
+		onRequestIdDblClick: function (oEvent) {
+			var oTextDomRef = oEvent.currentTarget.querySelector(".sapMObjStatusText");
+			var oTextNode = oTextDomRef && oTextDomRef.firstChild;
+			var sRequestId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID");
+			if (!oTextNode || oTextNode.nodeType !== Node.TEXT_NODE || !sRequestId) {
+				return;
+			}
+			oTextDomRef.classList.add("requestIdSelectable");
+			var oSelection = window.getSelection();
+			var oRange = document.createRange();
+			oRange.setStart(oTextNode, 0);
+			oRange.setEnd(oTextNode, Math.min(sRequestId.length, oTextNode.textContent.length));
+			oSelection.removeAllRanges();
+			oSelection.addRange(oRange);
+
+			document.addEventListener("mousedown", function onDocMouseDown() {
+				oTextDomRef.classList.remove("requestIdSelectable");
+				document.removeEventListener("mousedown", onDocMouseDown);
+			});
 		},
 
 		_registerShellBackNavigation: function () {
@@ -104,14 +134,14 @@ sap.ui.define([
 			this.AppModel.setProperty("/isWbsChangeAllowed", false);
 		},
 
-		_onClaimReportMatched: function (oEvent) {
+		_onRunReportMatched: function (oEvent) {
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
 			this.viaClaimReport = true;
 			this._fnInitializeAppModel();
 			Utility._fnAppModelSetProperty(this, "/cwsRequest/createCWSRequest", []); // Clear cwrequest model
 		},
 
-		_onClaimReportofn: function (oEvent) {
+		_onOfnReportMatched: function (oEvent) {
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
 			this.viaClaimofn = true;
 			this._fnInitializeAppModel();
@@ -141,11 +171,11 @@ sap.ui.define([
 						var idx;
 						jQuery.sap.each(assistanceData, function (i, element) {
 							idx = oData.results.findIndex(x => x.ULU_C === element.STAFF_ULU);
-							element.STAFF_ULU_T = oData.results[idx].ULU_T;
+							element.STAFF_ULU_T = (idx > -1) ? oData.results[idx].ULU_T : "";
 							element.isFdluEnabled = Boolean(element.STAFF_ULU_T);
 
 							idx = oData.results.findIndex(x => x.FDLU_C === element.STAFF_FDLU);
-							element.STAFF_FDLU_T = oData.results[idx].FDLU_T;
+							element.STAFF_FDLU_T = (idx > -1) ? oData.results[idx].FDLU_T : "";
 						});
 						this.AppModel.setProperty("/cwsRequest/createCWSRequest/assistanceList", (assistanceData) ? assistanceData : []);
 					}
@@ -627,8 +657,8 @@ sap.ui.define([
 				this._fnGetOpwnRequestData();
 			} else {
 				this._fnHandleNewRequest();
+				this.hideBusyIndicator();
 			}
-			this.hideBusyIndicator();
 			this.AppModel.setProperty("/oSyncAttach", false);
 
 			// var serviceName = Config.dbOperations.metadataClaims;
@@ -676,8 +706,12 @@ sap.ui.define([
 								Utility._fnCrossAppNavigationToInbox();
 							}.bind(this));
 						}
+					} else {
+						this.hideBusyIndicator();
 					}
 				}.bind(this));
+			} else {
+				this.hideBusyIndicator();
 			}
 		},
 
@@ -949,8 +983,8 @@ sap.ui.define([
 
 				var aFilters = [],
 					sUrlParameters = "$select=FULL_NM",
-					oOpwnSrvModel = this.getComponentModel("OpwnSrvModel"),
-					sPath = "/UserLookups",
+					oCatalogSrvModel = this.getComponentModel("CatalogSrvModel"),
+					sPath = Config.dbOperations.activeInactiveUserLookup, // includes staff who have left, so a past approver's name still resolves
 					sIndexTask = oData.results.length - 1,
 					sTaskCompletedBy = oData.results[sIndexTask].TASK_COMPLETED_BY,
 					sTaskCompletedByNid = oData.results[sIndexTask].TASK_COMPLETED_BY_NID;
@@ -966,7 +1000,7 @@ sap.ui.define([
 				aFilters.push(new Filter({
 					filters: [new Filter("SF_STF_NUMBER", FilterOperator.EQ, sTaskCompletedBy)]
 				}));
-				this.readODataCallWithParameters(oOpwnSrvModel, sPath, aFilters, sUrlParameters, function (oData) {
+				this.readODataCallWithParameters(oCatalogSrvModel, sPath, aFilters, sUrlParameters, function (oData) {
 					if (oData.results.length) {
 						this.AppModel.setProperty("/APPROVED_BY_FULLNM", "(" + oData.results[0].FULL_NM + ")");
 						this.AppModel.setProperty("/APPROVED_BY", sTaskCompletedBy);
@@ -2989,6 +3023,7 @@ sap.ui.define([
 						var saveSource = 'onCloseSaveCall';
 						that.AppModel.setProperty("/oSourceCall", 'onCloseSaveCall');
 						that.onPressSaveDraftRequest(saveSource, null, true);
+						this.runAutoSave = false; //stop auto save
 						that.AppModel.setProperty("/onCloseViewIsSave", 'Y');
 						// that.onClose();
 					} else {

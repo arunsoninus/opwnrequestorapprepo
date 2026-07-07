@@ -91,7 +91,7 @@
 						<m:Text text="Date of Joining: {AppModel>/cwsRequest/createCWSRequest/JOIN_DATE}"/>
 						<m:Text class="eodRed" text="Official Last Day: {AppModel>/cwsRequest/createCWSRequest/LEAVING_DATE}"
 							visible="{=${AppModel>/cwsRequest/createCWSRequest/LEAVING_DATE}=== null ? false : true}"/>
-						<m:ObjectStatus title="Request ID"
+						<m:ObjectStatus id="opwnRequestIdStatus" title="Request ID"
 							text="{AppModel>/cwsRequest/createCWSRequest/REQUEST_ID} ({AppModel>/cwsRequest/createCWSRequest/SUBMISSION_TYPE_T})"
 							visible="{= ${AppModel>/cwsRequest/createCWSRequest/REQUEST_STATUS} !== '31' ? true : false }" class="requestid"/>
 					</m:VBox>

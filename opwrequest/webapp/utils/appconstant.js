@@ -16,6 +16,7 @@ sap.ui.define([
 		"showSaveButton": true,
 		"showSubmitButton": true,
 		"showWithdrawButton": false,
+		"showEditButtonApproved" : false,
 		"showRetractButton": false,
 		"showCheckButton": false,
 		"showRejectButton": false,

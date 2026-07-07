@@ -280,7 +280,7 @@ sap.ui.define([
 			// this.AppModel.setProperty("/isEditAllowed", data.editAllowed);
 			if (data && Object.keys(data).length > 0) {
 
-				this.AppModel.setProperty("/isEditAllowed", data.isEditAllowed);
+				this.AppModel.setProperty("/isEditAllowed", data.editAllowed);
 				this.AppModel.setProperty("/isadminDetailsEditAllowed", data.adminDetailsEditAllowed);
 				this.AppModel.setProperty("/isWbsChangeAllowed", data.wbsChangeAllowed);
 				this.AppModel.setProperty("/derivePropUsage", data.derivePropUsage);
