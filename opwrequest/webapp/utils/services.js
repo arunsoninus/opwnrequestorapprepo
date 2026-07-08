@@ -384,16 +384,18 @@ sap.ui.define([
 			);
 		},
 		deleteZipAttachmentOnCancel: async function (component, oParameter, callBackFx) {
-			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			// var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
+			var AttachmentSrvModel = component.getComponentModel("AttachmentSrvModel");
 			var oHeaders = HeaderHelper._headerToken();
 
 			this._readDataUsingOdataModel(
 				Config.dbOperations.deleteMassAttachment,
-				UtilitySrvModel,
+				AttachmentSrvModel,
 				component,
 				[],
 				function (response) {
-					callBackFx(response.deleteAttachmentById);
+					var apiEntity = Config.dbOperations.deleteMassAttachment.substring(1);
+					callBackFx(response[apiEntity]);
 				}.bind(component),
 				oHeaders,
 				oParameter

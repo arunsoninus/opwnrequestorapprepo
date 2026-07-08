@@ -1317,6 +1317,10 @@ sap.ui.define([
 			return MessageBox.error(this.getI18n("CwsRequest.MassUpload.ZipOnly"));
 		},
 
+		handlefilesizeExceed: function (oEvent) {
+			return MessageBox.error(this.getI18n("CwsRequest.MassUpload.MaxSizeExceed"));
+		},
+
 		onChangeFileUploadZip: function (oEvent) {
 			var oFiles = oEvent.getSource();
 			var file = oFiles.oFileUpload.files[0];

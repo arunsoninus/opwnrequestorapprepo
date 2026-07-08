@@ -3206,7 +3206,8 @@ sap.ui.define([
 					this,
 					[],
 					function (response) {
-						if (response && response.deleteAttachment && response.deleteAttachment.status === "S") {
+						var apiEntity = Config.dbOperations.deleteAttachment.substring(1);
+						if (response && response[apiEntity] && response[apiEntity].status === "S") {
 							this._fnRefreshAttachment();
 						} else {
 							MessageBox.error(this.getI18n("AttachmentFailedToDelete"));
