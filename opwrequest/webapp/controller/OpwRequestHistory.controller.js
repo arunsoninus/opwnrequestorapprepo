@@ -308,7 +308,7 @@ sap.ui.define([
 				this.getDraftRequests();
 			} else if (sKey === "New") {
 				this.onPressCreateOpwnRequest();
-				this.AppModel.setProperty("/cwsRequest/SingleSubRadioSelected", true);
+				this.AppModel.setProperty("/cwsRequest/newRequest/SingleSubRadioSelected", true);
 				this.getUIControl("idOpwnRequestTable").setVisible(false);
 			} else {
 				this.GlobalFilterForTable = Utility._handleIconTabBarSelect(this, sKey);
@@ -548,8 +548,8 @@ sap.ui.define([
 					oEvent.getSource().setValue();
 				}
 			}
-			var validationMsg = Validation.validateDatesNDuration(this);
-			var data = this.AppModel.getProperty("/cwsRequest/createCWSRequest");
+			var validationMsg = Validation.validateDatesNDuration(this, "/cwsRequest/newRequest");
+			var data = this.AppModel.getProperty("/cwsRequest/newRequest");
 			var validateLeaving = Validation.validateLeavingDate(data, this);
 			if (validationMsg) {
 				oEvent.getSource().setValue("");
@@ -565,7 +565,7 @@ sap.ui.define([
 		onPressCreateOpwnRequest: function () {
 			this.initializeModel();
 			this.AppModel.setProperty("/cwsRequest/isMassUploadFeatureVisible", false);
-			this.AppModel.setProperty("/cwsRequest/createCWSRequest", {});
+			this.AppModel.setProperty("/cwsRequest/newRequest", $.extend(true, {}, AppConstant.pristineNewRequest));
 			this.AppModel.setProperty("/InstructionMessage", "");
 			this.AppModel.setProperty("/isTypeSelected", false);
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/noOfHeaderRows", 4);
@@ -573,12 +573,14 @@ sap.ui.define([
 		},
 		requestTypeSelection: function () {
 			//Open a Dialog to show the Entire Data
-			this.newRequestTypeDialog = sap.ui.xmlfragment("NewRequestTypeSelectionDialog",
-				"nus.edu.sg.opwrequest.view.fragments.NewRequestTypeSelectionDialog", this);
-			this.getView().addDependent(this.newRequestTypeDialog);
-			this.newRequestTypeDialog.setEscapeHandler(function () {
-				return;
-			});
+			if (!this.newRequestTypeDialog) {
+				this.newRequestTypeDialog = sap.ui.xmlfragment("NewRequestTypeSelectionDialog",
+					"nus.edu.sg.opwrequest.view.fragments.NewRequestTypeSelectionDialog", this);
+				this.getView().addDependent(this.newRequestTypeDialog);
+				this.newRequestTypeDialog.setEscapeHandler(function () {
+					return;
+				});
+			}
 			this.initializeNewOpwnRequest();
 			this._fnRequestType();
 			Utility.retrieveAttachmentTypes(this);
@@ -589,7 +591,7 @@ sap.ui.define([
 			var aFilter = [],
 				andFilter = [],
 				// serviceUrl = "/CwsAppConfigs",
-				oKey = this.AppModel.getProperty("/cwsRequest/createCWSRequest/TYPE");
+				oKey = this.AppModel.getProperty("/cwsRequest/newRequest/TYPE");
 			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
 			andFilter.push(new Filter("REFERENCE_KEY", FilterOperator.EQ, oKey));
 			aFilter.push(new sap.ui.model.Filter(andFilter, true));
@@ -609,7 +611,7 @@ sap.ui.define([
 		initializeNewOpwnRequest: function () {
 			var oCont = [],
 				oStaffID = this.AppModel.getProperty("/staffInfo/STAFF_ID");
-			this.AppModel.setProperty("/cwsRequest/SingleSubRadioSelected", true);
+			this.AppModel.setProperty("/cwsRequest/newRequest/SingleSubRadioSelected", true);
 			this.AppModel.setProperty("/requestFileName", "");
 			this.AppModel.setProperty("/visRequestFileName", false);
 			this.AppModel.setProperty("/isEditableType", true);
@@ -621,7 +623,7 @@ sap.ui.define([
 				}
 			}.bind(this));
 			if (oCont.length === 0) {
-				this.AppModel.setProperty("/cwsRequest/createCWSRequest/TYPE", this.getI18n("CwsRequest.Internal"));
+				this.AppModel.setProperty("/cwsRequest/newRequest/TYPE", this.getI18n("CwsRequest.Internal"));
 				this.AppModel.setProperty("/isEditableType", false);
 			}
 			if (oCont.length === 1 && oCont[0].STAFF_USER_GRP === this.getI18n("CwsRequest.DepAdmin") && oCont[0].PROCESS_CODE === this.getI18n(
@@ -676,19 +678,19 @@ sap.ui.define([
 		 * On Press Proceed to Create Request
 		 */
 		onPressProceedToCreate: function () {
-			var type = this.AppModel.getProperty("/cwsRequest/createCWSRequest/TYPE");
-			var startDate = this.AppModel.getProperty("/cwsRequest/createCWSRequest/START_DATE");
-			var endDate = this.AppModel.getProperty("/cwsRequest/createCWSRequest/END_DATE");
-			var durationDays = this.AppModel.getProperty("/cwsRequest/createCWSRequest/DURATION_DAYS");
-			var amount = this.AppModel.getProperty("/cwsRequest/createCWSRequest/AMOUNT");
-			var fullname = this.AppModel.getProperty("/cwsRequest/createCWSRequest/FULL_NM");
+			var type = this.AppModel.getProperty("/cwsRequest/newRequest/TYPE");
+			var startDate = this.AppModel.getProperty("/cwsRequest/newRequest/START_DATE");
+			var endDate = this.AppModel.getProperty("/cwsRequest/newRequest/END_DATE");
+			var durationDays = this.AppModel.getProperty("/cwsRequest/newRequest/DURATION_DAYS");
+			var amount = this.AppModel.getProperty("/cwsRequest/newRequest/AMOUNT");
+			var fullname = this.AppModel.getProperty("/cwsRequest/newRequest/FULL_NM");
 			var that = this;
-			var data = this.AppModel.getProperty("/cwsRequest/createCWSRequest");
+			var data = this.AppModel.getProperty("/cwsRequest/newRequest");
 			var validateLeaving = Validation.validateLeavingDate(data, this);
 			this.closeMessageStrip("opwnRequestDialogMStripId", "NewRequestTypeSelectionDialog");
 
 			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
-			var sStaffId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID");
+			var sStaffId = this.AppModel.getProperty("/cwsRequest/newRequest/STAFF_ID");
 
 			var filters = that.generateFilter("SF_STF_NUMBER", [sStaffId]);
 
@@ -742,7 +744,7 @@ sap.ui.define([
 
 		_payrollCheck: function (startDate, endDate) {
 			var payrollReq = {
-				"staffId": this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID"),
+				"staffId": this.AppModel.getProperty("/cwsRequest/newRequest/STAFF_ID"),
 				"startDate": startDate,
 				"endDate": endDate
 			};
@@ -750,7 +752,7 @@ sap.ui.define([
 			Services.getPayrollArea(this, payrollReq, function (payrollData) {
 				var oCode = payrollData.statusCode;
 				if (oCode === "S") {
-					this.fnPaymentAmount('N');
+					this.fnPaymentAmount('N', null, null, "/cwsRequest/newRequest");
 				} else {
 					this.showMessageStrip("opwnRequestDialogMStripId", payrollData.message, "E",
 						"NewRequestTypeSelectionDialog");
@@ -826,6 +828,7 @@ sap.ui.define([
 			this.onSelectIconFilter("Draft");
 			if (this.newRequestTypeDialog) {
 				this.newRequestTypeDialog.destroy(true);
+				this.newRequestTypeDialog = null;
 			}
 		},
 		/**
@@ -896,7 +899,7 @@ sap.ui.define([
 			component.AppModel.setProperty("/cwsRequest/createCWSRequest/massUploadRequestPayload", []);
 			var fileUploader = component.getUIControl("massRequestsOpwnFileUploaderId", "NewRequestTypeSelectionDialog");
 			var file = fileUploader.oFileUpload.files[0];
-			var claimType = component.AppModel.getProperty("/cwsRequest/createCWSRequest/TYPE");
+			var claimType = component.AppModel.getProperty("/cwsRequest/newRequest/TYPE");
 			var noOfHeaderRows = component.AppModel.getProperty("/cwsRequest/createCWSRequest/noOfHeaderRows");
 
 			if (!noOfHeaderRows) {

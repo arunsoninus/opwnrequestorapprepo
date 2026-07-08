@@ -247,17 +247,18 @@ sap.ui.define([
 			}
 		},
 
-		fnPaymentAmount: function (key, model, filter) {
+		fnPaymentAmount: function (key, model, filter, sBasePath) {
+			sBasePath = sBasePath || "/cwsRequest/createCWSRequest";
 			var oDeptRole = this.AppModel.getProperty("/isDeptOHRSS");
 			var paymentListObj = {
-				"REQ_UNIQUE_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID"),
-				"REQUEST_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID"),
+				"REQ_UNIQUE_ID": this.AppModel.getProperty(sBasePath + "/REQ_UNIQUE_ID"),
+				"REQUEST_ID": this.AppModel.getProperty(sBasePath + "/REQUEST_ID"),
 				"ROLE": (oDeptRole === true) ? this.getI18n("CwsRequest.OHRSS") : this.AppModel.getProperty("/userRole"),
-				"START_DATE": this.formatDate(this.AppModel.getProperty("/cwsRequest/createCWSRequest/START_DATE")),
-				"END_DATE": this.formatDate(this.AppModel.getProperty("/cwsRequest/createCWSRequest/END_DATE")),
-				"AMOUNT": this.AppModel.getProperty("/cwsRequest/createCWSRequest/AMOUNT"),
+				"START_DATE": this.formatDate(this.AppModel.getProperty(sBasePath + "/START_DATE")),
+				"END_DATE": this.formatDate(this.AppModel.getProperty(sBasePath + "/END_DATE")),
+				"AMOUNT": this.AppModel.getProperty(sBasePath + "/AMOUNT"),
 				// "NOOFMONTHS": parseInt(this.AppModel.getProperty("/Month")),
-				"STAFF_ID": this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID")
+				"STAFF_ID": this.AppModel.getProperty(sBasePath + "/STAFF_ID")
 			};
 
 			Services.getPaymentList(this, paymentListObj, function (paymentData) {
@@ -824,21 +825,21 @@ sap.ui.define([
 					var sPath = aContexts[i].getPath();
 					var selectedObj = this.AppModel.getProperty(sPath);
 					selectedObj.STF_NUMBER = selectedObj.STF_NUMBER.replace("(" + selectedObj.NUSNET_ID + ")", "").trim();
-					this.AppModel.setProperty("/cwsRequest/createCWSRequest/STAFF_ID", selectedObj.STF_NUMBER);
-					this.AppModel.setProperty("/cwsRequest/createCWSRequest/FULL_NM", selectedObj.FULL_NM);
-					this.AppModel.setProperty("/cwsRequest/createCWSRequest/STAFF_NUSNET_ID", selectedObj.NUSNET_ID);
-					this.AppModel.setProperty("/cwsRequest/createCWSRequest/CONCURRENT_STAFF_ID", selectedObj.SF_STF_NUMBER);
+					this.AppModel.setProperty("/cwsRequest/newRequest/STAFF_ID", selectedObj.STF_NUMBER);
+					this.AppModel.setProperty("/cwsRequest/newRequest/FULL_NM", selectedObj.FULL_NM);
+					this.AppModel.setProperty("/cwsRequest/newRequest/STAFF_NUSNET_ID", selectedObj.NUSNET_ID);
+					this.AppModel.setProperty("/cwsRequest/newRequest/CONCURRENT_STAFF_ID", selectedObj.SF_STF_NUMBER);
 
-					this.AppModel.setProperty("/cwsRequest/createCWSRequest/START_DATE", null);
-					this.AppModel.setProperty("/cwsRequest/createCWSRequest/END_DATE", null);
+					this.AppModel.setProperty("/cwsRequest/newRequest/START_DATE", null);
+					this.AppModel.setProperty("/cwsRequest/newRequest/END_DATE", null);
 					if (selectedObj.LEAVING_DATE) {
 						var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
 							pattern: "d MMM, yyyy"
 						});
 						var eodDate = oDateFormat.format(new Date(selectedObj.LEAVING_DATE));
-						this.AppModel.setProperty("/cwsRequest/createCWSRequest/LEAVING_DATE", eodDate);
+						this.AppModel.setProperty("/cwsRequest/newRequest/LEAVING_DATE", eodDate);
 					} else {
-						this.AppModel.setProperty("/cwsRequest/createCWSRequest/LEAVING_DATE", null);
+						this.AppModel.setProperty("/cwsRequest/newRequest/LEAVING_DATE", null);
 					}
 				}
 			}

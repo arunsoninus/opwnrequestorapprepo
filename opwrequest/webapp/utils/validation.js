@@ -13,10 +13,11 @@ sap.ui.define([
 			/**
 			 * On Enter Duration
 			 */
-			validateDatesNDuration: function (component) {
-				var startDate = component.AppModel.getProperty("/cwsRequest/createCWSRequest/START_DATE");
-				var endDate = component.AppModel.getProperty("/cwsRequest/createCWSRequest/END_DATE");
-				var durationDays = component.AppModel.getProperty("/cwsRequest/createCWSRequest/DURATION_DAYS");
+			validateDatesNDuration: function (component, sBasePath) {
+				sBasePath = sBasePath || "/cwsRequest/createCWSRequest";
+				var startDate = component.AppModel.getProperty(sBasePath + "/START_DATE");
+				var endDate = component.AppModel.getProperty(sBasePath + "/END_DATE");
+				var durationDays = component.AppModel.getProperty(sBasePath + "/DURATION_DAYS");
 				var message = "";
 				startDate = (startDate) ? startDate.setHours(0, 0, 0, 0) : null;
 				endDate = (endDate) ? endDate.setHours(0, 0, 0, 0) : null;

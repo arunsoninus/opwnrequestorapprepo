@@ -113,10 +113,25 @@ sap.ui.define([
 				}.bind(this), false);
 			}
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
+			if (this._project === "NEW") {
+				this._fnCapturePendingNewRequestValues();
+			}
 			this._fnInitializeAppModel();
 			this.viaRequestorForm = true;
 			this.firstTimeUnlockRequest = false;
 			this.unLockstop = true;
+		},
+		/**
+		 * The New Request dialog stages its fields (type, staff, dates, duration, amount) under the
+		 * dedicated /cwsRequest/newRequest node, which nothing else in the app writes to. Snapshot
+		 * that node here, before _fnInitializeAppModel() replaces AppModel wholesale (discarding
+		 * /cwsRequest/newRequest along with everything else), so _fnHandleNewRequest can merge it
+		 * onto the freshly reset /cwsRequest/createCWSRequest.
+		 */
+		_fnCapturePendingNewRequestValues: function () {
+			var oCurrentAppModel = this.getComponentModel("AppModel");
+			var oPending = oCurrentAppModel ? oCurrentAppModel.getProperty("/cwsRequest/newRequest") : null;
+			this._pendingNewRequestValues = oPending ? $.extend(true, {}, oPending) : null;
 		},
 		_fnInitializeAppModel: function () {
 			this.showBusyIndicator();
@@ -761,12 +776,33 @@ sap.ui.define([
 		 * Handle New Request Submission
 		 */
 		_fnHandleNewRequest: function () {
-			// var userRole = this.AppModel.getProperty("/userRole");
-			// var staffId = this.AppModel.getProperty("/loggedInUserStfNumber");
-			// var loggedInUserNid = this.AppModel.getProperty("/primaryAssigment/NUSNET_ID");
-			// var selectedStaffNid = this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_NUSNET_ID");
-			var selectedsid = this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID");
+			// The New Request dialog stages its fields under /cwsRequest/newRequest (see
+			// _fnCapturePendingNewRequestValues). Transfer that snapshot onto the freshly-reset
+			// /cwsRequest/createCWSRequest, then invalidate /cwsRequest/newRequest so it can't leak
+			// into a later "New Request" cycle. This invalidation can't happen synchronously right
+			// after navTo() back in OpwRequestHistory - the router's route-matched handler that reads
+			// this snapshot fires asynchronously after the hash change, so the staging node has to
+			// survive until it's actually consumed here.
+			var oPending = this._pendingNewRequestValues || {};
+			this._pendingNewRequestValues = null;
+
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/STAFF_ID", oPending.STAFF_ID);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/FULL_NM", oPending.FULL_NM);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/STAFF_NUSNET_ID", oPending.STAFF_NUSNET_ID);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/CONCURRENT_STAFF_ID", oPending.CONCURRENT_STAFF_ID);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/START_DATE", oPending.START_DATE);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/END_DATE", oPending.END_DATE);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/DURATION_DAYS", oPending.DURATION_DAYS);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/AMOUNT", oPending.AMOUNT);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/LEAVING_DATE", oPending.LEAVING_DATE);
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/TYPE", oPending.TYPE || this.getI18n("CwsRequest.Internal"));
+
+			this.AppModel.setProperty("/cwsRequest/newRequest", $.extend(true, {}, AppConstant.pristineNewRequest));
+
+			var selectedsid = (this.AppModel.getProperty("/cwsRequest/createCWSRequest/STAFF_ID")) ? this.AppModel.getProperty(
+				"/cwsRequest/createCWSRequest/STAFF_ID") : this.AppModel.getProperty("/loggedInUserStfNumber");
 			var concurrentStaffId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/CONCURRENT_STAFF_ID");
+
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", []);
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", []);
 			this.AppModel.setProperty("/cwsRequest/createCWSRequest/LOCATION", "L");
@@ -2056,6 +2092,14 @@ sap.ui.define([
 			this.lastSuccessRun = new Date();
 			if (oEvent) {
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest", this.ocwsRequest);
+				// Re-derive the dependent options lists (/subTypes, /requestTypes) from the
+				// just-restored REQUEST_TYPE *before* forcing a refresh - otherwise the Request Type /
+				// Sub-Type controls re-evaluate their selected value against whatever stale items list
+				// was left over from mid-edit changes, find no match, and fail to display the restored
+				// value even though the underlying model property is correct.
+				Utility.retrieveSubTypes(this);
+				Utility.retrieveRequestTypes(this, true, function () {
+				}.bind(this));
 				this.AppModel.refresh(true);
 			}
 			this.ocwsRequest = "";

@@ -994,7 +994,7 @@ sap.ui.define([
 			}
 		},
 		_clearModelBeforeNavigationToCWDetailView: function (component) {
-			component.AppModel.setProperty("/cwsRequest/createCWSRequest", AppConstant.cwsRequest.createCWSRequest); //to clear before navigating to the next screens
+			component.AppModel.setProperty("/cwsRequest/createCWSRequest", $.extend(true, {}, AppConstant.pristineCreateCWSRequest)); //to clear before navigating to the next screens
 		},
 		_fnSubmitClaim: function (component, callBackFx) {
 			var serviceUrl = Config.dbOperations.postClaim;

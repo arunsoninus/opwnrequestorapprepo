@@ -3,7 +3,7 @@ sap.ui.define([
 ], function (Device) {
 	"use strict";
 
-	return {
+	var oAppConstant = {
 		"attachmentList": [],
 		"showSearchField": false,
 		"rejectionRemarks": "",
@@ -147,6 +147,20 @@ sap.ui.define([
 		"cwsRequest": {
 			"selectedDates": [],
 			"disabledDates": [],
+			"newRequest": {
+				"TYPE": "",
+				"FULL_NM": "",
+				"STAFF_ID": "",
+				"STAFF_NUSNET_ID": "",
+				"CONCURRENT_STAFF_ID": "",
+				"START_DATE": null,
+				"END_DATE": null,
+				"DURATION_DAYS": null,
+				"AMOUNT": null,
+				"LEAVING_DATE": null,
+				"SingleSubRadioSelected": true,
+				"massUploadRadioSelected": false
+			},
 			"createCWSRequest": {
 				// "START_DATE": "2021-01-01",
 				// "END_DATE": "2021-12-31",
@@ -298,4 +312,18 @@ sap.ui.define([
 		}
 
 	};
+
+	// AppModel.setData(oAppConstant) (see BaseController/*.controller.js _fnInitializeAppModel /
+	// initializeModel) shares this object by reference rather than cloning it, so
+	// /cwsRequest/newRequest and /cwsRequest/createCWSRequest end up being the very object
+	// AppModel writes into - resetting them by cloning FROM oAppConstant.cwsRequest.* just clones
+	// the corrupted live data. These two snapshots are taken once, up front, and kept outside
+	// oAppConstant.cwsRequest so no AppModel.setProperty() call can ever reach them; reset call
+	// sites must clone from these, not from oAppConstant.cwsRequest.newRequest/createCWSRequest.
+	oAppConstant.pristineNewRequest = JSON.parse(JSON.stringify(oAppConstant.cwsRequest.newRequest));
+	oAppConstant.pristineCreateCWSRequest = JSON.parse(JSON.stringify(oAppConstant.cwsRequest.createCWSRequest));
+	Object.freeze(oAppConstant.pristineNewRequest);
+	Object.freeze(oAppConstant.pristineCreateCWSRequest);
+
+	return oAppConstant;
 });
