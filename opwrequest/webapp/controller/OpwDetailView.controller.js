@@ -2092,14 +2092,6 @@ sap.ui.define([
 			this.lastSuccessRun = new Date();
 			if (oEvent) {
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest", this.ocwsRequest);
-				// Re-derive the dependent options lists (/subTypes, /requestTypes) from the
-				// just-restored REQUEST_TYPE *before* forcing a refresh - otherwise the Request Type /
-				// Sub-Type controls re-evaluate their selected value against whatever stale items list
-				// was left over from mid-edit changes, find no match, and fail to display the restored
-				// value even though the underlying model property is correct.
-				Utility.retrieveSubTypes(this);
-				Utility.retrieveRequestTypes(this, true, function () {
-				}.bind(this));
 				this.AppModel.refresh(true);
 			}
 			this.ocwsRequest = "";
@@ -2506,7 +2498,8 @@ sap.ui.define([
 					} else if (cwsResponse.ACTION_CODE === "RETRACT") {
 						Utility._fnSuccessDialog(this, cwsResponse.message, function () {
 							// localStorage.setItem("New_DraftID", cwsResponse.REQ_UNIQUE_ID);
-							this._project = "cwsRequestViews('" + cwsResponse.ID + "')";
+							// this._project = "cwsRequestViews('" + cwsResponse.ID + "')";
+							this._project = Config.dbOperations.openRequestView +"('" + cwsResponse.ID + "')";
 							this._fnGetOpwnRequestData();
 						}.bind(this));
 					} else if (cwsResponse.ACTION_CODE === "CLOSE") {
