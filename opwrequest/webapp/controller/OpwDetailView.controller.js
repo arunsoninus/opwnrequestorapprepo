@@ -3314,6 +3314,13 @@ sap.ui.define([
 						var apiEntity = Config.dbOperations.deleteAttachment.substring(1);
 						if (response && response[apiEntity] && response[apiEntity].status === "S") {
 							this._fnRefreshAttachment();
+							// Keep the pre-edit snapshot (restored by Cancel) in sync so a
+							// successfully deleted attachment doesn't reappear on Cancel.
+							if (this.ocwsRequest && this.ocwsRequest.attachmentList && this.ocwsRequest.attachmentList.results) {
+								this.ocwsRequest.attachmentList.results = this.ocwsRequest.attachmentList.results.filter(function (oExisting) {
+									return oExisting.ATTCHMNT_ID !== oAttachment.ATTCHMNT_ID;
+								});
+							}
 						} else {
 							MessageBox.error(this.getI18n("AttachmentFailedToDelete"));
 						}
