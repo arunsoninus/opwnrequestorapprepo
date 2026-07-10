@@ -230,7 +230,13 @@ sap.ui.define([
 			aFilter.push(new sap.ui.model.Filter(andFilter, true));
 			if (this.AppModel.getProperty("/oCopyMode") === "Copied") {
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", []);
-			} else {
+				return Promise.resolve();
+			}
+			// Returns a Promise so callers that need the attachment list to be authoritative
+			// before proceeding (e.g. onPressEdit/onPressEditApproved snapshotting the pre-edit
+			// attachment list for the Cancel diff) can await this fetch instead of racing it -
+			// this read is async and previously nothing waited on it.
+			return new Promise(function (resolve) {
 				catalogSrvModel.read(Config.dbOperations.attachmentsView, {
 					filters: aFilter,
 					success: function (oData) {
@@ -240,12 +246,13 @@ sap.ui.define([
 						} else {
 							this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", []);
 						}
+						resolve();
 					}.bind(this),
 					error: function (oError) {
-
+						resolve();
 					}
 				});
-			}
+			}.bind(this));
 		},
 
 		// Begin of change - CCEV3364
@@ -2048,18 +2055,28 @@ sap.ui.define([
 		},
 
 		onPressEdit: function (key) {
-			this.AppModel.setProperty("/oEditKey", key);
-			this.ocwsRequest = $.extend(true, {}, this.AppModel.getProperty("/cwsRequest/createCWSRequest"));
-			this.AppModel.setProperty("/showEditButton", false);
-			this.AppModel.setProperty("/showUpdateButton", true);
-			this.AppModel.setProperty("/showCancelButton", true);
-			this.AppModel.setProperty("/showRejectButton", false);
-			this.AppModel.setProperty("/showApproveButton", false);
-			this.AppModel.setProperty("/isFormEditable", true);
-			this.fnPaymentAmount();
-			// Begin of change - CCEV3364
-			this._editProgramManager();
-			// End of change - CCEV3364
+			this.showBusyIndicator();
+			// The attachment list is fetched asynchronously (_fnRefreshAttachment) and nothing
+			// previously awaited it, so the pre-edit snapshot below could be taken before that
+			// fetch resolved - leaving this.ocwsRequest's attachmentList empty/stale and causing
+			// the Cancel session-upload diff to treat pre-existing attachments as newly uploaded
+			// (deleting them too). Awaiting a fresh fetch here guarantees the snapshot reflects
+			// the true backend attachment list before Edit mode (and any upload) can begin.
+			this._fnRefreshAttachment().then(function () {
+				this.hideBusyIndicator();
+				this.AppModel.setProperty("/oEditKey", key);
+				this.ocwsRequest = $.extend(true, {}, this.AppModel.getProperty("/cwsRequest/createCWSRequest"));
+				this.AppModel.setProperty("/showEditButton", false);
+				this.AppModel.setProperty("/showUpdateButton", true);
+				this.AppModel.setProperty("/showCancelButton", true);
+				this.AppModel.setProperty("/showRejectButton", false);
+				this.AppModel.setProperty("/showApproveButton", false);
+				this.AppModel.setProperty("/isFormEditable", true);
+				this.fnPaymentAmount();
+				// Begin of change - CCEV3364
+				this._editProgramManager();
+				// End of change - CCEV3364
+			}.bind(this));
 		},
 
 		_editProgramManager: function () {
@@ -2090,6 +2107,93 @@ sap.ui.define([
 
 		onPressCancel: function (oEvent) {
 			this.lastSuccessRun = new Date();
+
+			// onPressCancel is also invoked with no oEvent from handleAfterPosting() straight after a
+			// successful Save/Update/Resubmit, purely to reset the edit-mode button flags - not to discard
+			// the edit. Any attachments uploaded this session were just legitimately persisted as part of
+			// that save, so the session-upload cleanup (and its confirm prompt) must only run for a real,
+			// user-initiated Cancel click (which always carries a UI5 press event).
+			var aSessionUploadedAttachments = oEvent ? this._fnGetSessionUploadedAttachments() : [];
+			if (aSessionUploadedAttachments.length > 0) {
+				MessageBox.confirm(
+					this.getI18n("CwsRequest.Cancel.AttachmentRevertConfirm"), {
+					title: this.getI18n("CwsRequest.CfrmMsg.Title"),
+					actions: [this.getI18n("CwsRequest.CfrmMsg.Action.Yes"), this.getI18n("CwsRequest.CfrmMsg.Action.No")],
+					emphasizedAction: this.getI18n("CwsRequest.CfrmMsg.Action.Yes"),
+					onClose: function (oAction) {
+						if (oAction === this.getI18n("CwsRequest.CfrmMsg.Action.Yes")) {
+							this._fnDeleteSessionAttachmentsThenCancel(oEvent, aSessionUploadedAttachments);
+						}
+					}.bind(this)
+				}
+				);
+			} else {
+				this._fnProceedWithCancel(oEvent);
+			}
+		},
+
+		/**
+		 * Diff the attachments currently shown against the pre-edit snapshot (this.ocwsRequest)
+		 * to find attachments uploaded during the current Edit session - these are the ones
+		 * that need to be explicitly deleted on Cancel, since uploads persist to the backend
+		 * immediately and are not covered by the in-memory form revert.
+		 */
+		_fnGetSessionUploadedAttachments: function () {
+			var aCurrentAttachments = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList/results") || [];
+			var aOriginalAttachments = (this.ocwsRequest && this.ocwsRequest.attachmentList && this.ocwsRequest.attachmentList.results) || [];
+			var aOriginalAttachmentIds = aOriginalAttachments.map(function (oAttachment) {
+				return oAttachment.ATTCHMNT_ID;
+			});
+			return aCurrentAttachments.filter(function (oAttachment) {
+				return aOriginalAttachmentIds.indexOf(oAttachment.ATTCHMNT_ID) === -1;
+			});
+		},
+
+		/**
+		 * Deletes attachments uploaded during the current Edit session, then proceeds with the
+		 * usual cancel/revert flow regardless of individual delete outcomes (the form revert will
+		 * already drop them from the visible list since they postdate the ocwsRequest snapshot).
+		 */
+		_fnDeleteSessionAttachmentsThenCancel: async function (oEvent, aAttachments) {
+			this.showBusyIndicator();
+			var AttachmentSrvModel = this.getComponentModel("AttachmentSrvModel");
+			var draftId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID");
+			var oProcessCode = this.AppModel.getProperty("/cwsRequest/createCWSRequest/PROCESS_CODE");
+			var apiEntity = Config.dbOperations.deleteAttachment.substring(1);
+			var bHadError = false;
+
+			for (var i = 0; i < aAttachments.length; i++) {
+				var oParameter = {
+					draftId: draftId,
+					attachmentId: aAttachments[i].ATTCHMNT_ID,
+					processCode: oProcessCode
+				};
+				try {
+					var response = await Services._readDataUsingOdataModel(
+						Config.dbOperations.deleteAttachment,
+						AttachmentSrvModel,
+						this,
+						[],
+						null,
+						null,
+						oParameter
+					);
+					if (!response || !response[apiEntity] || response[apiEntity].status !== "S") {
+						bHadError = true;
+					}
+				} catch (oError) {
+					bHadError = true;
+				}
+			}
+
+			this.hideBusyIndicator();
+			if (bHadError) {
+				MessageBox.error(this.getI18n("AttachmentFailedToDelete"));
+			}
+			this._fnProceedWithCancel(oEvent);
+		},
+
+		_fnProceedWithCancel: function (oEvent) {
 			if (oEvent) {
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest", this.ocwsRequest);
 				this.AppModel.refresh(true);
@@ -2134,19 +2238,27 @@ sap.ui.define([
 			if (!sValid) {
 				MessageBox.error(this.getI18nVariables("CwsRequest.Request.ChangeRequestPending", [this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_ID")]));
 			} else {
-				this.AppModel.setProperty("/oEditKey", key);
-				this.ocwsRequest = $.extend(true, {}, this.AppModel.getProperty("/cwsRequest/createCWSRequest"));
-				this.AppModel.setProperty("/showEditButtonApproved", false);
-				this.AppModel.setProperty("/isFormEditable", true);
-				this.AppModel.setProperty("/showUpdateButton", true);
-				this.AppModel.setProperty("/showCancelButton", true);
-				this.AppModel.setProperty("/showCloseButton", false);
-				this.AppModel.setProperty("/showWithdrawButton", false);
-				this.fnPaymentAmount();
-				this.validateStartDate();
-				// Begin of change - CCEV3364
-				this._editProgramManager();
-				// End of change - CCEV3364
+				this.showBusyIndicator();
+				// See onPressEdit for why the pre-edit snapshot must wait for a fresh attachment
+				// fetch: without it, this.ocwsRequest could snapshot a stale/empty attachment
+				// list and the Cancel session-upload diff would then treat this approved
+				// request's pre-existing attachments as newly uploaded, deleting them too.
+				this._fnRefreshAttachment().then(function () {
+					this.hideBusyIndicator();
+					this.AppModel.setProperty("/oEditKey", key);
+					this.ocwsRequest = $.extend(true, {}, this.AppModel.getProperty("/cwsRequest/createCWSRequest"));
+					this.AppModel.setProperty("/showEditButtonApproved", false);
+					this.AppModel.setProperty("/isFormEditable", true);
+					this.AppModel.setProperty("/showUpdateButton", true);
+					this.AppModel.setProperty("/showCancelButton", true);
+					this.AppModel.setProperty("/showCloseButton", false);
+					this.AppModel.setProperty("/showWithdrawButton", false);
+					this.fnPaymentAmount();
+					this.validateStartDate();
+					// Begin of change - CCEV3364
+					this._editProgramManager();
+					// End of change - CCEV3364
+				}.bind(this));
 			}
 		},
 
