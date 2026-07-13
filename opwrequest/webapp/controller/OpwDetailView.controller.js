@@ -3368,8 +3368,9 @@ sap.ui.define([
 					this,
 					[],
 					function (response) {
-						if (response && response.fetchAttachment && response.fetchAttachment.status === "S") {
-							this._fnDownloadFile(response.fetchAttachment.attachmentFiles);
+						var apiEntity = Config.dbOperations.fetchAttachment.substring(1);
+						if (response && response[apiEntity] && response[apiEntity].status === "S") {
+							this._fnDownloadFile(response[apiEntity].attachmentFiles);
 						} else {
 							MessageBox.error(this.getI18n("AttachmentFailedToDownload"));
 						}
@@ -3432,7 +3433,8 @@ sap.ui.define([
 					this,
 					[],
 					function (oData) {
-						var result = oData.fetchAttachment || oData;
+						var apiEntity = Config.dbOperations.fetchAttachment.substring(1);
+						var result = oData[apiEntity] || oData;
 						if (result.status === "S") {
 							this._fnOpenFile(result.attachmentFiles);
 							this.hideBusyIndicator();
