@@ -834,23 +834,23 @@ sap.ui.define([
 		/**
 		 * on Press MAss Upload Claim Request
 		 */
-		onPressMassUploadClaimRequests: function () {
-			this.AppModel.setProperty("/cwsRequest/isMassUploadFeatureVisible", true);
-			this.AppModel.setProperty("/visibility/ClaimTypeDialog/claimTypeDialogStaffId", false);
-			this.AppModel.setProperty("/requiredUiControl/ClaimTypeDialog/claimTypeDialogStaffId", false);
-			this.claimTypeSelection();
-		},
-		claimTypeSelection: function () {
-			//Open a Dialog to show the Entire Data
-			this.claimTypeDialog = sap.ui.xmlfragment("ClaimTypeDialog",
-				"nus.edu.sg.opwrequest.view.fragments.ClaimTypeDialog", this);
-			this.claimTypeDialog.addStyleClass("sapUiSizeCompact");
-			this.getView().addDependent(this.claimTypeDialog);
-			this.claimTypeDialog.open();
-			this.initializeNewClaimRequest();
-			this.settingUluFdluValues();
-			this.settingClaimTypeValue();
-		},
+		// onPressMassUploadClaimRequests: function () {
+		// 	this.AppModel.setProperty("/cwsRequest/isMassUploadFeatureVisible", true);
+		// 	this.AppModel.setProperty("/visibility/ClaimTypeDialog/claimTypeDialogStaffId", false);
+		// 	this.AppModel.setProperty("/requiredUiControl/ClaimTypeDialog/claimTypeDialogStaffId", false);
+		// 	this.claimTypeSelection();
+		// },
+		// claimTypeSelection: function () {
+		// 	//Open a Dialog to show the Entire Data
+		// 	this.claimTypeDialog = sap.ui.xmlfragment("ClaimTypeDialog",
+		// 		"nus.edu.sg.opwrequest.view.fragments.ClaimTypeDialog", this);
+		// 	this.claimTypeDialog.addStyleClass("sapUiSizeCompact");
+		// 	this.getView().addDependent(this.claimTypeDialog);
+		// 	this.claimTypeDialog.open();
+		// 	this.initializeNewClaimRequest();
+		// 	this.settingUluFdluValues();
+		// 	this.settingClaimTypeValue();
+		// },
 		settingClaimTypeValue: function () {
 			ClaimTypeDataHandling._settingClaimTypeValue(this);
 		},
@@ -1249,7 +1249,6 @@ sap.ui.define([
 		},
 
 		generateLineItem: function (dataArray) {
-			var oView = this;
 			var spreadsheetData = dataArray.flatMap(data => {
 				const baseData = {
 					"SERIAL_NO": data.SERIAL_NO,
@@ -1631,14 +1630,14 @@ sap.ui.define([
 			this.GlobalFilterForTable = Utility._fnEssAllStatus(this);
 			Services._readDataUsingOdataModel(Config.dbOperations.openRequestView, OpwnSrvModel, this, this.GlobalFilterForTable, function (oData) {
 				if (oData.results.length > 0) {
-					this._fnExportClaims(oData.results);
+					this._fnExportMassUploadRequests(oData.results);
 				}
 				this.getView().setBusy(false);
 			}.bind(this));
 		},
-		_fnExportClaims: function (oLoadData) {
+		_fnExportMassUploadRequests: function (oLoadData) {
 			var EdmType = exportLibrary.EdmType;
-			var aCols = Utility._createColumnClaimResponse(this, EdmType, false);
+			var aCols = Utility._createColumnForRequests(this, EdmType, false);
 			var oSettings = {
 				workbook: {
 					columns: aCols,

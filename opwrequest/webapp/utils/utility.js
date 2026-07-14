@@ -1190,7 +1190,7 @@ sap.ui.define([
 			component.AppModel.setProperty("/cwsRequest/createCWSRequest", uiData);
 		},
 
-		_createColumnClaimResponse: function (component, EdmType) {
+		_createColumnForRequests: function (component, EdmType) {
 			var aCols = [{
 				label: component.getI18n("CwsRequest.RequestTable.RequestId"),
 				property: 'REQUEST_ID',
