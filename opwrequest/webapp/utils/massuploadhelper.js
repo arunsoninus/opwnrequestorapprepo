@@ -135,12 +135,12 @@ sap.ui.define([
 			}, {
 				label: 'Start Date',
 				property: 'START_DATE',
-				type: EdmType.DateTime,
+				type: EdmType.String,
 				width: '25'
 			}, {
 				label: 'End Date',
 				property: 'END_DATE',
-				type: EdmType.DateTime,
+				type: EdmType.String,
 				width: '25'
 			}, {
 				label: 'Duration',

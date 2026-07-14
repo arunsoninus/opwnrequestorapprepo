@@ -1254,10 +1254,10 @@ sap.ui.define([
 				const baseData = {
 					"SERIAL_NO": data.SERIAL_NO,
 					"STAFF_ID": data.STAFF_ID,
-					"START_DATE": data.START_DATE,
-					"END_DATE": data.END_DATE,
+					"START_DATE": Formatter.dateFormatUTCone(data.START_DATE),
+					"END_DATE": Formatter.dateFormatUTCone(data.END_DATE),
 					"DURATION_DAYS": data.DURATION_DAYS,
-					"SUB_TYPE_T": data.SUB_TYPE,
+					"SUB_TYPE": data.SUB_TYPE_DESC,
 					"amount": data.amount,
 					"ULU": data.ULU,
 					"FDLU": data.FDLU,
