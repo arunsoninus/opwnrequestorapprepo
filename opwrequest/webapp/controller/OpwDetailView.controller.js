@@ -509,11 +509,6 @@ sap.ui.define([
 
 		onUploadChange: function () {
 			this.showBusyIndicator();
-			// var serviceUrl = Config.dbOperations.uploadAttachment;
-			var AttachmentSrvModel = this.getComponentModel("AttachmentSrvModel");
-			var serviceUrl = AttachmentSrvModel.sServiceUrl.replace(/\/$/, '') + Config.dbOperations.uploadAttachment;
-			// var oView = this.getView(),
-			// 	oFiles = sap.ui.core.Fragment.byId(oView.getId(), "fileUploader");
 			var oFiles = this.getUIControl("fileUploader");
 			var draftId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID");
 			var oProcessCode = this.AppModel.getProperty("/cwsRequest/createCWSRequest/PROCESS_CODE");
@@ -530,43 +525,45 @@ sap.ui.define([
 					this.hideBusyIndicator();
 					return MessageBox.error(this.getI18n("CwsRequest.Upload.MaxSize"));
 				}
-				var form = new FormData();
-				form.append("files", file, file.name);
-				form.append("processCode", oProcessCode);
-				form.append("draftId", draftId);
-				form.append("fileName", file.name);
-				form.append("attachmentType", attachmentTypeDesc);
-				//added role as well
+				// Validate the cumulative size of all attachments (existing + new) does not exceed 10 MB.
+				if (this._getTotalAttachmentSize() + file.size > 10000000) {
+					this.hideBusyIndicator();
+					oFiles.clear();
+					this.AppModel.setProperty("/fileName", "");
+					this.AppModel.setProperty("/visfileName", false);
+					return MessageBox.error(this.getI18n("CwsRequest.Upload.MaxTotalSize"));
+				}
 				var role = this.AppModel.getProperty("/userRole");
-				form.append("role", role);
-				var oHeaders = Utility._headerToken(this);
-				delete oHeaders["Content-Type"];
-				var settings = {
-					"url": serviceUrl,
-					"method": "POST",
-					"timeout": 0,
-					"headers": oHeaders,
-					"processData": false,
-					"mimeType": "multipart/form-data",
-					"contentType": false,
-					"data": form
+				var oUploadParams = {
+					file: file,
+					processCode: oProcessCode,
+					draftId: draftId,
+					attachmentType: attachmentTypeDesc,
+					role: role
 				};
-				$.ajax(settings)
-					.done(function (response) {
+				Services.uploadAttachment(
+					this,
+					oUploadParams,
+					function (response) {
 						var oResponse = JSON.parse(response);
 						if (oResponse.status === "S") {
+							// Remember this file's size (keyed by name; duplicate names are disallowed)
+							// so the cumulative-size validation can account for it on later uploads.
+							this._oAttachmentSizes = this._oAttachmentSizes || {};
+							this._oAttachmentSizes[file.name] = file.size;
 							this._fnRefreshAttachment();
 							oFiles.clear();
 						} else {
 							this.handleErrorDialog(response);
 						}
-					}.bind(this))
-					.fail(function (response) {
+					}.bind(this),
+					function (response) {
 						this.handleErrorDialog(response);
-					}.bind(this))
-					.always(function () {
+					}.bind(this),
+					function () {
 						this.hideBusyIndicator();
-					}.bind(this));
+					}.bind(this)
+				);
 			} else {
 				this.hideBusyIndicator();
 				return MessageToast.show(this.getI18n("CwsRequest.Upload.SelectFile"));
@@ -584,6 +581,18 @@ sap.ui.define([
 			this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Attachments.Note2"));
 			// return MessageBox.error(this.getI18n("CwsRequest.Attachments.Note2"));
 		},
+
+		// Sum the sizes of the currently listed attachments. Sizes are captured per file
+		// at upload time (see onUploadChange); items no longer in the list (e.g. deleted)
+		// are naturally excluded since we iterate the current attachment list.
+		_getTotalAttachmentSize: function () {
+			var aList = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList/results") || [];
+			var oSizes = this._oAttachmentSizes || {};
+			return aList.reduce(function (iSum, oAttachment) {
+				return iSum + (oSizes[oAttachment.ATTACHMENT_NAME] || 0);
+			}, 0);
+		},
+
 		handleUploadComplete: function () {
 			this._fnRefreshAttachment();
 		},

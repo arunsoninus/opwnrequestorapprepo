@@ -433,6 +433,60 @@ sap.ui.define([
 				});
 		},
 
+		/**
+		 * Uploads a single attachment file via multipart/form-data.
+		 *
+		 * @param {object} component - the calling controller/component (provides the AttachmentSrvModel).
+		 * @param {object} oParams - upload payload: { file, processCode, draftId, attachmentType, role }.
+		 * @param {function} [fnDone] - success callback, receives the raw ajax response.
+		 * @param {function} [fnFail] - failure callback, receives the raw ajax error response.
+		 * @param {function} [fnAlways] - always callback, invoked after done/fail.
+		 */
+		uploadAttachment: function (component, oParams, fnDone, fnFail, fnAlways) {
+			var AttachmentSrvModel = component.getComponentModel("AttachmentSrvModel");
+			var serviceUrl = AttachmentSrvModel.sServiceUrl.replace(/\/$/, '') + Config.dbOperations.uploadAttachment;
+
+			var form = new FormData();
+			form.append("files", oParams.file, oParams.file.name);
+			form.append("processCode", oParams.processCode);
+			form.append("draftId", oParams.draftId);
+			form.append("fileName", oParams.file.name);
+			form.append("attachmentType", oParams.attachmentType);
+			//added role as well
+			form.append("role", oParams.role);
+
+			var oHeaders = HeaderHelper._headerToken(component);
+			delete oHeaders["Content-Type"];
+
+			var settings = {
+				"url": serviceUrl,
+				"method": "POST",
+				"timeout": 0,
+				"headers": oHeaders,
+				"processData": false,
+				"mimeType": "multipart/form-data",
+				"contentType": false,
+				"data": form
+			};
+
+			$.ajax(settings)
+				.done(function (response) {
+					if (typeof fnDone === "function") {
+						fnDone(response);
+					}
+				})
+				.fail(function (oError) {
+					if (typeof fnFail === "function") {
+						fnFail(oError);
+					}
+				})
+				.always(function () {
+					if (typeof fnAlways === "function") {
+						fnAlways();
+					}
+				});
+		},
+
 		_loadDataAttachment: function (component, oParameter, callBackFx) {
 			var UtilitySrvModel = component.getComponentModel("UtilitySrvModel");
 			var oHeaders = HeaderHelper._headerToken();

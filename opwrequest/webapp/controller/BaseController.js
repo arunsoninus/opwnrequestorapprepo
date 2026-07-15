@@ -69,7 +69,15 @@ sap.ui.define([
 			if (checkObj) {
 				updatedVal = checkObj.replace(/\,/g, '');
 				updatedVal = Math.round(updatedVal * 100) / 100;
-				updatedVal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+				if (updatedVal < 0) {
+					// Negative amounts are not allowed - invalidate the field via value state and reset to 0.
+					oEvent.getSource().setValueState("Error");
+					oEvent.getSource().setValue("0");
+					updatedVal = 0;
+				} else {
+					oEvent.getSource().setValueState("None");
+					updatedVal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+				}
 			}
 			this.AppModel.setProperty(oEvent.getSource().mBindingInfos.value.parts[0].path, updatedVal);
 			this.AppModel.refresh(true);
