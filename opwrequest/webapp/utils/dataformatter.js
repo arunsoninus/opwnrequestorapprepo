@@ -638,7 +638,21 @@ sap.ui.define([],
 			},
 
 			convertDatesnew: function (date) {
+				if (!date) {
+					return "";
+				}
+				// Handle OData V2 epoch format "/Date(1784082592369+0000)/" which
+				// new Date() cannot parse (results in "Invalid Date").
+				if (typeof date === "string") {
+					var oMatch = date.match(/\/Date\((-?\d+)([+-]\d+)?\)\//);
+					if (oMatch) {
+						date = parseInt(oMatch[1], 10);
+					}
+				}
 				var dateObj = new Date(date);
+				if (isNaN(dateObj.getTime())) {
+					return "";
+				}
 				var options = {
 					day: "numeric",
 					month: "short",

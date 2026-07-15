@@ -628,6 +628,7 @@ sap.ui.define([
 			this.runAutoSave = false; //stop auto save
 			this._fnClearLocal();
 			Utility._fnAppModelSetProperty(this, "/cwsRequest/createCWSRequest", {}); // Clear cwrequest model
+			Utility._fnAppModelSetProperty(this, "/oRequestHistory", []); // Clear request history data
 		},
 
 		_taskInboxLoad: function (oEvent) {
