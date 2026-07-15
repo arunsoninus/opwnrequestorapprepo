@@ -11,24 +11,22 @@
 				htmlText="{i18n>CwsRequest.Attachments.InfoList1}{i18n>CwsRequest.Attachments.InfoList2}{i18n>CwsRequest.Attachments.InfoList3}{i18n>CwsRequest.Attachments.InfoList4}{i18n>CwsRequest.Attachments.InfoList5}{i18n>CwsRequest.Attachments.InfoList6}{i18n>CwsRequest.Attachments.InfoList7}{i18n>CwsRequest.Attachments.InfoList8}{i18n>CwsRequest.Attachments.InfoList9}"/>
 			<Text/>
 			<VBox visible="{AppModel>/isFormEditable}">
-				<Label text="Document Type" required="true"
-					visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}"/>
+				<Label text="Document Type" required="true"/>
 				<HBox>
 					<ComboBox showSecondaryValues="true" placeholder="Select Document Type..." width="14em"
 						valueState="{AppModel>/cwsRequest/validationRequest/cbDoctypeVState}"
 						valueStateText="{AppModel>/cwsRequest/validationRequest/cbDoctypeVStateText}" editable="{AppModel>/isFormEditable}"
 						selectedKey="{AppModel>/cwsRequest/createCWSRequest/attachmentType}" items="{AppModel>/attachmentTypes}" change="onSelectDocumentType"
-						visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}">
+						enabled="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length &gt;= 5 ? false : true}">
 						<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
 					</ComboBox>
 					<u:FileUploader class="sapUiSmallMarginBegin" change="onChangeFileUpload" id="fileUploader" name="myFileUpload" tooltip="Upload Attachments"
 						uploadComplete="handleUploadComplete" buttonOnly="true" fileSizeExceed="handleFileSizeExceed" maximumFileSize="10"
 						maximumFilenameLength="100" filenameLengthExceed="handleFilenameLength" sameFilenameAllowed="false"
 						fileType="{i18n>CwsRequest.Attachments.AllowedExtensions}" typeMissmatch="handlefileTypemismatch"
-						visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}"
-						enabled="{AppModel>/isFormEditable}"/>
-					<Button class="sapUiSmallMarginBegin" text="Upload File" icon="sap-icon://upload" press="onUploadFile" enabled="{AppModel>/visfileName}"
-						visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length >= 5 ? false : true}"></Button>
+						enabled="{= ${AppModel>/isFormEditable} &amp;&amp; ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length &lt; 5}"/>
+					<Button class="sapUiSmallMarginBegin" text="Upload File" icon="sap-icon://upload" press="onUploadFile"
+						enabled="{= ${AppModel>/visfileName} &amp;&amp; ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length &lt; 5}"></Button>
 				</HBox>
 				<ObjectStatus visible="{AppModel>/visfileName}" class="sapUiSmallMarginTop" title="Selected File" text="{AppModel>/fileName}"
 					state="Success"/>
