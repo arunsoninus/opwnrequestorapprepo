@@ -34,7 +34,7 @@
 				visible="{= ${AppModel>/cwsRequest/createCWSRequest/attachmentType} === 'ATT04' ? true : false}"/>-->
 			</VBox>
 			<Text/>
-			<List mode="{=${AppModel>/isFormEditable}=== true ? 'Delete': 'None'}" delete="handleDeleteAttachment" enableBusyIndicator="true"
+			<List mode="None" enableBusyIndicator="true"
 				items="{ path: 'AppModel>/cwsRequest/createCWSRequest/attachmentList/results' }">
 				<headerToolbar>
 					<OverflowToolbar>
@@ -58,6 +58,9 @@
 						</VBox>
 						<VBox width="5%" alignContent="End">
 							<Button type="Transparent" icon="sap-icon://download" press="handleDownloadPress" class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
+							<Button type="Transparent" icon="sap-icon://delete" press="handleDeleteAttachment" tooltip="Delete"
+								visible="{AppModel>/isFormEditable}" enabled="{= ${AppModel>isSessionUpload} !== false }"
+								class="sapUiSmallMarginBegin"/>
 						</VBox>
 					</HBox>
 					<!--</l:HorizontalLayout>-->

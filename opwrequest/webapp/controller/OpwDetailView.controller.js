@@ -243,6 +243,9 @@ sap.ui.define([
 						if (oData.results.length) {
 							this.AppModel.setProperty("/oSyncAttach", false);
 							this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList", oData);
+							// Re-stamp deletability: a backend refresh replaces the results array, so
+							// newly uploaded (session) attachments become deletable while pre-edit ones stay disabled.
+							this._fnMarkAttachmentDeletability();
 						} else {
 							this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", []);
 						}
@@ -2082,6 +2085,9 @@ sap.ui.define([
 				this.AppModel.setProperty("/showRejectButton", false);
 				this.AppModel.setProperty("/showApproveButton", false);
 				this.AppModel.setProperty("/isFormEditable", true);
+				// Only attachments uploaded during this Edit session may be deleted; flag the
+				// existing (pre-edit) attachments so their Delete affordance stays disabled.
+				this._fnMarkAttachmentDeletability();
 				this.fnPaymentAmount();
 				// Begin of change - CCEV3364
 				this._editProgramManager();
@@ -2157,6 +2163,41 @@ sap.ui.define([
 			return aCurrentAttachments.filter(function (oAttachment) {
 				return aOriginalAttachmentIds.indexOf(oAttachment.ATTCHMNT_ID) === -1;
 			});
+		},
+
+		/**
+		 * Whether the given attachment was uploaded during the current Edit session (and is
+		 * therefore deletable). While editing an existing request, this.ocwsRequest holds the
+		 * pre-edit snapshot; any attachment already present in that snapshot is a previously
+		 * uploaded one and must NOT be deletable. When there is no snapshot (e.g. creating a
+		 * new request), there is no "previous" attachment, so everything is deletable.
+		 */
+		_fnIsSessionUploadedAttachment: function (oAttachment) {
+			if (!this.ocwsRequest || !this.ocwsRequest.attachmentList || !this.ocwsRequest.attachmentList.results) {
+				return true;
+			}
+			return !this.ocwsRequest.attachmentList.results.some(function (oOriginal) {
+				return oOriginal.ATTCHMNT_ID === oAttachment.ATTCHMNT_ID;
+			});
+		},
+
+		/**
+		 * Stamp each currently shown attachment with an isSessionUpload flag so the attachment
+		 * list can show the Delete affordance only for attachments uploaded during this Edit
+		 * session. Must be re-run whenever the attachment list is (re)loaded, since a backend
+		 * refresh replaces the results array and drops the flag.
+		 */
+		_fnMarkAttachmentDeletability: function () {
+			var aResults = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentList/results");
+			if (!aResults || !aResults.length) {
+				return;
+			}
+			aResults.forEach(function (oAttachment) {
+				oAttachment.isSessionUpload = this._fnIsSessionUploadedAttachment(oAttachment);
+			}.bind(this));
+			// Assign a fresh array reference so the JSONModel detects the change and re-evaluates
+			// the per-item Delete button bindings.
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", aResults.slice());
 		},
 
 		/**
@@ -2259,6 +2300,9 @@ sap.ui.define([
 					this.ocwsRequest = $.extend(true, {}, this.AppModel.getProperty("/cwsRequest/createCWSRequest"));
 					this.AppModel.setProperty("/showEditButtonApproved", false);
 					this.AppModel.setProperty("/isFormEditable", true);
+					// Only attachments uploaded during this Edit session may be deleted; flag the
+					// existing (pre-edit) attachments so their Delete affordance stays disabled.
+					this._fnMarkAttachmentDeletability();
 					this.AppModel.setProperty("/showUpdateButton", true);
 					this.AppModel.setProperty("/showCancelButton", true);
 					this.AppModel.setProperty("/showCloseButton", false);
@@ -3305,9 +3349,11 @@ sap.ui.define([
 			this.lastSuccessRun = new Date();
 			try {
 				this.showBusyIndicator();
-				var oList = oEvent.getSource(),
-					oItem = oEvent.getParameter("listItem"),
-					sPath = oItem.getBindingContext("AppModel").getPath();
+				// Invoked either from the list delete event (listItem param) or from the per-item
+				// Delete button (source carries the binding context).
+				var oItem = oEvent.getParameter("listItem");
+				var sPath = oItem ? oItem.getBindingContext("AppModel").getPath()
+					: oEvent.getSource().getBindingContext("AppModel").getPath();
 				var oAttachment = this.AppModel.getProperty(sPath);
 				//fetch rate Type and rate Amount 
 				var draftId = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID");
