@@ -57,10 +57,12 @@
 							<Text text="{AppModel>ATTACHMENT_TYPE}"/>
 						</VBox>
 						<VBox width="5%" alignContent="End">
-							<Button type="Transparent" icon="sap-icon://download" press="handleDownloadPress" class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
-							<Button type="Transparent" icon="sap-icon://delete" press="handleDeleteAttachment" tooltip="Delete"
-								visible="{AppModel>/isFormEditable}" enabled="{= ${AppModel>isSessionUpload} !== false }"
-								class="sapUiSmallMarginBegin"/>
+							<HBox>
+								<Button type="Transparent" icon="sap-icon://download" press="handleDownloadPress" class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
+								<Button type="Transparent" icon="sap-icon://delete" press="handleDeleteAttachment" tooltip="Delete"
+									visible="{AppModel>/isFormEditable}" enabled="{= ${AppModel>isSessionUpload} !== false }"
+									class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
+							</HBox>
 						</VBox>
 					</HBox>
 					<!--</l:HorizontalLayout>-->
