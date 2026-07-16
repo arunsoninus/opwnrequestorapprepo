@@ -21,7 +21,7 @@
 						<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
 					</ComboBox>
 					<u:FileUploader class="sapUiSmallMarginBegin" change="onChangeFileUpload" id="fileUploader" name="myFileUpload" tooltip="Upload Attachments"
-						uploadComplete="handleUploadComplete" buttonOnly="true" fileSizeExceed="handleFileSizeExceed" maximumFileSize="10"
+						uploadComplete="handleUploadComplete" buttonOnly="true" fileSizeExceed="handleFileSizeExceed" maximumFileSize="5"
 						maximumFilenameLength="100" filenameLengthExceed="handleFilenameLength" sameFilenameAllowed="false"
 						fileType="{i18n>CwsRequest.Attachments.AllowedExtensions}" typeMissmatch="handlefileTypemismatch"
 						enabled="{= ${AppModel>/isFormEditable} &amp;&amp; ${AppModel>/cwsRequest/createCWSRequest/attachmentList/results/}.length &lt; 5}"/>
@@ -45,25 +45,29 @@
 					</OverflowToolbar>
 				</headerToolbar>
 				<CustomListItem highlight="Success">
-					<HBox>
-						<VBox width="4%">
+					<HBox width="100%" alignItems="Center">
+						<VBox>
 							<core:Icon size="2rem" src="{parts: [ {path:'AppModel>ATTACHMENT_NAME'}], formatter: '.formatter.attachmentIconSet'}"
 								class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom"/>
 						</VBox>
-						<VBox width="92%" class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom">
+						<VBox class="sapUiSmallMarginBegin sapUiSmallMarginTopBottom">
+							<layoutData>
+								<FlexItemData growFactor="1" shrinkFactor="1" minWidth="0"/>
+							</layoutData>
 							<Link text="{AppModel>ATTACHMENT_NAME}" press="openAttachment"
 								visible="{parts: [ {path:'AppModel>ATTACHMENT_NAME'}], formatter: '.formatter.attachmentLink'}"/>
 							<Text text="{AppModel>ATTACHMENT_NAME}" visible="{parts: [ {path:'AppModel>ATTACHMENT_NAME'}], formatter: '.formatter.attachmentLinkv'}"/>
 							<Text text="{AppModel>ATTACHMENT_TYPE}"/>
 						</VBox>
-						<VBox width="5%" alignContent="End">
-							<HBox>
-								<Button type="Transparent" icon="sap-icon://download" press="handleDownloadPress" class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
-								<Button type="Transparent" icon="sap-icon://delete" press="handleDeleteAttachment" tooltip="Delete"
-									visible="{AppModel>/isFormEditable}" enabled="{= ${AppModel>isSessionUpload} !== false }"
-									class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
-							</HBox>
-						</VBox>
+						<HBox justifyContent="End" alignItems="Center">
+							<layoutData>
+								<FlexItemData shrinkFactor="0"/>
+							</layoutData>
+							<Button type="Transparent" icon="sap-icon://download" press="handleDownloadPress" class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
+							<Button type="Transparent" icon="sap-icon://delete" press="handleDeleteAttachment" tooltip="Delete"
+								visible="{AppModel>/isFormEditable}" enabled="{= ${AppModel>isSessionUpload} !== false }"
+								class="sapUiSmallMarginBegin sapUiMediumMarginTopBottom"/>
+						</HBox>
 					</HBox>
 					<!--</l:HorizontalLayout>-->
 				</CustomListItem>
