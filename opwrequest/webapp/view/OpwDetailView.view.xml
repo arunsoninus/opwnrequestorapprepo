@@ -59,8 +59,6 @@
 						enabled="{= ${AppModel>/isClaimLocked} ? false : true}" visible="{= ${AppModel>/showSaveButton} === true ? true : false }"/>
 					<m:Button id="submit" icon="sap-icon://activate" press="onPressSubmit" text="Submit" type="Transparent"
 						enabled="{= ${AppModel>/isClaimLocked} ? false : true}" visible="{= ${AppModel>/showSubmitButton} === true ? true : false }"/>
-					<m:Button id="check" icon="sap-icon://accept" press="onPressCheck" text="Check" type="Transparent"
-						enabled="{= ${AppModel>/isClaimLocked} ? false : true}" visible="{= ${AppModel>/showCheckButton} === true ? true : false }"/>
 					<m:Button id="approve" icon="sap-icon://accept" press="onPressApprove" text="Approve" type="Transparent"
 						enabled="{= ${AppModel>/isClaimLocked} ? false : true}" visible="{= ${AppModel>/showApproveButton} === true ? true : false }"/>
 					<m:Button id="reject" icon="sap-icon://decline" press="onPressReject" text="Reject" type="Transparent"

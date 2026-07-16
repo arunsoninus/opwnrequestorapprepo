@@ -18,7 +18,6 @@ sap.ui.define([
 		"showWithdrawButton": false,
 		"showEditButtonApproved" : false,
 		"showRetractButton": false,
-		"showCheckButton": false,
 		"showRejectButton": false,
 		"showVerifyButton": false,
 		"showApproveButton": false,

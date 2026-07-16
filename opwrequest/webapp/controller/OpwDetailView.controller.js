@@ -2313,6 +2313,7 @@ sap.ui.define([
 						this.persistentOperationCalled(aSaveObj);
 					}.bind(this));
 				} else {
+					this.showBusyIndicator();
 					this.onPostComment();
 					this.persistentOperationCalled(aSaveObj);
 				}
@@ -2347,6 +2348,12 @@ sap.ui.define([
 			var aSaveObj = this.getSaveObject(saveOrSubmit);
 			if (aSaveObj.wbsList.length > 0) {
 				aSaveObj.wbsList = aSaveObj.wbsList.filter(obj => !this.isEmpty(obj.WBS));
+			}
+			// Show the busy indicator only for a genuine Save-button click (which passes a UI5
+			// press event). Auto-save and other programmatic callers pass a string source and
+			// must stay silent so background saves don't flash the busy overlay.
+			if (saveSource && typeof saveSource.getSource === "function") {
+				this.showBusyIndicator();
 			}
 			this.onPostComment();
 			this.persistentOperationCalled(aSaveObj);

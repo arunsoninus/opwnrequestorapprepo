@@ -444,7 +444,6 @@ sap.ui.define([
 			Utility._fnAppModelSetProperty(this, "/showSubmitButton", false);
 			Utility._fnAppModelSetProperty(this, "/showWithdrawButton", false);
 			Utility._fnAppModelSetProperty(this, "/showRetractButton", false);
-			Utility._fnAppModelSetProperty(this, "/showCheckButton", false);
 			Utility._fnAppModelSetProperty(this, "/showRejectButton", false);
 			Utility._fnAppModelSetProperty(this, "/showVerifyButton", false);
 			Utility._fnAppModelSetProperty(this, "/showApproveButton", false);
@@ -1066,7 +1065,9 @@ sap.ui.define([
 						aParameter.inputList.push({
 							"DRAFT_ID": reqUniqueId
 						});
+						this.showBusyIndicator();
 						Services.performDraftDeletion(this, aParameter, function (oResponse) {
+							this.hideBusyIndicator();
 							if (!oResponse.isError) {
 								if (oEvent !== "D") {
 									MessageBox.success(this.getI18n("CwsRequest.Delete.Success"));
