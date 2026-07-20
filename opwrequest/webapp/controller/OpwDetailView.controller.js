@@ -391,7 +391,7 @@ sap.ui.define([
 				};
 
 				Services._loadDataAttachment(this, oParameter, function (syncResp) {
-					if (syncResp.attachmentFiles && syncResp.attachmentFiles[0].status === "S") {
+					if (syncResp.syncResultsByRequest && syncResp.syncResultsByRequest[0].status === "S") {
 						this._fnRefreshAttachment();
 						this.hideBusyIndicator();
 					} else {
