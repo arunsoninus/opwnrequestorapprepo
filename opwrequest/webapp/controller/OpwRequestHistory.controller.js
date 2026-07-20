@@ -1251,16 +1251,17 @@ sap.ui.define([
 		generateLineItem: function (dataArray) {
 			var spreadsheetData = dataArray.flatMap(data => {
 				const baseData = {
-					"SERIAL_NO": data.SERIAL_NO,
+					"serialNo": data.SERIAL_NO,
 					"STAFF_ID": data.STAFF_ID,
+					"FULL_NAME": data.FULL_NAME,
 					"START_DATE": Formatter.dateFormatUTCone(data.START_DATE),
 					"END_DATE": Formatter.dateFormatUTCone(data.END_DATE),
 					"DURATION_DAYS": data.DURATION_DAYS,
 					"SUB_TYPE": data.SUB_TYPE_DESC,
-					"amount": data.amount,
+					"amount": data.AMOUNT,
 					"ULU": data.ULU,
 					"FDLU": data.FDLU,
-					"program_NAME": data.program_NAME,
+					"program_NAME": data.PROGRAM_NAME,
 					"LOCATION": data.LOCATION,
 					"WORK_DETAILS": data.WORK_DETAILS,
 					"PROPERTY_USAGE": data.PROPERTY_USAGE,
