@@ -65,7 +65,9 @@ sap.ui.define([
 							var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
 								pattern: "d MMM, yyyy HH:mm"
 							});
-							var taskActualCompletionDate = oDateFormat.format(new Date(taskHistoryList[t].TASK_ACTUAL_DOC));
+							var utcDate = new Date(taskHistoryList[t].TASK_ACTUAL_DOC);
+							var sgtDate = new Date(utcDate.getTime() + 8 * 60 * 60 * 1000);
+							var taskActualCompletionDate = oDateFormat.format(sgtDate);
 							objNodes.nodeText = objNodes.COMPLETED_BY_FULL_NAME + "(" + taskActualCompletionDate + ")";
 							objNodes.taskActualCompletionFormatted = taskActualCompletionDate;
 						} else {
