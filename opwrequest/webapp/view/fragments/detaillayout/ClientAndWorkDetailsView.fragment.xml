@@ -32,11 +32,11 @@
 						<core:Item key="{AppModel>CONFIG_KEY}" text="{AppModel>CONFIG_VALUE}"/>
 					</ComboBox>
 					<Label text="Program Name" required="true"/>
-					<TextArea placeholder="Enter Program Name.." value="{AppModel>/cwsRequest/createCWSRequest/PROGRAM_NAME}" rows="2" maxLength="100"
+					<TextArea placeholder="Enter Program Name.." value="{AppModel>/cwsRequest/createCWSRequest/PROGRAM_NAME}" rows="2" maxLength="5000"
 						editable="{AppModel>/isFormEditable}" valueState="{AppModel>/cwsRequest/validationRequest/programnameVState}"
 						liveChange="handleLiveChangeTa" showExceededText="{AppModel>/isFormEditable}"/>
 					<Label text="Details of Work" wrapping="true" required="true"/>
-					<TextArea placeholder="Enter Details of Work.." value="{AppModel>/cwsRequest/createCWSRequest/WORK_DETAILS}" rows="5" maxLength="2000"
+					<TextArea placeholder="Enter Details of Work.." value="{AppModel>/cwsRequest/createCWSRequest/WORK_DETAILS}" rows="5" maxLength="5000"
 						editable="{AppModel>/isFormEditable}" liveChange="handleLiveChangeTa" showExceededText="{AppModel>/isFormEditable}"
 						valueState="{AppModel>/cwsRequest/validationRequest/workDetailsVState}"/>
 					<core:Title text="Admin Details"/>
