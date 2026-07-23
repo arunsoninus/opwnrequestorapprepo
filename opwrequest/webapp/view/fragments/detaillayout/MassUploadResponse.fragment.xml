@@ -86,7 +86,7 @@
 											</ColumnListItem>
 										</items>
 										<layoutData>
-											<l:SplitterLayoutData size="750px"/>
+											<l:SplitterLayoutData size="auto" minSize="750"/>
 										</layoutData>
 									</Table>
 									<!--	<List visible="false" width="100%" items="{ path: 'AppModel>/PaymentData/durationSplitList', sorter: { path: 'YEAR' } }">
@@ -129,7 +129,7 @@
 											</ColumnListItem>
 										</items>
 										<layoutData>
-											<l:SplitterLayoutData size="370px"/>
+											<l:SplitterLayoutData size="370px" minSize="300"/>
 										</layoutData>
 									</Table>
 								</l:Splitter>
