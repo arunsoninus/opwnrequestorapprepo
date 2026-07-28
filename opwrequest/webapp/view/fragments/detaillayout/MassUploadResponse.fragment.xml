@@ -80,7 +80,7 @@
 													<Text text="{AppModel>SUB_TYPE_DESC}"/>
 													<Text text="{ path: 'AppModel>START_DATE', formatter: '.formatter.dateFormatUTCone'}"/>
 													<Text text="{ path: 'AppModel>END_DATE', formatter: '.formatter.dateFormatUTCone'}"/>
-													<ExpandableText text="{AppModel>PROGRAM_NAME}" maxCharacters="150" overflowMode="Popover"/>
+													<ExpandableText text="{AppModel>PROGRAM_NAME}" maxCharacters="100" overflowMode="Popover"/>
 													<Text text="{path:'AppModel>AMOUNT',formatter:'.formatter.formatRequestAmount'}"/>
 												</cells>
 											</ColumnListItem>
