@@ -259,6 +259,37 @@ sap.ui.define([
 		},
 
 		// Begin of change - CCEV3364
+		/**
+		 * Builds the ULU/FDLU scope filter for the approval matrix.
+		 *
+		 * A matrix row scoped to every organisational unit is stored with the literal "ALL", while a
+		 * row scoped to one unit carries its code. Both forms are valid for the request at hand, so
+		 * each field is matched against "ALL" OR the request's own code. AND-ing the two fields yields
+		 * all four scope combinations - ULU/FDLU, ALL/ALL, ULU/ALL and ALL/FDLU - the last of which was
+		 * previously missing, hiding managers scoped to every ULU but a single FDLU.
+		 */
+		_buildProgramManagerScopeFilter: function () {
+			return new Filter({
+				filters: [
+					this._buildScopeFieldFilter("ULU", this.AppModel.getProperty("/cwsRequest/createCWSRequest/ULU")),
+					this._buildScopeFieldFilter("FDLU", this.AppModel.getProperty("/cwsRequest/createCWSRequest/FDLU"))
+				],
+				and: true
+			});
+		},
+
+		_buildScopeFieldFilter: function (sPath, sValue) {
+			var aFilters = [new Filter(sPath, FilterOperator.EQ, "ALL")];
+			// Before a ULU is picked - and before its FDLU is picked - only the all-scope rows apply.
+			if (sValue) {
+				aFilters.push(new Filter(sPath, FilterOperator.EQ, sValue));
+			}
+			return new Filter({
+				filters: aFilters,
+				and: false
+			});
+		},
+
 		_bindItemProgramManager: function (aUluFdluFilterGroup) {
 			// var sPath = "/EclaimsApprovalMatrixViews";
 			var oStaffUserGroupFilter = new Filter("STAFF_USER_GRP", FilterOperator.EQ, 'CW_PROGRAM_MANAGER'),
@@ -282,29 +313,7 @@ sap.ui.define([
 			// 	descending: true
 			// });
 			if (!aUluFdluFilterGroup) {
-				var iFDLU = this.AppModel.getProperty("/cwsRequest/createCWSRequest/FDLU"),
-					iULU = this.AppModel.getProperty("/cwsRequest/createCWSRequest/ULU"),
-					oFDLUFilter = new Filter("FDLU", FilterOperator.EQ, iFDLU),
-					oULUFilter = new Filter("ULU", FilterOperator.EQ, iULU),
-					oULUAllFilter = new Filter("ULU", FilterOperator.EQ, "ALL"),
-					oFdluAllFilter = new Filter("FDLU", FilterOperator.EQ, "ALL"),
-					aAllFdluFilterGroup = new Filter({
-						filters: [oULUFilter, oFDLUFilter],
-						and: true
-					}),
-					aUluFdluFilterGroup = new Filter({
-						filters: [oULUAllFilter, oFdluAllFilter],
-						and: true
-					}),
-					aAllUluFilterGroup = new Filter({
-						filters: [oULUFilter, oFdluAllFilter],
-						and: true
-					}),
-					aFilterGroup = new Filter({
-						filters: [aAllFdluFilterGroup, aUluFdluFilterGroup, aAllUluFilterGroup],
-						and: false
-					});
-				aUluFdluFilterGroup = aFilterGroup;
+				aUluFdluFilterGroup = this._buildProgramManagerScopeFilter();
 			}
 			oCwdProgramManager.setValue("");
 			aFilters.push(oApmValidFrom, oApmValidTo, oProcessCode, aUluFdluFilterGroup, oStaffUserGroupFilter);
@@ -2096,29 +2105,7 @@ sap.ui.define([
 		},
 
 		_editProgramManager: function () {
-			var iFDLU = this.AppModel.getProperty("/cwsRequest/createCWSRequest/FDLU"),
-				iULU = this.AppModel.getProperty("/cwsRequest/createCWSRequest/ULU"),
-				oFDLUFilter = new Filter("FDLU", FilterOperator.EQ, iFDLU),
-				oULUFilter = new Filter("ULU", FilterOperator.EQ, iULU),
-				oULUAllFilter = new Filter("ULU", FilterOperator.EQ, "ALL"),
-				oFdluAllFilter = new Filter("FDLU", FilterOperator.EQ, "ALL"),
-				aAllFdluFilterGroup = new Filter({
-					filters: [oULUFilter, oFDLUFilter],
-					and: true
-				}),
-				aUluFdluFilterGroup = new Filter({
-					filters: [oULUAllFilter, oFdluAllFilter],
-					and: true
-				}),
-				aAllUluFilterGroup = new Filter({
-					filters: [oULUFilter, oFdluAllFilter],
-					and: true
-				}),
-				aFilterGroup = new Filter({
-					filters: [aAllFdluFilterGroup, aUluFdluFilterGroup, aAllUluFilterGroup],
-					and: false
-				});
-			this._bindItemProgramManager(aFilterGroup);
+			this._bindItemProgramManager(this._buildProgramManagerScopeFilter());
 		},
 
 		onPressCancel: function (oEvent) {
