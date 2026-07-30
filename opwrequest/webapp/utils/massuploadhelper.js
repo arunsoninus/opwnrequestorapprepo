@@ -203,7 +203,7 @@ sap.ui.define([
 					title: "{AppModel>field}",
 					subtitle: "{AppModel>message}",
 					description: "{AppModel>message}",
-					type: "Error"
+					type: key === "E" ? "Error" : "Warning"
 				}),
 				path: "AppModel>" + sPath + arrayPath
 			});
