@@ -1,6 +1,12 @@
 {
   "welcomeFile": "/index.html",
   "authenticationMethod": "route",
+  "responseHeaders": [
+    { "name": "X-Content-Type-Options", "value": "nosniff" },
+    { "name": "Cross-Origin-Resource-Policy", "value": "same-origin" },
+    { "name": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=()" },
+    { "name": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" }
+  ],
   "routes": [
     {
       "source": "^/resources/(.*)$",
