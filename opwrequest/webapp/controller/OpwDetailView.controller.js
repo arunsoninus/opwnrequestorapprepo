@@ -449,13 +449,12 @@ sap.ui.define([
 		onUploadFile: function (oEvent) {
 			var oView = this.getView(),
 				attachmentType = this.AppModel.getProperty("/cwsRequest/createCWSRequest/attachmentType"),
-				aValidationMessages = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages"); //Added CCEV3364 - Donot upload file if there is any error in message model
-			// Begin of change - CCEV3364
+				aValidationMessages = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages"); //Do not upload file if there is any error in message model
+			
 			if (aValidationMessages.length > 0) {
 				this.onPressErrorMessages();
 				return;
 			}
-			// End of change - CCEV3364
 			if (attachmentType) {
 				this.AppModel.setProperty("/cwsRequest/validationRequest/cbDoctypeVState", ValueState.None);
 				this.onUploadChange();

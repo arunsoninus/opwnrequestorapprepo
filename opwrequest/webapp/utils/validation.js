@@ -377,6 +377,8 @@ sap.ui.define([
 					component.AppModel.setProperty("/oPercentageVState", "Error");
 					messageElement.message = component.getI18n("CwsRequest.costdistperc.Message");
 					messageList.push(messageElement);
+				} else {
+					component.AppModel.setProperty("/oPercentageVState", "None");
 				}
 				return messageList;
 			},
