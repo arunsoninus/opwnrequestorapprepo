@@ -2454,6 +2454,12 @@ sap.ui.define([
 
 		onPressSubmit: function () {
 			var oError = this.AppModel.getProperty("/cwsRequest/paymentError");
+			//Invalidate Attachment Selection
+			this.AppModel.setProperty("/fileName", "");
+			this.AppModel.setProperty("/visfileName", false);
+			var oFiles = this.getUIControl("fileUploader");
+			oFiles.clear();
+
 			var validationResponse = Validation.validateCwsRequest(this);
 			if (oError && oError.length === 1) {
 				validationResponse.messageList.push(oError[0]);
