@@ -1273,6 +1273,15 @@ sap.ui.define([
 
 		generateLineItem: function (dataArray) {
 			var spreadsheetData = dataArray.flatMap(data => {
+				var wbsList = data.wbsList || [];
+				// Admin Fees was previously exported as a raw "Usage of NUS Property" code under
+				// the wrong label - PROPERTY_USAGE/PROPERTY_USAGE_DESC on this response *is* the
+				// Admin Fee (mirrors ADMIN_FEE); show the readable description with the code
+				// alongside it, e.g. "0% Admin Fee - Other Paid Work (LVY05)".
+				var adminFee = data.PROPERTY_USAGE_DESC && data.ADMIN_FEE ?
+					(data.PROPERTY_USAGE_DESC + " (" + data.ADMIN_FEE + ")") :
+					(data.PROPERTY_USAGE_DESC || data.ADMIN_FEE || "");
+
 				const baseData = {
 					"serialNo": data.SERIAL_NO,
 					"STAFF_ID": data.STAFF_ID,
@@ -1287,8 +1296,18 @@ sap.ui.define([
 					"program_NAME": data.PROGRAM_NAME,
 					"LOCATION": data.LOCATION,
 					"WORK_DETAILS": data.WORK_DETAILS,
-					"PROPERTY_USAGE": data.PROPERTY_USAGE,
-					"PROPERTY_DETAILS": data.PROPERTY_DETAILS,
+					"PROPERTY_USAGE": adminFee,
+					"IS_WAIVED": data.IS_WAIVED,
+					"WBS_1": wbsList[0] ? wbsList[0].WBS : "",
+					"PERCENTAGE_1": wbsList[0] ? wbsList[0].VALUE : "",
+					"WBS_2": wbsList[1] ? wbsList[1].WBS : "",
+					"PERCENTAGE_2": wbsList[1] ? wbsList[1].VALUE : "",
+					"Remarks": (data.REMARKS || []).map(function (remark) {
+						return remark.REMARKS;
+					}).join("; "),
+					"ProgramManager": (data.SELECTED_PROGRAM_MGR || []).map(function (pm) {
+						return pm.value;
+					}).join("; "),
 					"Error": (data.validationResults).map(function (error) {
 						return error.message;
 					}).join("; "),

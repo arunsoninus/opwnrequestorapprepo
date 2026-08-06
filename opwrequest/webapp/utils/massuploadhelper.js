@@ -175,16 +175,44 @@ sap.ui.define([
 				property: 'WORK_DETAILS',
 				width: '30'
 			}, {
-				label: 'Usage of NUS Property',
+				label: 'Admin Fees',
 				property: 'PROPERTY_USAGE',
+				width: '30'
+			}, {
+				label: 'Waived/Not Applicable',
+				property: 'IS_WAIVED',
+				width: '10'
+			}, {
+				label: 'WBS 1',
+				property: 'WBS_1',
 				width: '20'
 			}, {
-				label: 'Details of Property Used',
-				property: 'PROPERTY_DETAILS',
+				label: 'Percentage 1',
+				property: 'PERCENTAGE_1',
+				width: '10'
+			}, {
+				label: 'WBS 2',
+				property: 'WBS_2',
+				width: '20'
+			}, {
+				label: 'Percentage 2',
+				property: 'PERCENTAGE_2',
+				width: '10'
+			}, {
+				label: 'Remarks',
+				property: 'Remarks',
 				width: '30'
+			}, {
+				label: 'Program Manager',
+				property: 'ProgramManager',
+				width: '15'
 			}, {
 				label: 'Error',
 				property: 'Error',
+				width: '10'
+			}, {
+				label: 'Warning',
+				property: 'Warning',
 				width: '10'
 			}];
 		},
