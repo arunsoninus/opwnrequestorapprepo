@@ -2615,6 +2615,7 @@ sap.ui.define([
 
 				if (cwsResponse.ACTION_CODE === "SAVE") {
 					var wasCopyMode = this.AppModel.getProperty("/oCopyMode") === "Copied";
+					var wasNewRequest = this._project === "NEW";
 					MessageToast.show(this.getI18n("CwsRequest.Request.DraftSaved"));
 					// localStorage.setItem("New_DraftID", cwsResponse.REQ_UNIQUE_ID);
 					this.AppModel.setProperty("/oCopyMode", "");
@@ -2626,11 +2627,14 @@ sap.ui.define([
 						this.oRouter.navTo("master", {
 							layout: "OneColumn"
 						}, true);
-					} else if (wasCopyMode && cwsResponse.ID) {
-						// Copy Form auto-saves the new draft under the SOURCE request's route
-						// param; swap it for the newly-created draft's own ID so the URL (and a
-						// refresh/bookmark of it) points at the copy, not the original request.
-						var sEntitySet = this._project.split("(")[0];
+					} else if ((wasCopyMode || wasNewRequest) && cwsResponse.ID) {
+						// Copy Form auto-saves the new draft under the SOURCE request's route param,
+						// and a brand-new request is first saved under the literal "NEW" route param;
+						// in both cases swap in the newly-created draft's own ID so the URL (and a
+						// refresh/bookmark of it) points at the persisted draft, not "NEW"/the source.
+						// For "NEW" this only runs once: this._project stops being "NEW" right after,
+						// so later autosaves of the same draft no longer satisfy wasNewRequest.
+						var sEntitySet = wasCopyMode ? this._project.split("(")[0] : Config.dbOperations.openRequestView.replace(/^\//, "");
 						this._project = sEntitySet + "('" + cwsResponse.ID + "')";
 						this.oRouter.navTo("detail", {
 							project: this._project,
