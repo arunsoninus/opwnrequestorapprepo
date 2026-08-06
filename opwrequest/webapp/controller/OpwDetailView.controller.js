@@ -3687,6 +3687,24 @@ sap.ui.define([
 					});
 				}
 
+				this.AppModel.setProperty(sPath + "/valueStateWbs", "None");
+				this.AppModel.setProperty(sPath + "/valueStateTextWbs", "");
+
+				if (oWBSkey) {
+					// Duplicate is already known from the in-memory wbsList - reject it right away
+					// instead of round-tripping through the WBS lookup service for a value we're
+					// going to discard anyway. That round trip can itself fail technically for a
+					// value already used elsewhere, which used to leave the duplicate in place
+					// (the service's failure path shows its own error dialog and never calls back,
+					// so this block never ran and the field was never cleared).
+					this.AppModel.setProperty(sPath + "/WBS", "");
+					this.AppModel.setProperty(sPath + "/WBS_CODE", "");
+					this.AppModel.setProperty(sPath + "/WBS_Desc", "");
+					this.AppModel.setProperty(sPath + "/valueStateWbs", "Error");
+					this.AppModel.setProperty(sPath + "/valueStateTextWbs", "Entry already exist");
+					return;
+				}
+
 				// var token = this.AppModel.getProperty("/token");
 				var saveObj = {};
 				saveObj.WBSRequest = {};
@@ -3698,20 +3716,17 @@ sap.ui.define([
 				// 	"AccessPoint": "A",
 				// 	"Content-Type": "application/json"
 				// };
-				this.AppModel.setProperty(sPath + "/valueStateWbs", "None");
-				this.AppModel.setProperty(sPath + "/valueStateTextWbs", "");
 
 				Services.validateWbs(this, saveObj, function (oWBSData) {
 					if (!oWBSData.EtOutput || (oWBSData.EtOutput && oWBSData.EtOutput.item &&
-						oWBSData.EtOutput.item.EvStatus === 'E') || oWBSkey) {
-						var keymsg = !oWBSData.EtOutput ? "Invalid WBS: " + sWBS : wbsValidateModel.getData().EtOutput.item.EvMsg;
+						oWBSData.EtOutput.item.EvStatus === 'E')) {
+						var keymsg = !oWBSData.EtOutput ? "Invalid WBS: " + sWBS : oWBSData.EtOutput.item.EvMsg;
 						var modifiedMessage = keymsg.replace(/\bexists\b/g, "exist");
-						var oMsg = oWBSkey ? "Entry already exist" : modifiedMessage;
 						this.AppModel.setProperty(sPath + "/WBS", "");
 						this.AppModel.setProperty(sPath + "/WBS_CODE", "");
 						this.AppModel.setProperty(sPath + "/WBS_Desc", "");
 						this.AppModel.setProperty(sPath + "/valueStateWbs", "Error");
-						this.AppModel.setProperty(sPath + "/valueStateTextWbs", oMsg);
+						this.AppModel.setProperty(sPath + "/valueStateTextWbs", modifiedMessage);
 					} else {
 						if (oWBSData.EtOutput && oWBSData.EtOutput.item) {
 							this.AppModel.setProperty(sPath + "/WBS", oWBSData.EtOutput.item.EvActwbs);
