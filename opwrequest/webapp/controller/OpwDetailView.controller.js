@@ -113,6 +113,7 @@ sap.ui.define([
 				}.bind(this), false);
 			}
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
+			this._layout = oEvent.getParameter("arguments").layout || this._layout || "MidColumnFullScreen";
 			if (this._project === "NEW") {
 				this._fnCapturePendingNewRequestValues();
 			}
@@ -944,6 +945,7 @@ sap.ui.define([
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", []);
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS", "31");
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/REQ_UNIQUE_ID", "");
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/ID", "");
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/REQUEST_ID", "");
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/statusDisplay", 'Draft');
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/MIGRATED", '');
@@ -2612,6 +2614,7 @@ sap.ui.define([
 				}
 
 				if (cwsResponse.ACTION_CODE === "SAVE") {
+					var wasCopyMode = this.AppModel.getProperty("/oCopyMode") === "Copied";
 					MessageToast.show(this.getI18n("CwsRequest.Request.DraftSaved"));
 					// localStorage.setItem("New_DraftID", cwsResponse.REQ_UNIQUE_ID);
 					this.AppModel.setProperty("/oCopyMode", "");
@@ -2622,6 +2625,16 @@ sap.ui.define([
 						this.AppModel.setProperty("/cwsRequest/createCWSRequest", {});
 						this.oRouter.navTo("master", {
 							layout: "OneColumn"
+						}, true);
+					} else if (wasCopyMode && cwsResponse.ID) {
+						// Copy Form auto-saves the new draft under the SOURCE request's route
+						// param; swap it for the newly-created draft's own ID so the URL (and a
+						// refresh/bookmark of it) points at the copy, not the original request.
+						var sEntitySet = this._project.split("(")[0];
+						this._project = sEntitySet + "('" + cwsResponse.ID + "')";
+						this.oRouter.navTo("detail", {
+							project: this._project,
+							layout: this._layout
 						}, true);
 					}
 				}

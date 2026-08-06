@@ -470,18 +470,41 @@ sap.ui.define([
 
 		onPressCopy: function (oEvent) {
 			this.showBusyIndicator();
-			Utility._clearModelBeforeNavigationToCWDetailView(this);
-			var prevSelectedKeyOfIconTabBar = this.getView().byId("itb1").getSelectedKey();
-			this.AppModel.setProperty("/prevSelectedKeyOfIconTabBar", prevSelectedKeyOfIconTabBar);
-			this.AppModel.setProperty("/cwsRequest/validationRequest", {});
 
 			var localModel = oEvent.getSource().getBindingContext("OpwnSrvModel");
 			var ruleSet = localModel.getPath().split("/").slice(-1).pop();
-			this.AppModel.setProperty("/oCopyMode", "Copied");
-			this.handleRouting("detail", {
-				project: ruleSet,
-				layout: "MidColumnFullScreen"
-			});
+			var selectedReq = localModel.getObject();
+
+			var oDeptRole = this.AppModel.getProperty("/isDeptOHRSS");
+			var paymentListObj = {
+				"ROLE": (oDeptRole === true) ? this.getI18n("CwsRequest.OHRSS") : this.AppModel.getProperty("/userRole"),
+				"START_DATE": this.formatDate(selectedReq.START_DATE),
+				"END_DATE": this.formatDate(selectedReq.END_DATE),
+				"AMOUNT": selectedReq.AMOUNT,
+				"STAFF_ID": selectedReq.STAFF_ID
+			};
+
+			Services.getPaymentList(this, paymentListObj, function (paymentData) {
+				this.hideBusyIndicator();
+
+				if (paymentData && paymentData.statusCode === "E") {
+					MessageBox.error(paymentData.message, {
+						title: "Cannot copy the request"
+					});
+					return;
+				}
+
+				this.showBusyIndicator();
+				Utility._clearModelBeforeNavigationToCWDetailView(this);
+				var prevSelectedKeyOfIconTabBar = this.getView().byId("itb1").getSelectedKey();
+				this.AppModel.setProperty("/prevSelectedKeyOfIconTabBar", prevSelectedKeyOfIconTabBar);
+				this.AppModel.setProperty("/cwsRequest/validationRequest", {});
+				this.AppModel.setProperty("/oCopyMode", "Copied");
+				this.handleRouting("detail", {
+					project: ruleSet,
+					layout: "MidColumnFullScreen"
+				});
+			}.bind(this));
 		},
 
 		openQuickView: function (oEvent) {
