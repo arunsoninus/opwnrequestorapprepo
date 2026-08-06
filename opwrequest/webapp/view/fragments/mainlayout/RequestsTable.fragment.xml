@@ -77,9 +77,9 @@
 					</VBox>
 					<HBox>
 						<Button icon="sap-icon://delete" tooltip="Delete" press="onPressDeleteDraft"
-							visible="{= (${AppModel>/iconTabBarSelectedKey} === 'Draft' &amp;&amp; ${OpwnSrvModel>REQUEST_STATUS} !== '49' &amp;&amp; ${AppModel>/userRole}=== ${i18n>CwsRequest.PrgAdmin}) ? true : false }"/>
+							visible="{= (${AppModel>/iconTabBarSelectedKey} === 'Draft' &amp;&amp; ${OpwnSrvModel>REQUEST_STATUS} !== '49' &amp;&amp; (${OpwnSrvModel>SUBMITTED_BY} === ${AppModel>/loggedInUserStfNumber} || ${AppModel>/isDeptOHRSS} === true)) ? true : false }"/>
 						<MenuButton text="Actions" visible="{= ${AppModel>/iconTabBarSelectedKey} === 'Draft' ? false : true }">
-							<menu>
+							<menu>	
 								<Menu>
 									<MenuItem text="Copy" icon="sap-icon://copy" press="onPressCopy"
 										visible="{parts: [ {path:'AppModel>/iconTabBarSelectedKey'}, {path:'OpwnSrvModel>END_DATE'},{path:'OpwnSrvModel>MIGRATED'},{path:'OpwnSrvModel>STAFF_ID'},{path:'AppModel>/appMatrixAuth'},{path:'AppModel>/primaryAssigment/SF_STF_NUMBER'} ], formatter: '.formatter.handleCopyBtnVisibility'}"/>
