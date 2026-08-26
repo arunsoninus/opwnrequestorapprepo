@@ -527,8 +527,7 @@ sap.ui.define([
 			var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
 			var sUrl = Config.dbOperations.deleteRemarks + "('" + remarksId + "')";
 			// Perform the DELETE request
-			oCatalogSrvModel.update(sUrl, null, {
-				method: "DELETE",
+			oCatalogSrvModel.remove(sUrl, {
 				success: function (remarksResponse) {
 					callBackFx(remarksResponse);
 				},
