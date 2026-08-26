@@ -3931,10 +3931,20 @@ sap.ui.define([
 						text: "Save",
 						press: function () {
 							var sText = sap.ui.getCore().byId("rejectionNote").getValue();
-							this.AppModel.getProperty("/cwsRequest/createCWSRequest/REMARKS")[oIndex].REMARKS = sText;
-							this.AppModel.refresh(true);
-							sap.ui.getCore().byId("rejectionNote").setValue();
-							this.oRejectDialog.close();
+							var oRemarksArr = this.AppModel.getProperty("/cwsRequest/createCWSRequest/REMARKS");
+							var remarksId = oRemarksArr[oIndex].ID;
+							var fnApplyLocalUpdate = function () {
+								oRemarksArr[oIndex].REMARKS = sText;
+								this.AppModel.refresh(true);
+								sap.ui.getCore().byId("rejectionNote").setValue();
+								this.oRejectDialog.close();
+							}.bind(this);
+
+							if (remarksId) {
+								Services.performRemarksUpdate(this, remarksId, sText, fnApplyLocalUpdate);
+							} else {
+								fnApplyLocalUpdate();
+							}
 						}.bind(this)
 					}),
 					endButton: new sap.m.Button({

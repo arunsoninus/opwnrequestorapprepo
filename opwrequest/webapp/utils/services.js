@@ -536,6 +536,27 @@ sap.ui.define([
 				}
 			});
 		},
+		performRemarksUpdate: function (component, remarksId, sRemarksText, callBackFx) {
+			var oCatalogSrvModel = component.getComponentModel("CatalogSrvModel");
+			var sUrl = Config.dbOperations.deleteRemarks + "('" + remarksId + "')";
+			var oData = {
+				"REMARKS": sRemarksText
+			};
+			var oHeaders = {
+				"If-Match": "*"
+			};
+			// Perform the PATCH request
+			oCatalogSrvModel.update(sUrl, oData, {
+				method: "PATCH",
+				headers: oHeaders,
+				success: function (remarksResponse) {
+					callBackFx(remarksResponse);
+				},
+				error: function (oError) {
+					sap.m.MessageToast.show(component.getI18n("CwsRequest.Service.StatusUpdateError"));
+				}
+			});
+		},
 		validateForWeekend: async function (component, callBackFx) {
 			// var oValidateModel = new JSONModel();
 			var OpwnSrvModel = component.getComponentModel("OpwnSrvModel");
