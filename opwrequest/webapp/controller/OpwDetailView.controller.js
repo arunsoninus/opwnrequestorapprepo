@@ -794,7 +794,7 @@ sap.ui.define([
 				if (this.runAutoSave && draftID) {
 					if (Utility.checkForLastRun(this.lastSuccessRun)) {
 						this.AppModel.setProperty("/oAutosave", "AutoSave");
-						this.onPressSaveDraftRequest("Save", null, false);
+						this.onPressSaveDraftRequest("Save", null, false, true);
 					}
 				} else {
 					return;
@@ -2375,7 +2375,7 @@ sap.ui.define([
 			return value === null || value === undefined || value === "";
 		},
 
-		onPressSaveDraftRequest: function (saveSource, sourceReq, unlockSent) {
+		onPressSaveDraftRequest: function (saveSource, sourceReq, unlockSent, isAutoSave) {
 			var saveOrSubmit = 'Save';
 			var aSaveObj = this.getSaveObject(saveOrSubmit);
 			if (aSaveObj.wbsList.length > 0) {
@@ -2387,7 +2387,11 @@ sap.ui.define([
 			if (saveSource && typeof saveSource.getSource === "function") {
 				this.showBusyIndicator();
 			}
-			this.onPostComment();
+			// Auto-save must not post whatever is still sitting, unposted, in the remarks
+			// FeedInput - only an explicit Post/Enter or a genuine user Save should do that.
+			if (!isAutoSave) {
+				this.onPostComment();
+			}
 			this.persistentOperationCalled(aSaveObj);
 		},
 
