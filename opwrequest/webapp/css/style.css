@@ -15,9 +15,15 @@
     position: relative;
     margin: 0rem;
     /*padding: 0rem !important;*/
-    width: 8.5rem;
+    /* Must match the fixed 6.5rem lane column width SAP sets for this zoom
+       level (ProcessFlow.less, table.sapSuiteUiCommonsPFZoomLevel3 th:nth-child(5n+3)).
+       A wider box here overflows the table cell - with an "auto" width dialog
+       this zoom level is exactly the one auto-selected for 3-lane flows
+       (ProcessFlow._initZoomLevel: 600-1023px), which is why misalignment only
+       showed up with 3 approvers. */
+    width: 6.5rem;
     min-width: 6.5rem;
-    max-width: 10.5rem;
+    max-width: 6.5rem;
     overflow: hidden;
 }
 
