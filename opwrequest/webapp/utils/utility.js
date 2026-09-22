@@ -442,9 +442,6 @@ sap.ui.define([
 			var aFilter = [];
 			var orFilter = [];
 			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '41'));
-			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '44')); // retract
-			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '45')); // Dept amdin
-			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '46'));
 			andFilter.push(new Filter(orFilter, false));
 			if (oRole === component.getI18n("CwsRequest.PrgAdmin")) {
 				var submittedByFilter = new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId);
@@ -514,10 +511,7 @@ sap.ui.define([
 			var andFilter = [];
 			var aFilter = [];
 			var orFilter = [];
-			//02,03,04,05,06,08
 			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '40'));
-			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '42'));
-			orFilter.push(new Filter("REQUEST_STATUS", FilterOperator.EQ, '43'));
 			andFilter.push(new Filter(orFilter, false));
 			if (oRole === component.getI18n("CwsRequest.PrgAdmin")) {
 				var submittedByFilter = new Filter("SUBMITTED_BY", FilterOperator.EQ, staffId);
