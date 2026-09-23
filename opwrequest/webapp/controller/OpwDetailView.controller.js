@@ -119,6 +119,7 @@ sap.ui.define([
 			}
 			this._fnInitializeAppModel();
 			this.viaRequestorForm = true;
+			this.adminFeeRecalcRequired = false;
 			this.firstTimeUnlockRequest = false;
 			this.unLockstop = true;
 		},
@@ -1598,6 +1599,7 @@ sap.ui.define([
 
 		onChangeDatesNDuration: function (oEvent, key) {
 			this.lastSuccessRun = new Date();
+			this.adminFeeRecalcRequired = true;
 			if (key === "DR") {
 				var oNumber = 0,
 					oValue = oEvent.getSource().getValue();

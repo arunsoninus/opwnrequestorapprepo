@@ -81,8 +81,10 @@ sap.ui.define([
 			}
 			this.AppModel.setProperty(oEvent.getSource().mBindingInfos.value.parts[0].path, updatedVal);
 			this.AppModel.refresh(true);
-			if (key === "Payment")
+			if (key === "Payment") {
+				this.adminFeeRecalcRequired = true;
 				this.populatePayment(oEvent);
+			}
 		},
 		/**
 		 * Handle Routing
@@ -366,11 +368,18 @@ sap.ui.define([
 
 		// Levy display and calculation
 
-		// !this.AppModel.getProperty("/cwsRequest/createCWSRequest/PROPERTY_USAGE")  &&
+		// Admin Fee (PROPERTY_USAGE) is re-derived via the Requestor Form only when:
+		// (a) the request has no saved PROPERTY_USAGE yet (brand new draft, nothing in the DB to
+		//     show), or
+		// (b) the user actually edited data that can affect it (Start/End Date, Duration, Amount,
+		//     etc. - see onChangeDatesNDuration/onEnterFormatAmount, which set adminFeeRecalcRequired).
+		// Simply opening an existing request via the Requestor Form (view/approve) must keep
+		// showing whatever PROPERTY_USAGE is already saved in the DB, same as Run Report does.
 		fnLevyCalculation: function () {
 			var oData = this.AppModel.getProperty("/levyList");
 
-			if (this.viaRequestorForm) {
+			if (this.viaRequestorForm && (this.adminFeeRecalcRequired || !this.AppModel.getProperty(
+					"/cwsRequest/createCWSRequest/PROPERTY_USAGE"))) {
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/PROPERTY_USAGE", this.AppModel.getProperty("/derivePropUsage"));
 			}
 
