@@ -514,6 +514,34 @@ sap.ui.define([
 		},
 
 		handleQuickViewBtnPress: function (oEvent) {
+			// The IconTabBar sits inside this ObjectHeader's headerContainer, so tapping a tab icon
+			// also opened the profile quick view.
+			//
+			// The cause is in the framework: ObjectHeader.ontap reports taps that land on an icon as
+			// a title-selector press without checking the icon is its own. How wide that net is
+			// depends on the UI5 version - up to 1.143 it only caught icons carrying a tooltip (the
+			// inner <span class="sapUiIconTitle">), but 1.152 rewrote it to
+			// oSource.closest(".sapUiIcon"), which catches EVERY icon regardless of tooltip. UAT
+			// runs 1.152, and every IconTabFilter in this view sets both icon and tooltip.
+			//
+			// So this guard is deliberately positive: open the quick view ONLY when domRef is this
+			// ObjectHeader's own title-selector icon, and ignore anything else. Matching negatively
+			// ("not inside the tab bar") tracks one UI5 version's behaviour and leaves every future
+			// icon in the header able to reopen the bug.
+			//
+			// The selector icon is rendered with id "<objectHeaderId>-titleArrow" and both paths
+			// that fire this event - ontap for pointer input and _handleSpaceOrEnter for keyboard -
+			// pass that element as domRef, so keyboard activation keeps working. titleSelectorPress
+			// carries only "domRef", never "browserEvent".
+			//
+			// Same fix as eclaimrequestorform PR #73.
+			var oHeader = oEvent && oEvent.getSource && oEvent.getSource();
+			var oDomRef = oEvent && oEvent.getParameter && oEvent.getParameter("domRef");
+			var sSelectorId = oHeader && oHeader.getId ? oHeader.getId() + "-titleArrow" : null;
+			if (!oDomRef || !sSelectorId || oDomRef.id !== sSelectorId) {
+				return;
+			}
+
 			Utility._fnOpenQuickViewForStaff(this);
 			this.openQuickView(oEvent);
 		},
