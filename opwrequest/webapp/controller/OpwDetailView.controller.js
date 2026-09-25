@@ -1271,7 +1271,7 @@ sap.ui.define([
 					for (let i = 0; i < oData.length; i++) {
 						var request = oData[i];
 						if (!(request.requestStatusCode === "38" || request.requestStatusCode === "49" || request.requestStatusCode === "35" || request.requestStatusCode ===
-							"36" || request.requestStatusCode === "37" || request.requestStatusCode === "41")) {
+							"36" || request.requestStatusCode === "37" || request.requestStatusCode === "41" || request.requestStatusCode === "39")) {
 							sValid = true;
 						}
 					}
