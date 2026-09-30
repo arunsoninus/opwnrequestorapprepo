@@ -77,7 +77,8 @@ sap.ui.define([
 					for (var i = 0; i < data.length; i++) {
 						sumofAbove += Number(data[i].DURATION);
 					}
-					if (parseFloat(sumofAbove) !== parseFloat(durationDays)) {
+					// Compare in hundredths: summing 2-dp values in floating point drifts (8.00 + 8.88 = 16.880000000000003)
+					if (Math.round(sumofAbove * 100) !== Math.round(parseFloat(durationDays) * 100)) {
 						component.AppModel.setProperty("/durationState", "Error");
 						validationElement.durationVState = "Error";
 						messageElement.message = component.getI18n("CwsRequest.basicinfo.Duration");
