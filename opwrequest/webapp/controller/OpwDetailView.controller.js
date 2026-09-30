@@ -2318,13 +2318,17 @@ sap.ui.define([
 			}
 
 			var validationResponse = Validation.validateCwsRequest(this);
-			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", validationResponse.messageList);
-			var errorList = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages");
 			var sKey = oEvent.getSource().getText();
 			var oUpdate = sKey === 'Update' ? 'UPDATE' : 'RESUBMIT';
 			if (oUpdate === "RESUBMIT" && this.AppModel.getProperty("/cwsRequest/createCWSRequest/REQUEST_STATUS") !== "38") {
 				oUpdate = "R_RESUBMIT";
 			}
+			// 365-day yearly cap applies to Re-Submit of retracted/rejected requests, not to Change Requests (status 38)
+			if (oUpdate === "R_RESUBMIT") {
+				Validation.validateTotalUtilizationLimit(data, validationResponse.messageList, this);
+			}
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", validationResponse.messageList);
+			var errorList = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages");
 			var aSaveObj = this.getSaveObject(oUpdate);
 			var oData = this.ocwsRequest;
 			var skipFields = ["ACTION_CODE", "isReceivedPaymentUpdate", "isUpdateReqd", "ROLE", "SUBMISSION_TYPE", "WBS_Desc"];
@@ -2466,6 +2470,8 @@ sap.ui.define([
 			oFiles.clear();
 
 			var validationResponse = Validation.validateCwsRequest(this);
+			Validation.validateTotalUtilizationLimit(this.AppModel.getProperty("/cwsRequest/createCWSRequest"), validationResponse.messageList,
+				this);
 			if (oError && oError.length === 1) {
 				validationResponse.messageList.push(oError[0]);
 			}

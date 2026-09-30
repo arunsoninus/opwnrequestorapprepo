@@ -63,6 +63,27 @@ sap.ui.define([
 				return validateResponse;
 			},
 
+			/**
+			 * Flags every calendar year whose Total Utilization (this request's days plus the staff's other
+			 * counted requests, as returned by totalUtilization) exceeds 365 days.
+			 * Applies to New Request submission and Re-Submit of retracted/rejected requests only - not to
+			 * Change Requests.
+			 * @returns {boolean} true when at least one year exceeds the limit
+			 */
+			validateTotalUtilizationLimit: function (data, messageList, component) {
+				var maxDays = 365,
+					bExceeded = false;
+				jQuery.sap.each(data.durationSplitList || [], function (i, durationElement) {
+					var totalDays = parseFloat(durationElement.TOTAL_UTILIZATION_YR);
+					if (totalDays > maxDays) {
+						bExceeded = true;
+						messageList.push(this._formatMessageList("Error", "Total Utilization Error",
+							component.getI18nVariables("CwsRequest.TotalUtilization.MaxDaysExceeded", [durationElement.YEAR, totalDays.toFixed(2), maxDays])));
+					}
+				}.bind(this));
+				return bExceeded;
+			},
+
 			validateDuration: function (data, validationElement, messageList, component) {
 				var messageElement = {
 					"type": "Error",
