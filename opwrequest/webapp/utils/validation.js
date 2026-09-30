@@ -77,7 +77,7 @@ sap.ui.define([
 					var totalDays = parseFloat(durationElement.TOTAL_UTILIZATION_YR);
 					if (totalDays > maxDays) {
 						bExceeded = true;
-						messageList.push(this._formatMessageList("Error", "Total Utilization Error",
+						messageList.push(this._formatMessageList("Error", "Total Utilization Breach",
 							component.getI18nVariables("CwsRequest.TotalUtilization.MaxDaysExceeded", [durationElement.YEAR, totalDays.toFixed(2), maxDays])));
 					}
 				}.bind(this));
