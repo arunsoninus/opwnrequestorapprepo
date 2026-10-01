@@ -598,7 +598,7 @@ sap.ui.define([
 			this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Upload.FileNameLength"));
 		},
 		handleFileSizeExceed: function () {
-			this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Attachments.Note2"));
+			this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Upload.MaxSize"));
 			// return MessageBox.error(this.getI18n("CwsRequest.Attachments.Note2"));
 		},
 
