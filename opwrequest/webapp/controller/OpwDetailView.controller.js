@@ -471,6 +471,13 @@ sap.ui.define([
 			this.AppModel.setProperty("/fileName", "");
 			this.AppModel.setProperty("/visfileName", false);
 
+			// FileUploader fires change with no file right after it rejects a selection
+			// (filenameLengthExceed / typeMissmatch / fileSizeExceed) and resets a previous value.
+			if (!file) {
+				return;
+			}
+			this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", []);
+
 			if (this._checkFileNameSpecialChar(file)) {
 				this._setFileUploadErrorMessage(this.getI18n("CwsRequest.Attachments.FileNameValidation1"));
 				oFiles.clear();
