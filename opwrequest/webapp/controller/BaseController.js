@@ -839,26 +839,78 @@ sap.ui.define([
 			if (aContexts && aContexts.length) {
 				for (var i = 0; i < aContexts.length; i++) {
 					var sPath = aContexts[i].getPath();
-					var selectedObj = this.AppModel.getProperty(sPath);
-					selectedObj.STF_NUMBER = selectedObj.STF_NUMBER.replace("(" + selectedObj.NUSNET_ID + ")", "").trim();
-					this.AppModel.setProperty("/cwsRequest/newRequest/STAFF_ID", selectedObj.STF_NUMBER);
-					this.AppModel.setProperty("/cwsRequest/newRequest/FULL_NM", selectedObj.FULL_NM);
-					this.AppModel.setProperty("/cwsRequest/newRequest/STAFF_NUSNET_ID", selectedObj.NUSNET_ID);
-					this.AppModel.setProperty("/cwsRequest/newRequest/CONCURRENT_STAFF_ID", selectedObj.SF_STF_NUMBER);
-
-					this.AppModel.setProperty("/cwsRequest/newRequest/START_DATE", null);
-					this.AppModel.setProperty("/cwsRequest/newRequest/END_DATE", null);
-					if (selectedObj.LEAVING_DATE) {
-						var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
-							pattern: "d MMM, yyyy"
-						});
-						var eodDate = oDateFormat.format(new Date(selectedObj.LEAVING_DATE));
-						this.AppModel.setProperty("/cwsRequest/newRequest/LEAVING_DATE", eodDate);
-					} else {
-						this.AppModel.setProperty("/cwsRequest/newRequest/LEAVING_DATE", null);
-					}
+					this._setSelectedStaff(this.AppModel.getProperty(sPath));
 				}
 			}
+		},
+
+		/**
+		 * Map the staff picked in the lookup (or resolved from a typed Staff ID) to the new request
+		 */
+		_setSelectedStaff: function (selectedObj) {
+			selectedObj.STF_NUMBER = selectedObj.STF_NUMBER.replace("(" + selectedObj.NUSNET_ID + ")", "").trim();
+			this.AppModel.setProperty("/cwsRequest/newRequest/STAFF_ID", selectedObj.STF_NUMBER);
+			this.AppModel.setProperty("/cwsRequest/newRequest/FULL_NM", selectedObj.FULL_NM);
+			this.AppModel.setProperty("/cwsRequest/newRequest/STAFF_NUSNET_ID", selectedObj.NUSNET_ID);
+			this.AppModel.setProperty("/cwsRequest/newRequest/CONCURRENT_STAFF_ID", selectedObj.SF_STF_NUMBER);
+
+			this.AppModel.setProperty("/cwsRequest/newRequest/START_DATE", null);
+			this.AppModel.setProperty("/cwsRequest/newRequest/END_DATE", null);
+			if (selectedObj.LEAVING_DATE) {
+				var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
+					pattern: "d MMM, yyyy"
+				});
+				var eodDate = oDateFormat.format(new Date(selectedObj.LEAVING_DATE));
+				this.AppModel.setProperty("/cwsRequest/newRequest/LEAVING_DATE", eodDate);
+			} else {
+				this.AppModel.setProperty("/cwsRequest/newRequest/LEAVING_DATE", null);
+			}
+		},
+
+		/**
+		 * Staff ID typed directly in the Select Staff field of the New Request dialog.
+		 * Runs the same lookup as the value help and maps the staff when it resolves.
+		 */
+		onChangeStaffInput: function (oEvent) {
+			var sValue = (oEvent.getParameter("value") || "").trim();
+			var sNewRequestPath = "/cwsRequest/newRequest/";
+			this.closeMessageStrip("opwnRequestDialogMStripId", "NewRequestTypeSelectionDialog");
+			// typed text no longer matches the previously mapped staff
+			["STAFF_ID", "STAFF_NUSNET_ID", "CONCURRENT_STAFF_ID"].forEach(function (sField) {
+				this.AppModel.setProperty(sNewRequestPath + sField, "");
+			}.bind(this));
+			this.AppModel.setProperty(sNewRequestPath + "LEAVING_DATE", null);
+			if (!sValue) {
+				this.AppModel.setProperty(sNewRequestPath + "FULL_NM", "");
+				return;
+			}
+			this.showBusyIndicator();
+			this._readStaffLookup(sValue, function (aStaff) {
+				this.hideBusyIndicator();
+				var bSingleStaff = aStaff.length > 0 && aStaff.every(function (oStaff) {
+					return oStaff.STF_NUMBER === aStaff[0].STF_NUMBER;
+				});
+				if (bSingleStaff) {
+					this._setSelectedStaff(aStaff[0]);
+					return;
+				}
+				this.AppModel.setProperty(sNewRequestPath + "FULL_NM", "");
+				if (aStaff.length) {
+					// more than one assignment for the Staff ID - let the user pick in the lookup
+					this.onValueHelpRequest();
+					this._oDialogAddStaff.then(function () {
+						this.AppModel.setProperty("/staffList", aStaff);
+					}.bind(this));
+				} else {
+					this.showMessageStrip("opwnRequestDialogMStripId", this.getI18nVariables("CwsRequest.Staff.NotFound", [sValue]), "E",
+						"NewRequestTypeSelectionDialog");
+				}
+			}.bind(this), function () {
+				this.hideBusyIndicator();
+				this.AppModel.setProperty(sNewRequestPath + "FULL_NM", "");
+				this.showMessageStrip("opwnRequestDialogMStripId", this.getI18n("CwsRequest.Staff.LookupFailed"), "E",
+					"NewRequestTypeSelectionDialog");
+			}.bind(this));
 		},
 		/**
 		 * @param oEvent
@@ -869,8 +921,24 @@ sap.ui.define([
 		 * Also performed some clean up on Filter and FilterOperator usage. Directly using the reference
 		 */
 		handleSearchStaffs: function (oEvent) {
-			this.showBusyIndicator();
 			var sValue = oEvent.getParameter("value").toString();
+			if (!sValue) {
+				this.AppModel.setProperty("/staffList", []);
+				return;
+			}
+			this.showBusyIndicator();
+			this._readStaffLookup(sValue, function (aStaff) {
+				this.AppModel.setProperty("/staffList", aStaff);
+				this.hideBusyIndicator();
+			}.bind(this), function () {
+				this.hideBusyIndicator();
+			}.bind(this));
+		},
+
+		/**
+		 * Read the staff for a Staff ID - shared by the lookup search and the typed Staff ID
+		 */
+		_readStaffLookup: function (sValue, fnSuccess, fnError) {
 			var filterStaffId = new Filter("SF_STF_NUMBER", FilterOperator.EQ, sValue);
 			var filterEXT = new Filter("IS_EXTERNAL", FilterOperator.EQ, 0);
 
@@ -889,29 +957,17 @@ sap.ui.define([
 				filters: [filterStaffId, filterEXT, orFilter],
 				and: true
 			});
-			if (!sValue) {
-				this.AppModel.setProperty("/staffList", []);
-				this.hideBusyIndicator();
-			} else {
-				var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
-				oCatalogSrvModel.read(Config.dbOperations.userLookup, {
-					urlParameters: {
-						"$select": "NUSNET_ID,FULL_NM,STF_NUMBER,IS_EXTERNAL,SF_STF_NUMBER,LEAVING_DATE"
-					},
-					filters: [aFilters],
-					success: function (oData) {
-						if (oData.results.length) {
-							this.AppModel.setProperty("/staffList", oData.results);
-						} else {
-							this.AppModel.setProperty("/staffList", []);
-						}
-						this.hideBusyIndicator();
-					}.bind(this),
-					error: function (oError) {
-						this.hideBusyIndicator();
-					}
-				});
-			}
+			var oCatalogSrvModel = this.getComponentModel("CatalogSrvModel");
+			oCatalogSrvModel.read(Config.dbOperations.userLookup, {
+				urlParameters: {
+					"$select": "NUSNET_ID,FULL_NM,STF_NUMBER,IS_EXTERNAL,SF_STF_NUMBER,LEAVING_DATE"
+				},
+				filters: [aFilters],
+				success: function (oData) {
+					fnSuccess(oData.results || []);
+				},
+				error: fnError
+			});
 		},
 
 
