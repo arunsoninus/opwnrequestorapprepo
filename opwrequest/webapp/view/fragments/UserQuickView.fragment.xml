@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-	<QuickView navigate=".onNavigate">
+	<QuickView navigate=".onNavigate" afterOpen=".onAfterOpenQuickView">
 		<QuickViewPage pageId="{AppModel>/employeeInformation/pageId}" header="User Profile of {AppModel>/loggedInUserStfNumber}"
 			title="{AppModel>/employeeInformation/FULL_NM} ({AppModel>/loggedInUserSfStfNumber})" titleUrl=""
 			description="{AppModel>/employeeInformation/WORK_TITLE}" groups="{ path: 'AppModel>/employeeInformation/groups', templateShareable: true }">

@@ -513,6 +513,15 @@ sap.ui.define([
 			Utility._handleOpenPopOver(oEvent, this, this._pQuickView, fragName, fragId);
 		},
 
+		onAfterOpenQuickView: function (oEvent) {
+			// the popover focuses its first focusable element (the email link) on open - move the
+			// focus to the popover itself so no field is highlighted while Esc still closes it
+			var oDomRef = oEvent.getSource().getDomRef();
+			if (oDomRef) {
+				oDomRef.focus();
+			}
+		},
+
 		handleQuickViewBtnPress: function (oEvent) {
 			// The IconTabBar sits inside this ObjectHeader's headerContainer, so tapping a tab icon
 			// also opened the profile quick view.
