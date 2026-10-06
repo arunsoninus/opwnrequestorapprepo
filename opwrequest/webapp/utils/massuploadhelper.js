@@ -230,7 +230,6 @@ sap.ui.define([
 				template: new sap.m.MessageItem({
 					title: "{AppModel>field}",
 					subtitle: "{AppModel>message}",
-					description: "{AppModel>message}",
 					type: key === "E" ? "Error" : "Warning"
 				}),
 				path: "AppModel>" + sPath + arrayPath
