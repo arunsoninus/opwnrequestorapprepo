@@ -296,8 +296,7 @@ sap.ui.define([
 					}, {
 						"label": "Email",
 						"value": "",
-						"emailSubject": "Subject",
-						"elementType": "email"
+						"emailSubject": "Subject"
 					}, {
 						"label": "Employee Category",
 						"value": ""
