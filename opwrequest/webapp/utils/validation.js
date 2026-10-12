@@ -13,6 +13,43 @@ sap.ui.define([
 			/**
 			 * On Enter Duration
 			 */
+			/**
+			 * Check that a date falls within the allowed (realistic) date range
+			 */
+			isDateWithinValidRange: function (component, oDate) {
+				var minDate = component.AppModel.getProperty("/minValidDate");
+				var maxDate = component.AppModel.getProperty("/maxValidDate");
+				oDate = new Date(oDate);
+				return !isNaN(oDate) && !(minDate && oDate < minDate) && !(maxDate && oDate > maxDate);
+			},
+
+			/**
+			 * Validate that the Start / End Date entered is a realistic date, i.e. a parseable date within the
+			 * allowed date range (rejects a typo on the year such as 202, which is otherwise read as year 0202).
+			 * An invalid date is cleared and flagged on the field.
+			 */
+			validateDateRange: function (component, oEvent) {
+				var oSource = oEvent.getSource();
+				if (!oSource.isA("sap.m.DatePicker")) {
+					return "";
+				}
+				var oDate = oSource.getDateValue();
+				var isInvalid = oEvent.getParameter("valid") === false || (!!oDate && !this.isDateWithinValidRange(component, oDate));
+				if (!isInvalid) {
+					oSource.setValueState(ValueState.None);
+					return "";
+				}
+				var message = component.getI18n("CwsRequest.Validation.InvalidDate");
+				var oBinding = oSource.getBinding("dateValue");
+				oSource.setValue("");
+				if (oBinding) {
+					component.AppModel.setProperty(oBinding.getPath(), null);
+				}
+				oSource.setValueState(ValueState.Error);
+				oSource.setValueStateText(message);
+				return message;
+			},
+
 			validateDatesNDuration: function (component, sBasePath) {
 				sBasePath = sBasePath || "/cwsRequest/createCWSRequest";
 				var startDate = component.AppModel.getProperty(sBasePath + "/START_DATE");

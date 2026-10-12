@@ -595,6 +595,11 @@ sap.ui.define([
 
 		onChangeNewRequestParams: function (oEvent, key) {
 			this.closeMessageStrip("opwnRequestDialogMStripId", "NewRequestTypeSelectionDialog");
+			var dateValidationMsg = Validation.validateDateRange(this, oEvent);
+			if (dateValidationMsg) {
+				this.showMessageStrip("opwnRequestDialogMStripId", dateValidationMsg, "E", "NewRequestTypeSelectionDialog");
+				return;
+			}
 			var oNumber = oEvent.getSource().getValue();
 			if (key === "DR") {
 				if (oNumber) {

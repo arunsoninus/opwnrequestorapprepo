@@ -4,6 +4,8 @@ sap.ui.define([
 	"use strict";
 
 	var oAppConstant = {
+		"minValidDate": new Date(2000, 0, 1),
+		"maxValidDate": new Date(2099, 11, 31),
 		"attachmentList": [],
 		"showSearchField": false,
 		"rejectionRemarks": "",

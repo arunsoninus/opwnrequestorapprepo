@@ -1607,6 +1607,20 @@ sap.ui.define([
 		onChangeDatesNDuration: function (oEvent, key) {
 			this.lastSuccessRun = new Date();
 			this.adminFeeRecalcRequired = true;
+			var dateValidationMsg = Validation.validateDateRange(this, oEvent);
+			if (dateValidationMsg) {
+				this.closeMessagePopOver();
+				this.showMessagePopOver({
+					"type": "Error",
+					"sTitle": "Date Validation",
+					"message": dateValidationMsg
+				});
+				// the date is cleared, so clear the year-wise duration split and the payments derived from it as well
+				this.populateDurationList();
+				this.populatePaymentYearList();
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/paymentList", []);
+				return;
+			}
 			if (key === "DR") {
 				var oNumber = 0,
 					oValue = oEvent.getSource().getValue();
@@ -1767,7 +1781,8 @@ sap.ui.define([
 			var sDate = (startDate) ? oDateFormat.format(new Date(startDate)) : "";
 			var eDate = (endDate) ? oDateFormat.format(new Date(endDate)) : "";
 
-			if (sDate && eDate) {
+			// no year-wise split for unrealistic dates (e.g. a typo on the year), else it lists a row for every year in between
+			if (sDate && eDate && Validation.isDateWithinValidRange(this, startDate) && Validation.isDateWithinValidRange(this, endDate)) {
 				sDate = new Date(sDate);
 				eDate = new Date(eDate);
 				var year = sDate.getFullYear();

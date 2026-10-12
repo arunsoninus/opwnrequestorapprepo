@@ -34,11 +34,11 @@
 							visible="{=(${AppModel>/isDepartmentAdmin} &amp;&amp; ${AppModel>/cwsRequest/newRequest/SingleSubRadioSelected}) === true ? true : false}"></Input>
 						<Label text="Start Date" required="true" visible="{= ${AppModel>/cwsRequest/newRequest/massUploadRadioSelected} === true ? false: true}"/>
 						<DatePicker placeholder="DD MMM YYYY" dateValue="{AppModel>/cwsRequest/newRequest/START_DATE}" valueFormat="yyyy-MM-dd"
-							displayFormat="dd MMM, yyyy" change="onChangeNewRequestParams"
+							displayFormat="dd MMM, yyyy" minDate="{AppModel>/minValidDate}" maxDate="{AppModel>/maxValidDate}" change="onChangeNewRequestParams"
 							visible="{= ${AppModel>/cwsRequest/newRequest/massUploadRadioSelected} === true ? false: true}"/>
 						<Label text="End Date" required="true" visible="{= ${AppModel>/cwsRequest/newRequest/massUploadRadioSelected} === true ? false: true}"/>
 						<DatePicker placeholder="DD MMM YYYY" dateValue="{AppModel>/cwsRequest/newRequest/END_DATE}" valueFormat="yyyy-MM-dd"
-							displayFormat="dd MMM, yyyy" change="onChangeNewRequestParams"
+							displayFormat="dd MMM, yyyy" minDate="{AppModel>/minValidDate}" maxDate="{AppModel>/maxValidDate}" change="onChangeNewRequestParams"
 							visible="{= ${AppModel>/cwsRequest/newRequest/massUploadRadioSelected} === true ? false: true}"></DatePicker>
 						<Label text="Actual days of OPWN" required="true" visible="{= ${AppModel>/cwsRequest/newRequest/massUploadRadioSelected} === true ? false: true}"/>
 						<VBox>

@@ -25,11 +25,13 @@
 					<core:Title text="Dates Selection"/>
 					<Label text="Start Date" required="true"/>
 					<DatePicker enabled="{AppModel>/PaidStartDate}" dateValue="{AppModel>/cwsRequest/createCWSRequest/START_DATE}"
-						placeholder="Select Start Date.." valueFormat="yyyy-MM-dd" displayFormat="dd MMM, yyyy" change="onChangeDatesNDuration"
+						placeholder="Select Start Date.." valueFormat="yyyy-MM-dd" displayFormat="dd MMM, yyyy" minDate="{AppModel>/minValidDate}"
+						maxDate="{AppModel>/maxValidDate}" change="onChangeDatesNDuration"
 						editable="{AppModel>/isFormEditable}" valueState="{AppModel>/cwsRequest/validationRequest/startDateVState}"/>
 					<Label text="End Date" required="true"/>
 					<DatePicker dateValue="{AppModel>/cwsRequest/createCWSRequest/END_DATE}" placeholder="Select End Date.." valueFormat="yyyy-MM-dd"
-						displayFormat="dd MMM, yyyy" change="onChangeDatesNDuration" editable="{AppModel>/isFormEditable}"
+						displayFormat="dd MMM, yyyy" minDate="{AppModel>/minValidDate}" maxDate="{AppModel>/maxValidDate}" change="onChangeDatesNDuration"
+						editable="{AppModel>/isFormEditable}"
 						valueState="{AppModel>/cwsRequest/validationRequest/endDateVState}"/>
 					<Label text="Actual days of {AppModel>/cwsRequest/createCWSRequest/REQUEST_TYPE}" required="true"/>
 					<VBox>
