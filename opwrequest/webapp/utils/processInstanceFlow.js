@@ -65,9 +65,9 @@ sap.ui.define([
 							var oDateFormat = sap.ui.core.format.DateFormat.getInstance({
 								pattern: "d MMM, yyyy HH:mm"
 							});
-							var utcDate = new Date(taskHistoryList[t].TASK_ACTUAL_DOC);
-							var sgtDate = new Date(utcDate.getTime() + 8 * 60 * 60 * 1000);
-							var taskActualCompletionDate = oDateFormat.format(sgtDate);
+							// TASK_ACTUAL_DOC is an explicit UTC ISO string; the formatter renders it in the browser's
+							// local zone, so no manual +8h shift (that double-shifted it once utility emitted "Z").
+							var taskActualCompletionDate = oDateFormat.format(new Date(taskHistoryList[t].TASK_ACTUAL_DOC));
 							objNodes.nodeText = objNodes.COMPLETED_BY_FULL_NAME + "(" + taskActualCompletionDate + ")";
 							objNodes.taskActualCompletionFormatted = taskActualCompletionDate;
 						} else {
