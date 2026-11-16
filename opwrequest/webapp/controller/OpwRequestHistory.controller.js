@@ -1646,28 +1646,33 @@ sap.ui.define([
 		},
 		initiateProcessInstanceRendering: async function (oEvent) {
 			this.showBusyIndicator();
-			var sPath = oEvent.getSource().getBindingContext("OpwnSrvModel").getPath();
-			var selectedReq = this.getComponentModel("OpwnSrvModel").getProperty(sPath);
-			if (!this._oProcessInstanceNode) {
-				// this._oProcessInstanceNode = sap.ui.xmlfragment(this.createId("fragProcessInstanceNodeTest"),
-				// 	"nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow", component);
+			try {
+				var sPath = oEvent.getSource().getBindingContext("OpwnSrvModel").getPath();
+				var selectedReq = this.getComponentModel("OpwnSrvModel").getProperty(sPath);
+				if (!this._oProcessInstanceNode) {
+					// this._oProcessInstanceNode = sap.ui.xmlfragment(this.createId("fragProcessInstanceNodeTest"),
+					// 	"nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow", component);
 
-				this._oProcessInstanceNode = await Fragment.load({
-					id: this.createId("fragProcessInstanceNodeTest"),
-					name: "nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow",
-					controller: this
-				});
-				this.getView().addDependent(this._oProcessInstanceNode);
-				// sap.ui.core.Fragment.byId(component.createId("fragExistingPromotion"), "tblExistingPromotion").setModel(
-				// 	"ExistingPromotionModel");
-				this._oProcessInstanceNode.setEscapeHandler(function () {
-					return;
-				});
+					this._oProcessInstanceNode = await Fragment.load({
+						id: this.createId("fragProcessInstanceNodeTest"),
+						name: "nus.edu.sg.opwrequest.view.fragments.TaskApprovalProcessFlow",
+						controller: this
+					});
+					this.getView().addDependent(this._oProcessInstanceNode);
+					// sap.ui.core.Fragment.byId(component.createId("fragExistingPromotion"), "tblExistingPromotion").setModel(
+					// 	"ExistingPromotionModel");
+					this._oProcessInstanceNode.setEscapeHandler(function () {
+						return;
+					});
+				}
+				//component.leaveDetails();
+				this.AppModel.setProperty("/processFlowRequestID", selectedReq.REQUEST_ID);
+				// await this._fnFrameProcessData(component,selectedReq);
+				await ProcessInstanceFlow._fnFrameProcessData(this, selectedReq);
+			} finally {
+				// Always clear the busy indicator, even when the tracker call fails or returns nothing.
+				this.hideBusyIndicator();
 			}
-			//component.leaveDetails();
-			this.AppModel.setProperty("/processFlowRequestID", selectedReq.REQUEST_ID);
-			// await this._fnFrameProcessData(component,selectedReq);
-			await ProcessInstanceFlow._fnFrameProcessData(this, selectedReq);
 		},
 
 		onPressCloseProcessNode: function () {
@@ -1764,7 +1769,10 @@ sap.ui.define([
 
 			this.AppModel.setProperty("/claimRequest/draftId", selectedReq.REQ_UNIQUE_ID);
 
+			this.showBusyIndicator();
 			Services.getAuditLogData(this, selectedReq, async function (auditResp) {
+				// Runs on success and on error, so hide first.
+				this.hideBusyIndicator();
 				if (auditResp && auditResp.auditLog) {
 					var aHeaderLogData = [],
 						aItemLogData = [], aAuditLogData = [],

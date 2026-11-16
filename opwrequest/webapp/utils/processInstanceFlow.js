@@ -27,6 +27,10 @@ sap.ui.define([
 			// component.showBusyIndicator();
 			component.AppModel.setProperty("/processFlowRequestID", selectedReq.REQUEST_ID);
 			await Services.fetchTaskProcessDetails(component, selectedReq, function (oResponse) {
+				// On a failed read the helper passes the error object here; skip rendering if there is no data.
+				if (!oResponse || !oResponse.changeHistoryMap) {
+					return;
+				}
 				var aSortedKeys = Object.keys(oResponse.changeHistoryMap).sort(
 					(a, b) => {
 						if (b[4] === "M" && a[4] === "M") {
