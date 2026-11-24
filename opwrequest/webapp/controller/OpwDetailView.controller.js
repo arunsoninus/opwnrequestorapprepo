@@ -1347,17 +1347,20 @@ sap.ui.define([
 
 						}.bind(this));
 						this.AppModel.setProperty("/isFdluEnabled", true);
-						if (requestData && requestData.ULU && requestData.FDLU) {
+						if (requestData && requestData.ULU && requestData.FDLU && requestData.ENG_ULU_T && requestData.ENG_FDLU_T) {
 							this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU", requestData.ULU);
-							this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", (requestData.ENG_ULU_T) ? requestData.ENG_ULU_T :
-								requestData.ULU);
+							this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", requestData.ENG_ULU_T);
 							this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU", requestData.FDLU);
-							this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", (requestData.ENG_FDLU_T) ? requestData.ENG_FDLU_T :
-								requestData.FDLU);
+							this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", requestData.ENG_FDLU_T);
 						} else {
-							// New request: default the engaging department from the logged-in Program Admin's
-							// primary assignment - only if that ULU/FDLU combination exists in the master data.
-							this._fnDefaultEngagingDeptFromLoggedInUser().then(this._editProgramManager.bind(this));
+							// New request, or a saved request whose ULU/FDLU has no description (e.g. the draft
+							// auto-saved for a new request before the default was checked): validate the
+							// combination against the master data before showing it.
+							var bSavedCodes = Boolean(requestData && requestData.ULU && requestData.FDLU);
+							this._fnDefaultEngagingDeptFromLoggedInUser(
+								bSavedCodes ? requestData.ULU : undefined,
+								bSavedCodes ? requestData.FDLU : undefined
+							).then(this._editProgramManager.bind(this));
 							return;
 						}
 
@@ -1391,9 +1394,9 @@ sap.ui.define([
 		 * error naming the codes is added to the message list.
 		 * @returns {Promise} resolved once the fields are set (never rejected)
 		 */
-		_fnDefaultEngagingDeptFromLoggedInUser: function () {
-			var sUluCode = this.AppModel.getProperty("/primaryAssigment/ULU_C") || "";
-			var sFdluCode = this.AppModel.getProperty("/primaryAssigment/FDLU_C") || "";
+		_fnDefaultEngagingDeptFromLoggedInUser: function (sRequestUlu, sRequestFdlu) {
+			var sUluCode = sRequestUlu || this.AppModel.getProperty("/primaryAssigment/ULU_C") || "";
+			var sFdluCode = sRequestFdlu || this.AppModel.getProperty("/primaryAssigment/FDLU_C") || "";
 			var fnSet = function (sUlu, sUluText, sFdlu, sFdluText) {
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU", sUlu);
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", sUluText);
@@ -1403,11 +1406,22 @@ sap.ui.define([
 			}.bind(this);
 			var fnReject = function () {
 				fnSet("", "", "", "");
-				var aMessages = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages") || [];
-				aMessages.push(Validation._formatMessageList("Error", this.getI18n("CwsRequest.UluFdlu.NotFound.Title"),
-					this.getI18n("CwsRequest.UluFdlu.NotFound", [sUluCode || "-", sFdluCode || "-"])));
-				this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aMessages);
-				this.onPressErrorMessages();
+				// Copy the list (a fresh array makes the bound popover/button refresh) and add the
+				// message only if it is not already there - a reload of the same draft re-runs this check.
+				var aMessages = (this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages") || []).slice();
+				var sTitle = this.getI18n("CwsRequest.UluFdlu.NotFound.Title");
+				var sMessage = this.getI18n("CwsRequest.UluFdlu.NotFound", [sUluCode || "-", sFdluCode || "-"]);
+				var bExists = aMessages.some(function (oMsg) {
+					return oMsg && oMsg.message === sMessage;
+				});
+				if (!bExists) {
+					aMessages.push(Validation._formatMessageList("Error", sTitle, sMessage));
+					this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aMessages);
+				}
+				// Open the list only when it actually holds messages; otherwise carry on as normal.
+				if (aMessages.length > 0) {
+					this.onPressErrorMessages();
+				}
 			}.bind(this);
 			// A description that is empty or just repeats the code is treated as "not maintained".
 			var fnHasText = function (sText, sCode) {
