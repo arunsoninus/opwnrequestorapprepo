@@ -1402,7 +1402,6 @@ sap.ui.define([
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", sUluText);
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU", sFdlu);
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", sFdluText);
-				this.AppModel.setProperty("/isFdluEnabled", Boolean(sUlu));
 			}.bind(this);
 			var fnReject = function () {
 				fnSet("", "", "", "");
@@ -1415,7 +1414,10 @@ sap.ui.define([
 					return oMsg && oMsg.message === sMessage;
 				});
 				if (!bExists) {
-					aMessages.push(Validation._formatMessageList("Error", sTitle, sMessage));
+					var oMessage = Validation._formatMessageList("Error", sTitle, sMessage);
+					// Tag it so selecting an engaging ULU/FDLU in the lookup can remove it again.
+					oMessage.msgKey = "ULU_FDLU_NOT_FOUND";
+					aMessages.push(oMessage);
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aMessages);
 				}
 				// Open the list only when it actually holds messages; otherwise carry on as normal.

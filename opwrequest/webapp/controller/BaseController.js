@@ -1027,6 +1027,21 @@ sap.ui.define([
 		},
 
 		/**
+		 * Drops the "ULU/FDLU combination does not exist" message once the user picks an engaging
+		 * ULU or FDLU from the lookup; any other messages in the list are kept.
+		 */
+		_fnClearUluFdluNotFoundMessage: function () {
+			var sPath = "/cwsRequest/createCWSRequest/singleRequestErrorMessages";
+			var aMessages = this.AppModel.getProperty(sPath) || [];
+			var aRemaining = aMessages.filter(function (oMsg) {
+				return !(oMsg && oMsg.msgKey === "ULU_FDLU_NOT_FOUND");
+			});
+			if (aRemaining.length !== aMessages.length) {
+				this.AppModel.setProperty(sPath, aRemaining);
+			}
+		},
+
+		/**
 		 * Set Values From Lookup
 		 */
 		setValuesFromLookup: function (bindingControl, bindingPath, selectedObj) {
@@ -1044,6 +1059,8 @@ sap.ui.define([
 					appModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", selectedObj.ULU_T);
 					appModel.setProperty("/cwsRequest/createCWSRequest/FDLU", "");
 					appModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", "");
+					appModel.setProperty("/isFdluEnabled", true);
+					this._fnClearUluFdluNotFoundMessage();
 					// Begin of change - Change Program Manager when ULU changed
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR", []);
 					this._bindItemProgramManager();
@@ -1052,6 +1069,7 @@ sap.ui.define([
 				case "/cwsRequest/createCWSRequest/FDLU_T":
 					appModel.setProperty("/cwsRequest/createCWSRequest/FDLU", selectedObj.FDLU_C);
 					appModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", selectedObj.FDLU_T);
+					this._fnClearUluFdluNotFoundMessage();
 					// Begin of change - Change Program Manager when FDLU changed
 					this.AppModel.setProperty("/cwsRequest/createCWSRequest/SELECTED_PROGRAM_MGR", []);
 					this._bindItemProgramManager();
