@@ -270,6 +270,12 @@ sap.ui.define([
 				// "NOOFMONTHS": parseInt(this.AppModel.getProperty("/Month")),
 				"STAFF_ID": this.AppModel.getProperty(sBasePath + "/STAFF_ID")
 			};
+			// Opened from Run Report: compute the list in report mode, as the backend's Run Report sync
+			// does - skips the "End Date more than N months ago" restriction (read-only view) and adds the
+			// WBS/allotment amendment history to paid months.
+			if (this.bAccessReport) {
+				paymentListObj.accessReport = true;
+			}
 
 			Services.getPaymentList(this, paymentListObj, function (paymentData) {
 				this._fnpopulatePayments(paymentData, key);

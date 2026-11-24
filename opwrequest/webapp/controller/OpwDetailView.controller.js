@@ -119,6 +119,7 @@ sap.ui.define([
 			}
 			this._fnInitializeAppModel();
 			this.viaRequestorForm = true;
+			this.bAccessReport = false;
 			this.adminFeeRecalcRequired = false;
 			this.firstTimeUnlockRequest = false;
 			this.unLockstop = true;
@@ -154,6 +155,8 @@ sap.ui.define([
 		_onRunReportMatched: function (oEvent) {
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
 			this.viaClaimReport = true;
+			// Opened from Run Report: payment list is computed in report mode (see fnPaymentAmount).
+			this.bAccessReport = true;
 			this._fnInitializeAppModel();
 			Utility._fnAppModelSetProperty(this, "/cwsRequest/createCWSRequest", []); // Clear cwrequest model
 		},
@@ -161,6 +164,7 @@ sap.ui.define([
 		_onOfnReportMatched: function (oEvent) {
 			this._project = oEvent.getParameter("arguments").project || this._project || "0";
 			this.viaClaimofn = true;
+			this.bAccessReport = false;
 			this._fnInitializeAppModel();
 			Utility._fnAppModelSetProperty(this, "/cwsRequest/createCWSRequest", []);
 		},
@@ -671,6 +675,7 @@ sap.ui.define([
 			this.taskId = oEvent.getParameter("arguments").taskId;
 			this.taskName = oEvent.getParameter("arguments").taskName;
 			this.viaInbox = true;
+			this.bAccessReport = false;
 			this._fnInitializeAppModel();
 			this.firstTimeUnlockRequest = false;
 			this.unLockstop = true;
