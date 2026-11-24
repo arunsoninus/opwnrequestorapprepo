@@ -158,10 +158,34 @@ sap.ui.define([
 				});
 
 				component.AppModel.setProperty("/oFlowProcess", oFlowProcess);
-				component._oProcessInstanceNode.open();
+				var oDialog = component._oProcessInstanceNode;
+				// Re-pin once the open animation is done, in case the flow was not rendered yet at open().
+				oDialog.attachEventOnce("afterOpen", function () {
+					processInstanceFlow._pinZoomLevel(oDialog);
+				});
+				oDialog.open();
+				processInstanceFlow._pinZoomLevel(oDialog);
 				component.hideBusyIndicator();
 			}.bind(component));
 
+		},
+		/**
+		 * ProcessFlow picks its zoom level from its own rendered width (<600px => Four, 600-1023px => Three).
+		 * Inside an auto-width dialog that means tiny Level-Four nodes whose 2.25rem content area clips the
+		 * approver name and timestamp, and a node size that changes with the number of lanes. Pin it to
+		 * Level Two so every node/lane has the same fixed size and the custom content fits.
+		 */
+		_pinZoomLevel: function (oDialog) {
+			if (!oDialog) {
+				return;
+			}
+			oDialog.findAggregatedObjects(true, function (oControl) {
+				return oControl.isA("sap.suite.ui.commons.ProcessFlow");
+			}).forEach(function (oProcessFlow) {
+				if (oProcessFlow.getZoomLevel() !== "Two") {
+					oProcessFlow.setZoomLevel("Two");
+				}
+			});
 		},
 		_onPressCloseProcessNode: function (component) {
 			component._oProcessInstanceNode.close();

@@ -94,12 +94,37 @@
     font-size: 0.875rem;
 }
 
+/* Process tracker node content (zoom level pinned to Two: 9rem node, ~10rem content area). */
+.processFlowNodeContent {
+    align-items: center;
+    text-align: center;
+}
 .processFlowNodeText {
-    font-size: 0.5rem !important
+    font-size: 0.75rem !important;
+    line-height: 1rem;
+}
+.processFlowNodeName {
+    font-weight: bold;
+}
+.processFlowNodeTimestamp {
+    margin-top: 0.125rem;
+    white-space: nowrap;
 }
 .processFlowNodeDelegationText {
-    font-size: 0.6rem !important;
+    font-size: 0.6875rem !important;
     font-weight: bold;
+    margin-top: 0.125rem;
+}
+/* Photo fills whatever height the text lines leave in the fixed node, up to 7rem. */
+.processFlowNodeImage {
+    flex: 1 1 auto;
+    min-height: 4rem;
+    max-height: 7rem;
+    max-width: 100%;
+    width: auto;
+    object-fit: contain;
+    margin-top: 0.375rem;
+    border-radius: 0.25rem;
 }
 
 .equalColumns .columns {
