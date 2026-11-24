@@ -1355,10 +1355,10 @@ sap.ui.define([
 							this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", (requestData.ENG_FDLU_T) ? requestData.ENG_FDLU_T :
 								requestData.FDLU);
 						} else {
-							this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU", this.AppModel.getProperty("/primaryAssigment/ULU_C"));
-							this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", this.AppModel.getProperty("/primaryAssigment/ULU_T"));
-							this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU", this.AppModel.getProperty("/primaryAssigment/FDLU_C"));
-							this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", this.AppModel.getProperty("/primaryAssigment/FDLU_T"));
+							// New request: default the engaging department from the logged-in Program Admin's
+							// primary assignment - only if that ULU/FDLU combination exists in the master data.
+							this._fnDefaultEngagingDeptFromLoggedInUser().then(this._editProgramManager.bind(this));
+							return;
 						}
 
 					} else {
@@ -1381,6 +1381,67 @@ sap.ui.define([
 				}.bind(this)
 			});
 
+		},
+
+		/**
+		 * Defaults the engaging ULU/FDLU of a new request to the logged-in Program Admin's primary
+		 * assignment. The combination is first checked against the ULU/FDLU master data (the same list
+		 * the value help offers). If it is not there, or has no ULU/FDLU description (e.g. UAT job data
+		 * carrying the code in the text field), both fields are left blank for the user to pick and an
+		 * error naming the codes is added to the message list.
+		 * @returns {Promise} resolved once the fields are set (never rejected)
+		 */
+		_fnDefaultEngagingDeptFromLoggedInUser: function () {
+			var sUluCode = this.AppModel.getProperty("/primaryAssigment/ULU_C") || "";
+			var sFdluCode = this.AppModel.getProperty("/primaryAssigment/FDLU_C") || "";
+			var fnSet = function (sUlu, sUluText, sFdlu, sFdluText) {
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU", sUlu);
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/ULU_T", sUluText);
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU", sFdlu);
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/FDLU_T", sFdluText);
+				this.AppModel.setProperty("/isFdluEnabled", Boolean(sUlu));
+			}.bind(this);
+			var fnReject = function () {
+				fnSet("", "", "", "");
+				var aMessages = this.AppModel.getProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages") || [];
+				aMessages.push(Validation._formatMessageList("Error", this.getI18n("CwsRequest.UluFdlu.NotFound.Title"),
+					this.getI18n("CwsRequest.UluFdlu.NotFound", [sUluCode || "-", sFdluCode || "-"])));
+				this.AppModel.setProperty("/cwsRequest/createCWSRequest/singleRequestErrorMessages", aMessages);
+				this.onPressErrorMessages();
+			}.bind(this);
+			// A description that is empty or just repeats the code is treated as "not maintained".
+			var fnHasText = function (sText, sCode) {
+				return Boolean(sText) && String(sText).trim() !== "" && String(sText).trim() !== String(sCode).trim();
+			};
+
+			return new Promise(function (resolve) {
+				if (!sUluCode || !sFdluCode) {
+					fnReject();
+					resolve();
+					return;
+				}
+				this.getComponentModel("CatalogSrvModel").read(Config.dbOperations.uluFdluDetails, {
+					filters: [new Filter({
+						filters: [new Filter("ULU_C", FilterOperator.EQ, sUluCode), new Filter("FDLU_C", FilterOperator.EQ, sFdluCode)],
+						and: true
+					})],
+					success: function (oData) {
+						var oMatch = (oData && oData.results || []).find(function (oRow) {
+							return fnHasText(oRow.ULU_T, oRow.ULU_C) && fnHasText(oRow.FDLU_T, oRow.FDLU_C);
+						});
+						if (oMatch) {
+							fnSet(oMatch.ULU_C, oMatch.ULU_T, oMatch.FDLU_C, oMatch.FDLU_T);
+						} else {
+							fnReject();
+						}
+						resolve();
+					},
+					error: function () {
+						fnReject();
+						resolve();
+					}
+				});
+			}.bind(this));
 		},
 
 		_fnFetchLoginUserDetail: function (nusNetId) {
