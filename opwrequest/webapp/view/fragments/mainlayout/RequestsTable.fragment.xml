@@ -36,10 +36,10 @@
 			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" width="7.5em">
 				<Label design="Bold" text="End Date"/>
 			</Column>
-			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" width="15em">
+			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
 				<Label design="Bold" text="Program Name" wrapping="true"/>
 			</Column>
-			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" width="9em">
 				<Label design="Bold" text="Amount Payable to Staff" wrapping="true"/>
 			</Column>
 			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" width="12em">

@@ -234,18 +234,34 @@ sap.ui.define([
 			}
 
 			aFilter.push(new sap.ui.model.Filter(andFilter, true));
+			// Several refreshes can be in flight at once (e.g. on open: one for the current request
+			// only, then one for every version once the request history arrives). Only the latest
+			// call may update the list, otherwise a slower earlier response hides the attachments
+			// of the original request / previous change requests. A superseded call's promise
+			// settles with the latest one, so callers that await it (Edit snapshots) still see
+			// the final list.
+			this._iAttachmentLoadSeq = (this._iAttachmentLoadSeq || 0) + 1;
+			var iLoadSeq = this._iAttachmentLoadSeq;
+			var fnIsStale = function () {
+				return iLoadSeq !== this._iAttachmentLoadSeq;
+			}.bind(this);
 			if (this.AppModel.getProperty("/oCopyMode") === "Copied") {
 				this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList/results", []);
-				return Promise.resolve();
+				this._pAttachmentLoad = Promise.resolve();
+				return this._pAttachmentLoad;
 			}
 			// Returns a Promise so callers that need the attachment list to be authoritative
 			// before proceeding (e.g. onPressEdit/onPressEditApproved snapshotting the pre-edit
 			// attachment list for the Cancel diff) can await this fetch instead of racing it -
 			// this read is async and previously nothing waited on it.
-			return new Promise(function (resolve) {
+			this._pAttachmentLoad = new Promise(function (resolve) {
 				catalogSrvModel.read(Config.dbOperations.attachmentsView, {
 					filters: aFilter,
 					success: function (oData) {
+						if (fnIsStale()) {
+							resolve(this._pAttachmentLoad); // settle with the newer refresh instead
+							return;
+						}
 						if (oData.results.length) {
 							this.AppModel.setProperty("/oSyncAttach", false);
 							this.AppModel.setProperty("/cwsRequest/createCWSRequest/attachmentList", oData);
@@ -258,10 +274,11 @@ sap.ui.define([
 						resolve();
 					}.bind(this),
 					error: function (oError) {
-						resolve();
-					}
+						resolve(fnIsStale() ? this._pAttachmentLoad : undefined);
+					}.bind(this)
 				});
 			}.bind(this));
+			return this._pAttachmentLoad;
 		},
 
 		// Begin of change - CCEV3364
