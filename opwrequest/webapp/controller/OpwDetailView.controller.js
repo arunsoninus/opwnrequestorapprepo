@@ -1014,9 +1014,11 @@ sap.ui.define([
 				requestData.REQUEST_ID, this.AppModel.getProperty("/userRole"), requestData.PROCESS_CODE, function (taskAgentData) {
 					var bTaskAgentFlag = (taskAgentData.length) ? taskAgentData[0].isMatchingStaff : false;
 					var bMessage = (taskAgentData.length) ? taskAgentData[0].message : '';
-					if (bTaskAgentFlag) {
+					// The task is already completed: the "task has already been completed" banner
+					// is enough, so the "already part of the workflow" pop-up is not shown.
+					if (bTaskAgentFlag && !this.AppModel.getProperty("/showCompleteMessage")) {
 						Utility.handleVisibilityForTaskAgent(this, false);
-						MessageBox.error(bMessage)
+						MessageBox.error(bMessage);
 					}
 					// return {
 					// 	bTaskAgentFlag: bTaskAgentFlag,
