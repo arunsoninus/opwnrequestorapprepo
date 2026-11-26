@@ -30,13 +30,13 @@
 			<Column hAlign="Left" minScreenWidth="Tablet" demandPopin="true" width="8.5em" visible="{AppModel>/isDepartmentAdmin}">
 				<Label design="Bold" text="{i18n>CwsRequest.RequestTable.RequestedFor}"/>
 			</Column>
-			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" width="7.5em">
 				<Label design="Bold" text="Start Date"/>
 			</Column>
-			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" width="7.5em">
 				<Label design="Bold" text="End Date"/>
 			</Column>
-			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
+			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline" width="15em">
 				<Label design="Bold" text="Program Name" wrapping="true"/>
 			</Column>
 			<Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" popinDisplay="Inline">
